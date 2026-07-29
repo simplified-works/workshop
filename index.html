@@ -12,53 +12,78 @@
     padding: 40px 24px 80px;
     min-height: 100vh;
     background: linear-gradient(160deg, #eef2ff 0%, #fdf2f8 100%);
+    color: #111;
   }
   h1 {
     font-size: 42px;
-    margin: 0 0 8px;
+    margin: 0 0 32px;
     color: #1e1b4b;
   }
-  p.untertitel {
-    font-size: 20px;
-    color: #6b7280;
-    margin: 0 0 36px;
-  }
-  a.kachel {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    font-size: 32px;
-    font-weight: 700;
+  .kachel {
+    display: block;
     text-decoration: none;
     color: #fff;
     border-radius: 24px;
-    padding: 28px 24px;
+    padding: 26px 24px;
     margin-bottom: 20px;
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
     transition: transform 0.1s ease;
   }
-  a.kachel:active {
-    transform: scale(0.97);
-  }
-  a.kachel .emoji {
-    font-size: 44px;
-    background: rgba(255, 255, 255, 0.25);
-    border-radius: 16px;
-    width: 68px;
-    height: 68px;
+  .kachel:active { transform: scale(0.97); }
+  .kachel .titel {
     display: flex;
     align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+    gap: 16px;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: 0.03em;
   }
-  a.kachel .pfeil {
-    margin-left: auto;
-    font-size: 28px;
-    opacity: 0.7;
+  .kachel .untertitel {
+    font-size: 17px;
+    opacity: 0.9;
+    margin-top: 6px;
   }
-  .mila  { background: linear-gradient(135deg, #ec4899, #f97316); }
-  .levi  { background: linear-gradient(135deg, #3b82f6, #06b6d4); }
-  .henry { background: linear-gradient(135deg, #22c55e, #84cc16); }
+  .werkstatt { background: linear-gradient(135deg, #f59e0b, #ef4444); }
+  .slides    { background: linear-gradient(135deg, #2563eb, #7c3aed); }
+  .karten    { background: linear-gradient(135deg, #0891b2, #2563eb); }
+  .notizbuch { background: linear-gradient(135deg, #16a34a, #0d9488); }
+
+  .kinder {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .kinder a {
+    flex: 1;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.22);
+    color: #fff;
+    text-decoration: none;
+    font-size: 22px;
+    font-weight: 700;
+    border-radius: 14px;
+    padding: 16px 8px;
+    min-height: 48px;
+  }
+  .kinder a:active { background: rgba(255, 255, 255, 0.35); }
+
+  .plakate {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    margin-top: 36px;
+  }
+  .plakat {
+    background: #fff;
+    border-radius: 16px;
+    padding: 18px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #333;
+    white-space: pre-line;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
   .version {
     position: fixed;
     bottom: 12px;
@@ -70,18 +95,43 @@
 </head>
 <body>
   <h1>Workshop 🛠️</h1>
-  <p class="untertitel">Tipp auf deinen Namen und leg los!</p>
 
-  <a class="kachel mila" href="mila/">
-    <span class="emoji">🦄</span> Mila <span class="pfeil">›</span>
-  </a>
-  <a class="kachel levi" href="levi/">
-    <span class="emoji">🚀</span> Levi <span class="pfeil">›</span>
-  </a>
-  <a class="kachel henry" href="henry/">
-    <span class="emoji">🐉</span> Henry <span class="pfeil">›</span>
+  <div class="kachel werkstatt">
+    <div class="titel">🔨 WERKSTATT</div>
+    <div class="untertitel">Hier entstehen die Apps</div>
+    <div class="kinder">
+      <a href="mila/">Mila</a>
+      <a href="levi/">Levi</a>
+      <a href="henry/">Henry</a>
+    </div>
+  </div>
+
+  <a class="kachel slides" href="slides/">
+    <div class="titel">📽️ SLIDES</div>
+    <div class="untertitel">Die Präsentation für alle 5 Tage</div>
   </a>
 
-  <div class="version">v2 · 08:53</div>
+  <a class="kachel karten" href="karten/">
+    <div class="titel">🃏 KARTEN</div>
+    <div class="untertitel">Aufträge und Prompts zum Nachschlagen</div>
+  </a>
+
+  <a class="kachel notizbuch" href="notizbuch/">
+    <div class="titel">📓 NOTIZBUCH</div>
+    <div class="untertitel">Dein Logbuch — bleibt auf deinem Gerät</div>
+  </a>
+
+  <div class="plakate">
+    <div class="plakat">ERST DAS PROBLEM.
+DANN DIE LÖSUNG.
+NIE ANDERSRUM.</div>
+    <div class="plakat">Wer es nicht erklären kann,
+kann es nicht bauen lassen.</div>
+    <div class="plakat">Ich mag …
+Ich wünschte …
+Was wäre, wenn …</div>
+  </div>
+
+  <div class="version">v3 · 09:10</div>
 </body>
 </html>

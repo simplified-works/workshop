@@ -14,6 +14,18 @@ Sprache und ohne Fachbegriffe, wenn du nicht danach gefragt wirst.
 - Keine echten Namen, Adressen, Telefonnummern oder Fotos.
   Das Repository ist öffentlich.
 
+## Bereiche
+
+- mila/, levi/, henry/ — die Projekte der Kinder. Hier wird gebaut.
+- slides/ — die Präsentation für alle 5 Tage. Taste P zeigt Presenter-Notizen, F Vollbild.
+- karten/ — die Auftrags- und Prompt-Karten, auch druckbar.
+- notizbuch/ — das digitale Logbuch der Kinder. Speichert nur im Browser (localStorage), nichts davon liegt auf GitHub.
+- inhalt/workshop-inhalt.md — die Quelldatei aller Workshop-Inhalte.
+
+Änderungen an slides/, karten/ oder notizbuch/ müssen inhaltlich aus
+inhalt/workshop-inhalt.md kommen. Erst dort ändern, dann übernehmen.
+Keine Inhalte erfinden.
+
 ## Wenn jemand "Speicherpunkt" sagt
 git add -A und commit mit einer kurzen Nachricht in einfacher Sprache.
 
