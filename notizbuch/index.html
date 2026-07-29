@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Notizbuch</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, sans-serif;
+    background: #fafafa; color: #111;
+    padding: 20px 16px 90px;
+    font-size: 19px;
+  }
+  button, input, textarea { font-family: inherit; font-size: 19px; }
+  textarea { resize: vertical; }
+
+  /* Wer bist du? */
+  #wahl {
+    position: fixed; inset: 0; z-index: 100; background: #fafafa;
+    display: flex; flex-direction: column; justify-content: center;
+    align-items: center; gap: 18px; padding: 24px;
+  }
+  #wahl h1 { font-size: 40px; margin-bottom: 16px; }
+  #wahl button {
+    width: min(420px, 100%); font-size: 30px; font-weight: 700;
+    color: #fff; border: none; border-radius: 18px;
+    padding: 24px; min-height: 64px; cursor: pointer;
+  }
+  #wahl .mila  { background: linear-gradient(135deg, #ec4899, #f97316); }
+  #wahl .levi  { background: linear-gradient(135deg, #3b82f6, #06b6d4); }
+  #wahl .henry { background: linear-gradient(135deg, #22c55e, #84cc16); }
+
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  header h1 { font-size: 30px; }
+  #wer {
+    border: 2px solid #ddd; background: #fff; border-radius: 14px;
+    padding: 10px 18px; min-height: 48px; font-weight: 700; cursor: pointer;
+  }
+  .hinweis {
+    font-size: 15px; color: #888; margin-bottom: 18px;
+  }
+
+  /* Reiter */
+  #reiter {
+    display: flex; gap: 8px; overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px; margin-bottom: 18px;
+  }
+  #reiter button {
+    flex-shrink: 0; border: none; border-radius: 14px;
+    background: #ececf0; padding: 12px 18px; min-height: 48px;
+    font-size: 17px; font-weight: 700; cursor: pointer; color: #444;
+  }
+  #reiter button.aktiv { background: #2563eb; color: #fff; }
+
+  section.bereich { display: none; }
+  section.bereich.aktiv { display: block; }
+  section.bereich h2 { font-size: 26px; margin-bottom: 6px; }
+  .erklaer { font-size: 16px; color: #777; margin-bottom: 16px; }
+
+  .kasten {
+    background: #fff; border-radius: 16px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+    padding: 16px; margin-bottom: 14px;
+  }
+  .kasten label { display: block; font-size: 15px; font-weight: 700; color: #666; margin: 10px 0 4px; }
+  .kasten label:first-child { margin-top: 0; }
+  .feld {
+    width: 100%; border: 1.5px solid #ddd; border-radius: 10px;
+    padding: 12px; min-height: 48px; background: #fff;
+  }
+  textarea.feld { min-height: 64px; }
+  .loeschen {
+    border: none; background: none; color: #c00; font-size: 16px;
+    padding: 10px 0 0; cursor: pointer; min-height: 44px;
+  }
+  .plus {
+    width: 100%; border: 2px dashed #bbb; background: none;
+    border-radius: 16px; padding: 16px; min-height: 56px;
+    font-size: 22px; font-weight: 700; color: #666; cursor: pointer;
+  }
+  .zaehler { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+
+  /* Feldtest: drei Spalten */
+  #feldtest-spalten { display: grid; gap: 14px; grid-template-columns: 1fr 1fr 1fr; }
+  @media (max-width: 700px) { #feldtest-spalten { grid-template-columns: 1fr; } }
+
+  /* Satz-Baukasten */
+  #satz-anzeige {
+    font-size: 22px; font-weight: 700; line-height: 1.4;
+    background: #eef2ff; border-radius: 12px; padding: 14px; margin-top: 12px;
+  }
+
+  .haken { display: flex; align-items: center; gap: 12px; font-size: 19px; font-weight: 600; }
+  .haken input { width: 28px; height: 28px; }
+
+  /* Fuss */
+  #aktionen { display: flex; gap: 12px; margin-top: 26px; flex-wrap: wrap; }
+  #aktionen button {
+    flex: 1; min-width: 200px; border: none; border-radius: 16px;
+    padding: 18px; min-height: 56px; font-size: 19px; font-weight: 700; cursor: pointer;
+  }
+  #export { background: #2563eb; color: #fff; }
+  #drucken { background: #ececf0; color: #333; }
+
+  #toast {
+    position: fixed; bottom: 44px; left: 50%; transform: translateX(-50%);
+    background: rgba(20,20,25,0.85); color: #fff; border-radius: 20px;
+    padding: 8px 20px; font-size: 15px; opacity: 0; transition: opacity 0.25s;
+    pointer-events: none; z-index: 90;
+  }
+  .version { position: fixed; bottom: 12px; right: 16px; font-size: 14px; color: #999; }
+
+  @media print {
+    body { background: #fff; padding: 0; font-size: 12pt; }
+    #wahl, #reiter, #aktionen, #toast, .version, .plus, .loeschen, #wer, .hinweis { display: none !important; }
+    section.bereich { display: block !important; page-break-inside: avoid; margin-bottom: 20pt; }
+    .kasten { box-shadow: none; border: 0.75pt solid #999; }
+  }
+</style>
+</head>
+<body>
+
+<div id="wahl">
+  <h1>Wer bist du?</h1>
+  <button class="mila" data-name="mila">Mila</button>
+  <button class="levi" data-name="levi">Levi</button>
+  <button class="henry" data-name="henry">Henry</button>
+</div>
+
+<header>
+  <h1>Notizbuch</h1>
+  <button id="wer"></button>
+</header>
+<p class="hinweis">Deine Notizen liegen nur auf diesem Gerät. Exportiere sie am Freitag.</p>
+
+<nav id="reiter">
+  <button data-b="aerger" class="aktiv">Ärger-Jagd</button>
+  <button data-b="parkplatz">Parkplatz</button>
+  <button data-b="interview">Interview</button>
+  <button data-b="pass">Problem-Pass</button>
+  <button data-b="feldtest">Feldtest</button>
+  <button data-b="tagebuch">Tagebuch</button>
+</nav>
+
+<section class="bereich aktiv" id="b-aerger">
+  <h2>Ärger-Jagd</h2>
+  <p class="erklaer">Sammle 10 Sachen, die echt nerven. Wer hat sich geärgert, und wann?</p>
+  <div class="zaehler" id="aerger-zaehler"></div>
+  <div id="aerger-liste"></div>
+  <button class="plus" id="aerger-plus">+ Neuer Ärger</button>
+</section>
+
+<section class="bereich" id="b-parkplatz">
+  <h2>Parkplatz</h2>
+  <p class="erklaer">Ideen sind hier nicht verboten — nur noch nicht dran. Am Dienstag holen wir sie zurück.</p>
+  <div id="parkplatz-liste"></div>
+  <button class="plus" id="parkplatz-plus">+ Neue Idee parken</button>
+</section>
+
+<section class="bereich" id="b-interview">
+  <h2>Interview</h2>
+  <p class="erklaer">Möglichst wörtlich aufschreiben, was die Person sagt.</p>
+  <div class="kasten">
+    <label>Ausgangsfrage</label>
+    <textarea class="feld" id="iv-frage"></textarea>
+  </div>
+  <div id="iv-warums"></div>
+</section>
+
+<section class="bereich" id="b-pass">
+  <h2>Problem-Pass</h2>
+  <div class="kasten">
+    <label>Satz-Baukasten</label>
+    <label>[NAME]</label><input class="feld" id="satz-name">
+    <label>braucht [WAS]</label><input class="feld" id="satz-was">
+    <label>weil [ÜBERRASCHUNG]</label><input class="feld" id="satz-weil">
+    <div id="satz-anzeige"></div>
+  </div>
+  <div class="kasten">
+    <label>1. WER hat das Problem? (echter Mensch, echter Name)</label>
+    <textarea class="feld" id="pass-wer"></textarea>
+    <label>2. WAS nervt genau? (wann? wo? wie oft?)</label>
+    <textarea class="feld" id="pass-was"></textarea>
+    <label>3. WOHER weiss ich das? Was hat die Person wörtlich gesagt?</label>
+    <textarea class="feld" id="pass-woher"></textarea>
+    <label>4. WORAN merke ich, dass es geklappt hat? (etwas, das man sehen kann)</label>
+    <textarea class="feld" id="pass-woran"></textarea>
+    <label>5. Das Kleinste, was schon hilft.</label>
+    <textarea class="feld" id="pass-kleinstes"></textarea>
+  </div>
+  <div class="kasten">
+    <div class="haken">
+      <input type="checkbox" id="pass-frei">
+      <span id="pass-frei-text">Von Papa freigegeben</span>
+    </div>
+  </div>
+</section>
+
+<section class="bereich" id="b-feldtest">
+  <h2>Feldtest</h2>
+  <p class="erklaer">Was hat die echte Person gesagt und gemacht?</p>
+  <div id="feldtest-spalten"></div>
+  <div class="kasten">
+    <label>Wo hat sie gezögert?</label>
+    <textarea class="feld" id="ft-gezoegert"></textarea>
+  </div>
+</section>
+
+<section class="bereich" id="b-tagebuch">
+  <h2>Tagebuch</h2>
+  <div id="tagebuch-tage"></div>
+</section>
+
+<div id="aktionen">
+  <button id="export">Alles exportieren</button>
+  <button id="drucken">Drucken</button>
+</div>
+
+<div id="toast">gespeichert</div>
+<div class="version">v1 · 09:10</div>
+
+<script>
+const NAMEN = ['mila', 'levi', 'henry'];
+const WOCHENTAGE = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'];
+const TB_FELDER = [
+  ['gemacht', 'Heute gemacht'],
+  ['herausgefunden', 'Herausgefunden'],
+  ['nervt', 'Was noch nervt'],
+  ['morgen', 'Morgen will ich']
+];
+const FT_LISTEN = [['mag', 'Ich mag'], ['wuenschte', 'Ich wünschte'], ['waswaere', 'Was wäre, wenn']];
+
+let name = localStorage.getItem('werkstatt-aktiv') || '';
+let daten = null;
+
+function leereDaten() {
+  return {
+    aerger: [],
+    parkplatz: [],
+    interview: { frage: '', antworten: ['', '', '', '', ''] },
+    pass: { satzName: '', satzWas: '', satzWeil: '', wer: '', was: '', woher: '',
+            woran: '', kleinstes: '', frei: false, freiDatum: '' },
+    feldtest: { mag: [], wuenschte: [], waswaere: [], gezoegert: '' },
+    tagebuch: WOCHENTAGE.map(() => ({ gemacht: '', herausgefunden: '', nervt: '', morgen: '' }))
+  };
+}
+
+function lade() {
+  let d = leereDaten();
+  try {
+    const roh = localStorage.getItem('werkstatt-' + name);
+    if (roh) d = Object.assign(d, JSON.parse(roh));
+  } catch (e) {}
+  return d;
+}
+
+let speicherTimer = null;
+function speichere() {
+  localStorage.setItem('werkstatt-' + name, JSON.stringify(daten));
+  clearTimeout(speicherTimer);
+  const t = document.getElementById('toast');
+  t.style.opacity = '1';
+  speicherTimer = setTimeout(() => { t.style.opacity = '0'; }, 900);
+}
+
+function gross(n) { return n.charAt(0).toUpperCase() + n.slice(1); }
+
+/* ---------- Wer bist du? ---------- */
+const wahl = document.getElementById('wahl');
+document.querySelectorAll('#wahl button').forEach(b => {
+  b.onclick = () => {
+    name = b.dataset.name;
+    localStorage.setItem('werkstatt-aktiv', name);
+    starte();
+  };
+});
+document.getElementById('wer').onclick = () => { wahl.style.display = 'flex'; };
+
+function starte() {
+  wahl.style.display = 'none';
+  document.getElementById('wer').textContent = gross(name);
+  daten = lade();
+  baueAlles();
+}
+
+/* ---------- Reiter ---------- */
+document.querySelectorAll('#reiter button').forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll('#reiter button').forEach(x => x.classList.remove('aktiv'));
+    document.querySelectorAll('section.bereich').forEach(x => x.classList.remove('aktiv'));
+    b.classList.add('aktiv');
+    document.getElementById('b-' + b.dataset.b).classList.add('aktiv');
+  };
+});
+
+/* ---------- Bausteine ---------- */
+function bindeFeld(el, holen, setzen) {
+  el.value = holen();
+  el.addEventListener('input', () => { setzen(el.value); speichere(); });
+}
+
+function baueAerger() {
+  const liste = document.getElementById('aerger-liste');
+  liste.innerHTML = '';
+  daten.aerger.forEach((e, i) => {
+    const k = document.createElement('div');
+    k.className = 'kasten';
+    k.innerHTML = '<label>Was nervt?</label><textarea class="feld"></textarea>' +
+      '<label>Wer ärgert sich?</label><input class="feld">' +
+      '<label>Wann?</label><input class="feld">' +
+      '<button class="loeschen">Eintrag löschen</button>';
+    const [was, wer, wann] = k.querySelectorAll('.feld');
+    bindeFeld(was, () => e.was || '', v => e.was = v);
+    bindeFeld(wer, () => e.wer || '', v => e.wer = v);
+    bindeFeld(wann, () => e.wann || '', v => e.wann = v);
+    k.querySelector('.loeschen').onclick = () => {
+      daten.aerger.splice(i, 1); speichere(); baueAerger();
+    };
+    liste.appendChild(k);
+  });
+  document.getElementById('aerger-zaehler').textContent = daten.aerger.length + ' von 10';
+}
+document.getElementById('aerger-plus').onclick = () => {
+  daten.aerger.push({ was: '', wer: '', wann: '' });
+  speichere(); baueAerger();
+};
+
+function baueParkplatz() {
+  const liste = document.getElementById('parkplatz-liste');
+  liste.innerHTML = '';
+  daten.parkplatz.forEach((e, i) => {
+    const k = document.createElement('div');
+    k.className = 'kasten';
+    k.innerHTML = '<textarea class="feld"></textarea><button class="loeschen">Löschen</button>';
+    bindeFeld(k.querySelector('.feld'), () => e.text || '', v => e.text = v);
+    k.querySelector('.loeschen').onclick = () => {
+      daten.parkplatz.splice(i, 1); speichere(); baueParkplatz();
+    };
+    liste.appendChild(k);
+  });
+}
+document.getElementById('parkplatz-plus').onclick = () => {
+  daten.parkplatz.push({ text: '' });
+  speichere(); baueParkplatz();
+};
+
+function baueInterview() {
+  bindeFeld(document.getElementById('iv-frage'),
+    () => daten.interview.frage, v => daten.interview.frage = v);
+  const wrap = document.getElementById('iv-warums');
+  wrap.innerHTML = '';
+  for (let i = 0; i < 5; i++) {
+    const k = document.createElement('div');
+    k.className = 'kasten';
+    k.innerHTML = '<label>' + (i + 1) + '. Warum?</label><textarea class="feld"></textarea>';
+    bindeFeld(k.querySelector('.feld'),
+      () => daten.interview.antworten[i] || '', v => daten.interview.antworten[i] = v);
+    wrap.appendChild(k);
+  }
+}
+
+function satzAnzeige() {
+  const p = daten.pass;
+  document.getElementById('satz-anzeige').textContent =
+    (p.satzName || '[NAME]') + ' braucht ' + (p.satzWas || '[WAS]') +
+    ', weil ' + (p.satzWeil || '[ÜBERRASCHUNG]') + '.';
+}
+
+function bauePass() {
+  const p = daten.pass;
+  [['satz-name', 'satzName'], ['satz-was', 'satzWas'], ['satz-weil', 'satzWeil'],
+   ['pass-wer', 'wer'], ['pass-was', 'was'], ['pass-woher', 'woher'],
+   ['pass-woran', 'woran'], ['pass-kleinstes', 'kleinstes']].forEach(([id, key]) => {
+    bindeFeld(document.getElementById(id), () => p[key] || '', v => {
+      p[key] = v;
+      if (id.startsWith('satz')) satzAnzeige();
+    });
+  });
+  satzAnzeige();
+  const frei = document.getElementById('pass-frei');
+  const freiText = document.getElementById('pass-frei-text');
+  function zeigeFrei() {
+    freiText.textContent = p.frei && p.freiDatum
+      ? 'Von Papa freigegeben am ' + p.freiDatum
+      : 'Von Papa freigegeben';
+  }
+  frei.checked = !!p.frei;
+  zeigeFrei();
+  frei.onchange = () => {
+    p.frei = frei.checked;
+    p.freiDatum = frei.checked ? new Date().toLocaleDateString('de-CH') : '';
+    zeigeFrei(); speichere();
+  };
+}
+
+function baueFeldtest() {
+  const wrap = document.getElementById('feldtest-spalten');
+  wrap.innerHTML = '';
+  FT_LISTEN.forEach(([key, titel]) => {
+    const sp = document.createElement('div');
+    sp.className = 'kasten';
+    sp.innerHTML = '<label>' + titel + ' …</label><div class="ft-liste"></div>' +
+      '<button class="plus" style="padding:10px;font-size:17px;min-height:48px;">+</button>';
+    const liste = sp.querySelector('.ft-liste');
+    function baueListe() {
+      liste.innerHTML = '';
+      daten.feldtest[key].forEach((e, i) => {
+        const zeile = document.createElement('div');
+        zeile.innerHTML = '<textarea class="feld" style="margin-top:8px;"></textarea>' +
+          '<button class="loeschen">Löschen</button>';
+        bindeFeld(zeile.querySelector('.feld'),
+          () => daten.feldtest[key][i] || '', v => daten.feldtest[key][i] = v);
+        zeile.querySelector('.loeschen').onclick = () => {
+          daten.feldtest[key].splice(i, 1); speichere(); baueListe();
+        };
+        liste.appendChild(zeile);
+      });
+    }
+    baueListe();
+    sp.querySelector('.plus').onclick = () => {
+      daten.feldtest[key].push(''); speichere(); baueListe();
+    };
+    wrap.appendChild(sp);
+  });
+  bindeFeld(document.getElementById('ft-gezoegert'),
+    () => daten.feldtest.gezoegert, v => daten.feldtest.gezoegert = v);
+}
+
+function baueTagebuch() {
+  const wrap = document.getElementById('tagebuch-tage');
+  wrap.innerHTML = '';
+  WOCHENTAGE.forEach((wt, i) => {
+    const k = document.createElement('div');
+    k.className = 'kasten';
+    k.innerHTML = '<label style="font-size:19px;color:#111;">Tag ' + (i + 1) + ' · ' + wt + '</label>' +
+      TB_FELDER.map(([key, titel]) =>
+        '<label>' + titel + '</label><textarea class="feld" data-key="' + key + '"></textarea>'
+      ).join('');
+    k.querySelectorAll('textarea').forEach(ta => {
+      const key = ta.dataset.key;
+      bindeFeld(ta, () => daten.tagebuch[i][key] || '', v => daten.tagebuch[i][key] = v);
+    });
+    wrap.appendChild(k);
+  });
+}
+
+function baueAlles() {
+  baueAerger(); baueParkplatz(); baueInterview(); bauePass(); baueFeldtest(); baueTagebuch();
+}
+
+/* ---------- Export ---------- */
+function exportText() {
+  const z = [];
+  const p = daten.pass;
+  z.push('WERKSTATT-NOTIZBUCH VON ' + gross(name).toUpperCase());
+  z.push('Exportiert am ' + new Date().toLocaleString('de-CH'));
+  z.push('');
+  z.push('=== ÄRGER-JAGD (' + daten.aerger.length + ' von 10) ===');
+  daten.aerger.forEach((e, i) => {
+    z.push((i + 1) + '. Was nervt: ' + (e.was || '—'));
+    z.push('   Wer ärgert sich: ' + (e.wer || '—'));
+    z.push('   Wann: ' + (e.wann || '—'));
+  });
+  z.push('');
+  z.push('=== PARKPLATZ ===');
+  daten.parkplatz.forEach((e, i) => z.push((i + 1) + '. ' + (e.text || '—')));
+  z.push('');
+  z.push('=== INTERVIEW ===');
+  z.push('Ausgangsfrage: ' + (daten.interview.frage || '—'));
+  daten.interview.antworten.forEach((a, i) => z.push('Warum ' + (i + 1) + ': ' + (a || '—')));
+  z.push('');
+  z.push('=== PROBLEM-PASS ===');
+  z.push('Satz: ' + (p.satzName || '[NAME]') + ' braucht ' + (p.satzWas || '[WAS]') +
+         ', weil ' + (p.satzWeil || '[ÜBERRASCHUNG]') + '.');
+  z.push('1. Wer hat das Problem: ' + (p.wer || '—'));
+  z.push('2. Was nervt genau: ' + (p.was || '—'));
+  z.push('3. Woher weiss ich das: ' + (p.woher || '—'));
+  z.push('4. Woran merke ich, dass es geklappt hat: ' + (p.woran || '—'));
+  z.push('5. Das Kleinste, was schon hilft: ' + (p.kleinstes || '—'));
+  z.push(p.frei ? 'Von Papa freigegeben am ' + p.freiDatum : 'Noch nicht freigegeben');
+  z.push('');
+  z.push('=== FELDTEST ===');
+  FT_LISTEN.forEach(([key, titel]) => {
+    z.push(titel + ' …');
+    if (!daten.feldtest[key].length) z.push('  —');
+    daten.feldtest[key].forEach(e => z.push('  - ' + (e || '—')));
+  });
+  z.push('Wo hat sie gezögert: ' + (daten.feldtest.gezoegert || '—'));
+  z.push('');
+  z.push('=== TAGEBUCH ===');
+  WOCHENTAGE.forEach((wt, i) => {
+    z.push('Tag ' + (i + 1) + ' · ' + wt);
+    TB_FELDER.forEach(([key, titel]) => z.push('  ' + titel + ': ' + (daten.tagebuch[i][key] || '—')));
+  });
+  return z.join('\n');
+}
+
+document.getElementById('export').onclick = () => {
+  const datum = new Date().toISOString().slice(0, 10);
+  const blob = new Blob([exportText()], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'werkstatt-' + name + '-' + datum + '.txt';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+};
+
+document.getElementById('drucken').onclick = () => window.print();
+
+/* ---------- Los ---------- */
+if (name && NAMEN.includes(name)) starte();
+</script>
+</body>
+</html>
