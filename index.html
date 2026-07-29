@@ -5,35 +5,83 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Workshop</title>
 <style>
+  * { box-sizing: border-box; }
   body {
     font-family: -apple-system, sans-serif;
     margin: 0;
-    padding: 32px 24px;
+    padding: 40px 24px 80px;
+    min-height: 100vh;
+    background: linear-gradient(160deg, #eef2ff 0%, #fdf2f8 100%);
   }
   h1 {
-    font-size: 40px;
-    margin: 0 0 32px;
+    font-size: 42px;
+    margin: 0 0 8px;
+    color: #1e1b4b;
+  }
+  p.untertitel {
+    font-size: 20px;
+    color: #6b7280;
+    margin: 0 0 36px;
   }
   a.kachel {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 20px;
     font-size: 32px;
-    font-weight: 600;
+    font-weight: 700;
     text-decoration: none;
-    color: #111;
-    background: #f2f2f7;
-    border-radius: 16px;
+    color: #fff;
+    border-radius: 24px;
     padding: 28px 24px;
     margin-bottom: 20px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    transition: transform 0.1s ease;
   }
   a.kachel:active {
-    background: #e0e0e6;
+    transform: scale(0.97);
+  }
+  a.kachel .emoji {
+    font-size: 44px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 16px;
+    width: 68px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  a.kachel .pfeil {
+    margin-left: auto;
+    font-size: 28px;
+    opacity: 0.7;
+  }
+  .mila  { background: linear-gradient(135deg, #ec4899, #f97316); }
+  .levi  { background: linear-gradient(135deg, #3b82f6, #06b6d4); }
+  .henry { background: linear-gradient(135deg, #22c55e, #84cc16); }
+  .version {
+    position: fixed;
+    bottom: 12px;
+    right: 16px;
+    font-size: 14px;
+    color: #999;
   }
 </style>
 </head>
 <body>
-  <h1>Workshop</h1>
-  <a class="kachel" href="mila/">Mila</a>
-  <a class="kachel" href="levi/">Levi</a>
-  <a class="kachel" href="henry/">Henry</a>
+  <h1>Workshop 🛠️</h1>
+  <p class="untertitel">Tipp auf deinen Namen und leg los!</p>
+
+  <a class="kachel mila" href="mila/">
+    <span class="emoji">🦄</span> Mila <span class="pfeil">›</span>
+  </a>
+  <a class="kachel levi" href="levi/">
+    <span class="emoji">🚀</span> Levi <span class="pfeil">›</span>
+  </a>
+  <a class="kachel henry" href="henry/">
+    <span class="emoji">🐉</span> Henry <span class="pfeil">›</span>
+  </a>
+
+  <div class="version">v2 · 08:53</div>
 </body>
 </html>
