@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Werkstatt-Slides</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, sans-serif;
+    background: #fff;
+    color: #111;
+    overflow: hidden;
+    -webkit-text-size-adjust: none;
+  }
+
+  /* Fortschrittsleiste */
+  #fortschritt {
+    position: fixed; top: 0; left: 0; height: 5px; width: 0;
+    background: #2563eb; z-index: 30; transition: width 0.2s ease;
+  }
+
+  /* Startbildschirm */
+  #start {
+    height: 100%; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; gap: 16px;
+    padding: 24px;
+  }
+  #start h1 { font-size: clamp(32px, 6vw, 56px); margin-bottom: 24px; }
+  #start button {
+    font-family: inherit;
+    display: block; width: min(560px, 100%);
+    font-size: clamp(22px, 3.5vw, 32px); font-weight: 700;
+    color: #fff; border: none; border-radius: 18px;
+    padding: 22px 28px; min-height: 64px;
+    cursor: pointer; text-align: left;
+  }
+  #start button small { display: block; font-size: 0.55em; font-weight: 400; opacity: 0.9; }
+
+  /* Slide-Bühne */
+  #buehne {
+    display: none; height: 100%;
+    padding: 6vh 6vw;
+    flex-direction: column; justify-content: center;
+    user-select: none; -webkit-user-select: none;
+    cursor: pointer;
+  }
+  .inhalt { max-width: 1100px; margin: 0 auto; width: 100%; }
+  .kicker {
+    font-size: clamp(18px, 2.5vw, 28px); font-weight: 700;
+    letter-spacing: 0.08em; margin-bottom: 20px;
+  }
+  .inhalt h1 { font-size: clamp(40px, 8vw, 92px); line-height: 1.1; }
+  .inhalt h2 { font-size: clamp(30px, 5vw, 56px); line-height: 1.15; margin-bottom: 28px; }
+  .inhalt p.gross { font-size: clamp(30px, 5vw, 60px); line-height: 1.25; }
+  .inhalt p.riesig { font-size: clamp(38px, 7vw, 84px); line-height: 1.15; font-weight: 800; }
+  .inhalt p.sub { font-size: clamp(22px, 3vw, 34px); margin-top: 24px; color: #555; }
+  .inhalt pre {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: clamp(15px, 2.4vw, 26px); line-height: 1.5;
+    background: #f5f5f7; border-radius: 14px;
+    padding: 24px 28px; overflow-x: auto; white-space: pre;
+  }
+  .inhalt pre.klein { font-size: clamp(11px, 1.7vw, 18px); }
+  .inhalt code {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    background: #f5f5f7; border-radius: 6px; padding: 2px 10px;
+  }
+
+  /* Fusszeile */
+  #position {
+    position: fixed; bottom: 12px; left: 16px;
+    font-size: 14px; color: #999; z-index: 30;
+  }
+  #heim {
+    position: fixed; top: 14px; left: 14px; z-index: 40;
+    font-size: 22px; color: #bbb; text-decoration: none;
+    padding: 8px 12px; display: none;
+  }
+  .version {
+    position: fixed; bottom: 12px; right: 16px;
+    font-size: 14px; color: #999; z-index: 30;
+  }
+
+  /* Presenter-Notizen */
+  #notizen {
+    display: none;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+    background: rgba(20, 20, 25, 0.96); color: #eee;
+    padding: 18px 24px 40px; max-height: 45vh; overflow-y: auto;
+    font-size: 16px; line-height: 1.5;
+  }
+  #notizen h3 { font-size: 14px; letter-spacing: 0.08em; color: #aaa; margin-bottom: 10px; }
+  #notizen ul { margin-left: 20px; }
+  #notizen li { margin-bottom: 6px; }
+  body.presenter #notizen { display: block; }
+</style>
+</head>
+<body>
+
+<div id="fortschritt"></div>
+<a id="heim" href="#" title="Zur Übersicht">✕</a>
+
+<div id="start">
+  <h1>Werkstatt-Woche</h1>
+</div>
+
+<div id="buehne"><div class="inhalt" id="slide"></div></div>
+
+<div id="position"></div>
+<div id="notizen"></div>
+<div class="version">v1 · 09:10</div>
+
+<script>
+const TAGE = [
+{
+  nr: 1, titel: "Der Roboter, der nichts weiß", farbe: "#2563eb",
+  slides: [
+    '<p class="kicker">WERKSTATT-WOCHE · TAG 1</p><h1>Der Roboter, der nichts weiß</h1>',
+    '<p class="gross">„Sagt mir irgendwas, das es geben sollte. Irgendwas Blödsinniges."</p>',
+    '<h2>Der Bauplan</h2><pre>MO   Wie tickt das Ding?\nDI   WAS baust du?     ← der schwerste Tag\nMI   Bauen\nDO   Jemand benutzt es. Du reparierst.\nFR   Aufs Handy. Vorführen.</pre>',
+    '<p class="gross">Am Freitag hast du: ein Icon auf deinem Handy. Und eine Adresse, die Oma öffnen kann.</p>',
+    '<p class="gross">Montag und Dienstag baut niemand. Erst muss klar sein, WAS.</p>',
+    '<p class="kicker">DIE BUTTERBROT-CHALLENGE</p><p class="gross">Ich bin ein Roboter. Ich mache genau das, was ihr sagt.</p>',
+    '<p class="gross">Was war schwerer? Das Brot machen — oder erklären, wie man\'s macht?</p>',
+    '<p class="riesig">Wer es nicht erklären kann, kann es nicht bauen lassen.</p>',
+    '<h2>Was steht hier eigentlich?</h2><pre class="klein">        ┌─────────────────────────────────────────┐\n        │           PAPAS COMPUTER                │\n        │   ┌────────┐        ┌──────────────┐    │\n        │   │ Claude │───────▶│  DEIN FACH   │    │\n        │   │  Code  │  baut  │    mila/     │    │\n        │   └────────┘        └──────┬───────┘    │\n        │        ▲                   │            │\n        └────────┼───────────────────┼────────────┘\n                 │                   │\n            du sagst          ┌──────┴──────────┐\n            was du willst     ▼                 ▼\n                      stebookpro.local   …github.io/…\n                       DEIN iPAD            OMA\n                       (zuhause)          (überall)</pre>',
+    '<h2>Zwei Adressen, nicht eine.</h2><pre>stebookpro.local:8000   →  zuhause, sofort\n…github.io/workshop/    →  die ganze Welt,\n                           nach dem Veröffentlichen</pre>',
+    '<p class="riesig">„Bei mir geht\'s doch!"</p><p class="sub">— ja. Bei dir.</p>',
+    '<p class="gross">Der Versions-Stempel: <code>v7 · 14:32</code></p><p class="sub">Alte Nummer = du siehst was Altes. Runterziehen zum Neuladen.</p>',
+    '<p class="gross">Regenschirm → ?<br>Fahrradhelm → ?<br>Post-it → ?<br>Reißverschluss → ?</p>',
+    '<p class="gross">Eine App, die dir jeden Morgen ein zufälliges Wort auf Isländisch schickt.</p><p class="sub">Wessen Problem löst das?</p>',
+    '<p class="riesig">ERST DAS PROBLEM.<br>DANN DIE LÖSUNG.<br>NIE ANDERSRUM.</p>',
+    '<p class="kicker">AUFTRAG 1</p><h1>Die Ärger-Jagd</h1>'
+  ],
+  notizen: [
+    'Beim Hook den <b>ersten</b> Vorschlag nehmen, nicht den besten. Es muss ihre Idee sein.',
+    'Butterbrot gnadenlos spielen, dabei völlig ernst bleiben. „Nimm das Brot" → ganze Packung hochheben. „Streich die Butter drauf" → ganzes Stück obendrauf legen.',
+    'Bei S14 zehn Sekunden Stille aushalten. Nicht auflösen.',
+    'Werkstatt-Moment: iPad rumgeben, jedes Kind sieht „Hier baut Mila".',
+    'Bei der Umgebung an echten Dingen auf dem Bildschirm zeigen, nicht abstrakt reden.',
+    'Prüffrage am Ende: Kann jedes Kind erklären, warum erst Mittwoch gebaut wird?',
+    'Nachbereitung: Welches Kind war am stillsten? Das wird morgen dein Interviewpartner beim Vormachen.'
+  ]
+},
+{
+  nr: 2, titel: "Das Problem jagen", farbe: "#7c3aed",
+  slides: [
+    '<p class="kicker">TAG 2</p><h1>Das Problem jagen</h1>',
+    '<p class="gross">Alle Ärger-Zettel auf den Tisch. Vorlesen. Noch nicht bewerten.</p>',
+    '<p class="riesig">FÜNFMAL WARUM</p>',
+    '<h2>Beispiel:</h2><pre>Hausaufgaben nerven.\n  → Warum?  Ich vergesse, was auf ist.\n  → Warum?  Ich schreib\'s nicht auf.\n  → Warum?  Beim Klingeln packen alle hektisch ein.\n  → Warum?  Es sind nur 15 Sekunden.</pre>',
+    '<p class="gross">Vorher: „Hausaufgaben nerven."<br>Nachher: „Ich brauche 15 Sekunden, während alle drängeln."</p><p class="sub">— Das Zweite kann man lösen.</p>',
+    '<p class="gross">Die ersten zwei Antworten sind langweilig. Die vierte ist interessant.</p>',
+    '<p class="gross">Jetzt du: 3 Minuten pro Person. Dann tauschen.</p>',
+    '<h2>DEIN SATZ:</h2><pre>[NAME] braucht [WAS],\nweil [ÜBERRASCHUNG].</pre>',
+    '<h2>Zwei Prüffragen:</h2><pre>1. Steht da ein echter Name?\n   „Kinder" und „Leute" gelten nicht.\n2. Steht da schon eine Lösung drin?\n   Wenn „App" vorkommt → nochmal.</pre>',
+    '<p class="kicker">DER PROBLEM-PASS</p><p class="gross">Ohne Pass kein Claude Code.</p>',
+    '<h2>Feld 4: Woran merkst du, dass es geklappt hat?</h2><pre>✗  „Wenn die App gut ist."\n✓  „Wenn Levi in unter 15 Sekunden\n    etwas eingetragen hat, ohne zu fragen."</pre>',
+    '<p class="gross">Feld 5: Das Kleinste, was schon hilft.</p><p class="sub">Am Mittwoch hast du 20 Minuten.</p>',
+    '<p class="gross">Wie tickt Claude eigentlich?</p><p class="sub">„Der Hund bellt im …" · „Es war einmal eine …" · „2, 4, 6, …"</p>',
+    '<p class="gross">Genau das macht er: das nächste Stück raten. Er weiß nicht, ob es stimmt. Er weiß nur, was gut klingt.</p>',
+    '<p class="gross">Wenn er etwas nicht weiß, sagt er selten „keine Ahnung". Er rät weiter — und das klingt genauso überzeugend.</p><p class="sub">Das heißt <b>Halluzination</b>.</p>',
+    '<p class="sub">Deshalb ab morgen:</p><p class="riesig">NICHT GLAUBEN — AUSPROBIEREN.</p>',
+    '<p class="gross">Der Chat kann reden. Claude Code kann Hände benutzen. Morgen benutzt du ihn.</p>',
+    '<p class="kicker">AUFTRAG 2</p><h1>Das echte Interview</h1>'
+  ],
+  notizen: [
+    'Beim Vormachen das stillste Kind von gestern interviewen.',
+    'Bei S9 hart sein. Sätze mit „App" oder ohne echten Namen gehen zurück. Das ist die einzige Härte, die die Woche braucht.',
+    'Feld 5 <b>kleiner machen, als das Kind will.</b> Deine Hauptaufgabe heute. Ein soziales Netzwerk für Hunde wird zu einem Knopf.',
+    'Pass feierlich unterschreiben. Ernst gemeint — das Ritual trägt bis Freitag.',
+    'Der Lösungs-Parkplatz aus Auftrag 1 wird jetzt wieder geöffnet: geparkte Ideen dürfen zurück ins Spiel.',
+    'Wenn die Zeit knapp wird: S13–S17 kürzen, nicht den Pass.'
+  ]
+},
+{
+  nr: 3, titel: "Bauen", farbe: "#ea580c",
+  slides: [
+    '<p class="kicker">TAG 3</p><h1>Bauen</h1>',
+    '<p class="gross">Was hat die echte Person zu deiner Skizze gesagt?</p><p class="sub">Wenn sie überrascht hat: Pass jetzt korrigieren, nicht später.</p>',
+    '<p class="kicker">DER SPEICHERPUNKT</p><p class="gross">Wie im Spiel. Nach jeder Sache, die funktioniert.</p>',
+    '<p class="gross">Es gibt heute nichts, was du endgültig kaputt machen kannst.</p>',
+    '<p class="gross">Ziel heute ist NICHT die fertige App. Ziel ist: Sie existiert. Sie geht auf. Ein Knopf tut was.</p>',
+    '<h2>Der Startprompt:</h2><pre>Ich bin [ALTER] und lerne programmieren.\nBau eine Web-App in einer Datei index.html.\n\nProblem: [Satz aus dem Pass]\nFür wen: [Name]\n\nSie soll erstmal NUR: [die eine Sache]\n\nFür iPhone, große Knöpfe.\nErklär mir einfach, was du gebaut hast.</pre>',
+    '<p class="gross">Nach jedem Schritt, der funktioniert:</p><p class="riesig">„Mach einen Speicherpunkt."</p>',
+    '<p class="gross">Die Frage, die heute immer gilt:</p><p class="riesig">Und hilft das jetzt [NAME]?</p>',
+    '<h2>Wenn was kaputt ist:</h2><pre>Ich habe:      [was du gemacht hast]\nErwartet:      [was passieren sollte]\nPassiert ist:  [was wirklich kam]</pre>',
+    '<p class="gross">Wenn\'s hoffnungslos ist: „Geh zurück zum letzten Speicherpunkt."</p><p class="sub">Das ist kein Scheitern. Dafür sind sie da.</p>',
+    '<p class="gross">Jetzt raus in die Welt:</p><p class="riesig">„veröffentliche"</p>',
+    '<p class="kicker">AUFTRAG 3</p><h1>Der Feldtest</h1><p class="sub">⚠ Schweigepflicht</p>'
+  ],
+  notizen: [
+    '<b>Nicht selbst tippen.</b> Auch nicht, wenn es schneller ginge. Besonders dann nicht.',
+    'Kinder ihren Prompt aussprechen lassen, bevor sie ihn tippen. Halbe Fehler lösen sich dabei von selbst.',
+    'Fehler nicht wegräumen, bevor das Kind sie bemerkt hat.',
+    'Wenn v1 um Minute 25 nicht läuft: Feldtest mit der Papierskizze machen. Donnerstag 5 Minuten fertigbauen. Kein Drama.',
+    'Versions-Stempel gleich nach der ersten Version einbauen lassen.',
+    'Während des Sprints <b>nicht</b> veröffentlichen — kostet pro Änderung eine Minute. Nur am Ende.'
+  ]
+},
+{
+  nr: 4, titel: "Der echte Test", farbe: "#16a34a",
+  slides: [
+    '<p class="kicker">TAG 4</p><h1>Der echte Test</h1>',
+    '<p class="gross">Was hat die Person gestern Abend gemacht?</p>',
+    '<h2>Sortieren:</h2><pre>Ich mag …\nIch wünschte …\nWas wäre, wenn …</pre>',
+    '<p class="gross">Wo hat sie gezögert? Wo hat sie geklickt, wo du es nicht erwartet hast?</p>',
+    '<p class="gross">Wer hat gemerkt, dass jemand seine App ANDERS benutzt hat, als er dachte?</p>',
+    '<p class="gross">Das habt ihr in einem Abend herausgefunden. Große Firmen brauchen dafür manchmal ein Jahr.</p>',
+    '<p class="gross">Jetzt: genau ZWEI Wünsche. Der Rest kommt auf die Später-Liste.</p>',
+    '<h2>Prompt-Disziplin:</h2><pre>Ein Wunsch pro Prompt.\nSag WAS, nicht WIE.</pre>',
+    '<p class="gross">Besser: „Der Text ist zu klein zum Lesen."<br>Nicht: „Mach font-size auf 24px."</p>',
+    '<p class="gross">Nach jeder Änderung:</p><p class="riesig">anschauen · testen · Speicherpunkt</p>',
+    '<p class="kicker">AUFTRAG 4</p><h1>Fertig machen</h1>'
+  ],
+  notizen: [
+    'Bei S5 die Stille aushalten. Der Moment trägt den ganzen Design-Thinking-Anspruch der Woche.',
+    'Die Später-Liste kommt an die Wand — sie ist am Freitag Ausstellungsmaterial und zeigt, dass bewusst ausgewählt wurde.',
+    'Wenn ein Kind lustlos ist: Auftrag 4 vorziehen, Einladung schreiben und <b>sofort persönlich übergeben</b>. Zugesagtes Publikum wirkt besser als jede Motivationsrede.',
+    'Am Ende veröffentlichen lassen, damit der Stand gesichert ist.'
+  ]
+},
+{
+  nr: 5, titel: "Ausliefern", farbe: "#db2777",
+  slides: [
+    '<p class="kicker">TAG 5</p><h1>Ausliefern</h1>',
+    '<p class="gross">Genau drei Dinge:</p><p class="riesig">Name · Farben · Icon</p>',
+    '<p class="gross">Der Name: höchstens 12 Zeichen. Er muss unters Icon passen.</p>',
+    '<p class="gross">„Mach das Design schöner mit einer Farbe, die zu [Thema] passt. Nur Farben und Abstände, keine neuen Funktionen."</p>',
+    '<p class="gross">„Erstelle ein App-Icon als SVG: einfaches Symbol, kräftige Farbe, muss auch ganz klein erkennbar sein."</p>',
+    '<p class="gross">Warum kommt das Aussehen zuletzt? Weil du sonst zwei Stunden Farben ausgesucht hättest für eine App, die keiner bedienen kann.</p>',
+    '<h2>JETZT AUFS HANDY:</h2><pre>Mach aus meiner App eine richtige App fürs iPhone:\nmanifest.json mit Name, Icon und display: standalone,\ndie Apple-Meta-Tags fürs Vollbild.\nKEIN Service Worker.</pre>',
+    '<p class="riesig">„veröffentliche"</p>',
+    '<h2>Alle gleichzeitig:</h2><pre>1. Adresse in Safari öffnen\n2. Teilen-Knopf\n3. „Zum Home-Bildschirm"\n4. Name prüfen → Hinzufügen\n5. Safari schließen\n6. Icon antippen</pre>',
+    '<p class="gross">QR-Poster drucken. Bildschirmaufnahme, 30 Sekunden.</p>',
+    '<h2>Deine drei Minuten heute Abend:</h2><pre>1. Das ist [NAME]. Ihr Problem war …\n2. Ich habe gebaut … (zeigen, nicht erzählen)\n3. Beim Testen habe ich gemerkt …\n4. Als Nächstes würde ich …</pre>',
+    '<p class="riesig">Die Person kommt zuerst. Immer.</p>',
+    '<p class="gross">Was war schwerer: der Computer-Teil oder der Menschen-Teil?</p>'
+  ],
+  notizen: [
+    'Beim Homescreen-Schritt alle gleichzeitig, laut mitzählen. Zeit zum Ausflippen ist eingeplant.',
+    'Erst heute das Icon — vorher wäre es vier Tage lang eine Zwischenspeicher-Fehlerquelle gewesen.',
+    'Zwei Titel am Abend, den ersten zuerst und ernst gemeint: <b>Fehler-Held</b> (lehrreichster Absturz) · <b>Problem-Jäger</b> (schärfste Problemformulierung, nicht schönste App)',
+    'Schlusssatz: „Das Coden übernimmt die Maschine immer mehr. Das Herausfinden, was gebaut werden sollte, bleibt bei euch. Deshalb waren Montag und Dienstag die wichtigsten Tage."'
+  ]
+}
+];
+
+const start = document.getElementById('start');
+const buehne = document.getElementById('buehne');
+const slideEl = document.getElementById('slide');
+const posEl = document.getElementById('position');
+const balken = document.getElementById('fortschritt');
+const notizenEl = document.getElementById('notizen');
+const heim = document.getElementById('heim');
+
+// Tagesknöpfe bauen
+TAGE.forEach((t, i) => {
+  const b = document.createElement('button');
+  b.style.background = t.farbe;
+  b.innerHTML = 'Tag ' + t.nr + ' — ' + t.titel + '<small>' + t.slides.length + ' Slides</small>';
+  b.onclick = () => zeige(i, 0);
+  start.appendChild(b);
+});
+
+let tag = -1, idx = 0;
+
+function zeige(t, s) {
+  tag = t; idx = s;
+  const T = TAGE[tag];
+  start.style.display = 'none';
+  buehne.style.display = 'flex';
+  heim.style.display = 'block';
+  slideEl.innerHTML = T.slides[idx];
+  slideEl.querySelectorAll('.kicker, h1, h2').forEach(e => e.style.color = T.farbe);
+  balken.style.background = T.farbe;
+  balken.style.width = ((idx + 1) / T.slides.length * 100) + '%';
+  posEl.textContent = 'Tag ' + T.nr + ' · Slide ' + (idx + 1) + '/' + T.slides.length;
+  notizenEl.innerHTML = '<h3>PRESENTER · TAG ' + T.nr + '</h3><ul>' +
+    T.notizen.map(n => '<li>' + n + '</li>').join('') + '</ul>';
+  history.replaceState(null, '', '#tag' + T.nr + '-' + (idx + 1));
+}
+
+function zeigeStart() {
+  tag = -1;
+  buehne.style.display = 'none';
+  start.style.display = 'flex';
+  heim.style.display = 'none';
+  balken.style.width = '0';
+  posEl.textContent = '';
+  document.body.classList.remove('presenter');
+  history.replaceState(null, '', location.pathname);
+}
+
+function weiter() {
+  if (tag < 0) return;
+  if (idx + 1 < TAGE[tag].slides.length) zeige(tag, idx + 1);
+  else if (tag + 1 < TAGE.length) zeige(tag + 1, 0);
+}
+function zurueck() {
+  if (tag < 0) return;
+  if (idx > 0) zeige(tag, idx - 1);
+  else if (tag > 0) zeige(tag - 1, TAGE[tag - 1].slides.length - 1);
+}
+
+heim.onclick = e => { e.preventDefault(); zeigeStart(); };
+
+// Tastatur
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); weiter(); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); zurueck(); }
+  else if (e.key === 'p' || e.key === 'P') document.body.classList.toggle('presenter');
+  else if (e.key === 'f' || e.key === 'F') {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen();
+  }
+  else if (e.key === 'Escape') zeigeStart();
+});
+
+// Tippen links/rechts
+let gewischt = false;
+buehne.addEventListener('click', e => {
+  if (gewischt) { gewischt = false; return; }
+  if (e.clientX < window.innerWidth / 2) zurueck(); else weiter();
+});
+
+// Wischen
+let tx = 0;
+buehne.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+buehne.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - tx;
+  if (Math.abs(dx) > 50) {
+    gewischt = true;
+    if (dx < 0) weiter(); else zurueck();
+  }
+}, { passive: true });
+
+// Anker beim Laden
+const m = location.hash.match(/^#tag(\d)-(\d+)$/);
+if (m) {
+  const t = parseInt(m[1], 10) - 1, s = parseInt(m[2], 10) - 1;
+  if (TAGE[t] && TAGE[t].slides[s]) zeige(t, s);
+}
+</script>
+</body>
+</html>
