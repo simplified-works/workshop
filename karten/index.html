@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Werkstatt-Karten</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, sans-serif;
+    background: #fafafa; color: #111;
+    padding: 28px 20px 80px;
+  }
+  h1 { font-size: 34px; margin-bottom: 6px; }
+  p.intro { font-size: 18px; color: #666; margin-bottom: 28px; }
+  h2.gruppe { font-size: 22px; margin: 28px 0 14px; color: #444; }
+
+  #raster {
+    display: grid; gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+  .karte {
+    background: #fff; border-radius: 18px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    padding: 20px; min-height: 130px;
+    cursor: pointer; border: none; text-align: left;
+    font-family: inherit; font-size: 18px; font-weight: 600;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .karte .tag-nr {
+    align-self: flex-start; color: #fff; border-radius: 10px;
+    padding: 4px 12px; font-size: 15px; font-weight: 700;
+  }
+  .karte .emoji { font-size: 34px; }
+  .karte .titel { font-size: 19px; line-height: 1.25; }
+
+  /* Grossansicht */
+  #gross {
+    display: none; position: fixed; inset: 0; z-index: 50;
+    background: rgba(0,0,0,0.45); padding: 20px;
+    overflow-y: auto;
+  }
+  #gross.offen { display: flex; align-items: flex-start; justify-content: center; }
+  #gross .blatt {
+    background: #fff; border-radius: 22px; padding: 28px 24px 24px;
+    max-width: 640px; width: 100%; margin: auto 0;
+    position: relative;
+  }
+  #gross .blatt .band {
+    color: #fff; border-radius: 12px; display: inline-block;
+    padding: 6px 16px; font-weight: 700; font-size: 17px; margin-bottom: 14px;
+  }
+  #gross h3 { font-size: 28px; margin-bottom: 16px; }
+  #gross .text { font-size: 20px; line-height: 1.5; }
+  #gross .text p { margin-bottom: 12px; }
+  #gross .text ol { margin: 0 0 12px 24px; }
+  #gross .text li { margin-bottom: 8px; }
+  #gross pre {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 17px; line-height: 1.5;
+    background: #f5f5f7; border-radius: 12px;
+    padding: 16px 18px; overflow-x: auto; white-space: pre-wrap;
+    margin-bottom: 14px;
+  }
+  #gross button {
+    font-family: inherit; cursor: pointer; border: none;
+    font-size: 18px; font-weight: 600;
+    border-radius: 14px; padding: 14px 22px; min-height: 48px;
+  }
+  #zu { position: absolute; top: 14px; right: 14px; background: #eee; width: 48px; }
+  #kopieren { background: #2563eb; color: #fff; margin-top: 4px; }
+  #kopiert-hinweis {
+    display: inline-block; margin-left: 12px; font-size: 17px;
+    color: #16a34a; font-weight: 600; opacity: 0; transition: opacity 0.2s;
+  }
+
+  .tag1 { background: #2563eb; } .tag2 { background: #7c3aed; }
+  .tag3 { background: #ea580c; } .tag4 { background: #16a34a; }
+
+  .version { position: fixed; bottom: 12px; right: 16px; font-size: 14px; color: #999; }
+
+  /* Druck: Postkarten, zwei pro A4 */
+  #druck { display: none; }
+  @media print {
+    body { background: #fff; padding: 0; }
+    h1, p.intro, h2.gruppe, #raster, #gross, .version { display: none !important; }
+    #druck { display: block; }
+    .druckkarte {
+      border: 1.5pt solid #000; border-radius: 12pt;
+      height: 12.2cm; padding: 0.8cm; overflow: hidden;
+      margin-bottom: 0.6cm;
+      page-break-inside: avoid;
+    }
+    .druckkarte:nth-child(2n) { page-break-after: always; }
+    .druckkarte .kopf { font-size: 13pt; font-weight: 700; margin-bottom: 8pt; }
+    .druckkarte .inhalt { font-size: 11pt; line-height: 1.45; }
+    .druckkarte .inhalt p { margin-bottom: 6pt; }
+    .druckkarte .inhalt ol { margin: 0 0 6pt 14pt; }
+    .druckkarte pre {
+      font-family: ui-monospace, Menlo, monospace; font-size: 9.5pt;
+      border: 0.75pt solid #999; border-radius: 6pt;
+      padding: 6pt 8pt; white-space: pre-wrap;
+    }
+  }
+</style>
+</head>
+<body>
+
+<h1>Karten</h1>
+<p class="intro">Antippen zum Vergrössern. Über den Browser drucken für Papierkarten.</p>
+
+<h2 class="gruppe">Auftragskarten</h2>
+<div id="raster" class="auftraege"></div>
+
+<h2 class="gruppe">Prompt-Karten</h2>
+<div id="raster2" class="prompts" style="display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));"></div>
+
+<div id="gross"><div class="blatt">
+  <button id="zu">✕</button>
+  <div id="gross-inhalt"></div>
+</div></div>
+
+<div id="druck"></div>
+<div class="version">v1 · 09:10</div>
+
+<script>
+const AUFTRAEGE = [
+{
+  tag: 1, wochentag: 'Montag', titel: 'Die Ärger-Jagd',
+  html: '<p>Sammle bis morgen <b>10 Sachen, die nerven</b>. Eine pro Eintrag.</p>' +
+        '<p><b>Regel:</b> Es muss echt sein und du musst es gesehen haben. Nichts Ausgedachtes.</p>' +
+        '<p>Was hat heute genervt? Deine Schwester? Opa? Deine Lehrerin? Du selbst?<br>' +
+        'Schreib dazu: <b>wer</b> hat sich geärgert und <b>wann</b>.</p>' +
+        '<p>→ Fällt dir eine Lösung ein? Ab auf den <b>Parkplatz</b>. Nicht jetzt.</p>'
+},
+{
+  tag: 2, wochentag: 'Dienstag', titel: 'Das echte Interview',
+  html: '<p><b>A)</b> Sprich mit der Person aus deinem Pass. Frag fünfmal „Warum?". ' +
+        'Schreib möglichst wörtlich mit, was sie sagt. <i>(Nicht da? Ruf an. Ernsthaft.)</i></p>' +
+        '<p><b>B)</b> Falte ein Blatt in 8 Felder. 8 Ideen, 1 Minute pro Feld. Nicht schön — viele.</p>' +
+        '<p><b>C)</b> Zeig ihr deine beste Skizze. Schreib auf, was sie sagt. ' +
+        'Besonders, wenn sie etwas nicht versteht.</p>'
+},
+{
+  tag: 3, wochentag: 'Mittwoch', titel: 'Der Feldtest ⚠ Schweigepflicht',
+  html: '<p>Gib deine App der echten Person. Sag nur <b>einen</b> Satz — die Aufgabe. ' +
+        'Zum Beispiel: „Trag mal eine Hausaufgabe ein."</p>' +
+        '<p><b>Dann sagst du nichts mehr.</b> Nicht erklären. Nicht helfen. ' +
+        'Nicht „du musst da drücken". Nur zuschauen und mitschreiben.</p>' +
+        '<p>Notiere: <i>Ich mag … / Ich wünschte … / Was wäre, wenn …</i><br>' +
+        'Und: Wo hat sie gezögert? Wo hat sie geklickt, wo du es nicht erwartet hast?</p>'
+},
+{
+  tag: 4, wochentag: 'Donnerstag', titel: 'Fertig machen',
+  html: '<ol><li>Finde einen Namen. Höchstens 12 Zeichen.</li>' +
+        '<li>Zeichne dein App-Icon. Einfach. Muss auch ganz klein erkennbar sein.</li>' +
+        '<li><b>Schreib eine Einladung</b> für die Vorführung morgen Abend. ' +
+        'Mindestens für die Person aus deinem Problem-Pass. Von Hand, auf Papier, persönlich übergeben.</li></ol>'
+}
+];
+
+const PROMPTS = [
+{ emoji: '🚀', titel: 'ANFANGEN',
+  text: 'Ich bin [ALTER] und lerne programmieren.\nBau eine Web-App in einer Datei index.html.\nProblem: [aus dem Pass]\nFür wen: [Name]\nSie soll erstmal NUR: [die eine Sache]\nFür iPhone, große Knöpfe.\nErklär mir einfach, was du gebaut hast.' },
+{ emoji: '✨', titel: 'ÄNDERN',
+  text: 'Ändere nur eine Sache: [Wunsch]\nAlles andere bleibt wie es ist.' },
+{ emoji: '🐛', titel: 'KAPUTT',
+  text: 'Ich habe: [was du gemacht hast]\nErwartet: [was passieren sollte]\nPassiert ist: [was wirklich kam]\nWas ist los?' },
+{ emoji: '💾', titel: 'SPEICHERN', text: 'Mach einen Speicherpunkt.' },
+{ emoji: '⏪', titel: 'ZURÜCK', text: 'Geh zurück zum letzten Speicherpunkt.' },
+{ emoji: '🤔', titel: 'VERSTEHEN',
+  text: 'Erklär mir die Datei so, als wäre ich 10.\nWas macht welcher Teil?' },
+{ emoji: '📤', titel: 'RAUS IN DIE WELT', text: 'veröffentliche' },
+{ emoji: '📱', titel: 'AUFS HANDY',
+  text: 'Mach daraus eine richtige iPhone-App:\nmanifest.json, Apple-Meta-Tags, Vollbild.\nKEIN Service Worker.' }
+];
+
+const raster = document.getElementById('raster');
+const raster2 = document.getElementById('raster2');
+const gross = document.getElementById('gross');
+const grossInhalt = document.getElementById('gross-inhalt');
+const druck = document.getElementById('druck');
+
+function esc(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+AUFTRAEGE.forEach(a => {
+  const k = document.createElement('button');
+  k.className = 'karte';
+  k.innerHTML = '<span class="tag-nr tag' + a.tag + '">Tag ' + a.tag + '</span>' +
+                '<span class="titel">' + a.titel + '</span>';
+  k.onclick = () => oeffne(
+    '<span class="band tag' + a.tag + '">Auftrag ' + a.tag + ' · ' + a.wochentag + '</span>' +
+    '<h3>' + a.titel + '</h3><div class="text">' + a.html + '</div>');
+  raster.appendChild(k);
+});
+
+PROMPTS.forEach(p => {
+  const k = document.createElement('button');
+  k.className = 'karte';
+  k.innerHTML = '<span class="emoji">' + p.emoji + '</span>' +
+                '<span class="titel">' + p.titel + '</span>';
+  k.onclick = () => oeffne(
+    '<h3>' + p.emoji + ' ' + p.titel + '</h3>' +
+    '<pre>' + esc(p.text) + '</pre>' +
+    '<button id="kopieren">Kopieren</button><span id="kopiert-hinweis">Kopiert ✓</span>',
+    p.text);
+  raster2.appendChild(k);
+});
+
+function oeffne(html, kopierText) {
+  grossInhalt.innerHTML = html;
+  gross.classList.add('offen');
+  const kb = document.getElementById('kopieren');
+  if (kb) kb.onclick = () => {
+    kopiere(kopierText);
+    const h = document.getElementById('kopiert-hinweis');
+    h.style.opacity = '1';
+    setTimeout(() => { h.style.opacity = '0'; }, 1600);
+  };
+}
+
+function kopiere(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text);
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
+}
+
+document.getElementById('zu').onclick = () => gross.classList.remove('offen');
+gross.addEventListener('click', e => { if (e.target === gross) gross.classList.remove('offen'); });
+
+// Druckansicht aufbauen
+AUFTRAEGE.forEach(a => {
+  const d = document.createElement('div');
+  d.className = 'druckkarte';
+  d.innerHTML = '<div class="kopf">AUFTRAG ' + a.tag + ' · ' + a.wochentag.toUpperCase() +
+                ' — ' + a.titel + '</div><div class="inhalt">' + a.html + '</div>';
+  druck.appendChild(d);
+});
+PROMPTS.forEach(p => {
+  const d = document.createElement('div');
+  d.className = 'druckkarte';
+  d.innerHTML = '<div class="kopf">' + p.emoji + ' ' + p.titel + '</div>' +
+                '<div class="inhalt"><pre>' + esc(p.text) + '</pre></div>';
+  druck.appendChild(d);
+});
+</script>
+</body>
+</html>
