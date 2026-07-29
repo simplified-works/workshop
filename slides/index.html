@@ -110,7 +110,7 @@
 
 <div id="position"></div>
 <div id="notizen"></div>
-<div class="version">v1 · 09:10</div>
+<div class="version">v2 · 10:34</div>
 
 <script>
 const TAGE = [
@@ -119,13 +119,13 @@ const TAGE = [
   slides: [
     '<p class="kicker">WERKSTATT-WOCHE · TAG 1</p><h1>Der Roboter, der nichts weiß</h1>',
     '<p class="gross">„Sagt mir irgendwas, das es geben sollte. Irgendwas Blödsinniges."</p>',
-    '<h2>Der Bauplan</h2><pre>MO   Wie tickt das Ding?\nDI   WAS baust du?     ← der schwerste Tag\nMI   Bauen\nDO   Jemand benutzt es. Du reparierst.\nFR   Aufs Handy. Vorführen.</pre>',
-    '<p class="gross">Am Freitag hast du: ein Icon auf deinem Handy. Und eine Adresse, die Oma öffnen kann.</p>',
-    '<p class="gross">Montag und Dienstag baut niemand. Erst muss klar sein, WAS.</p>',
+    '<h2>Der Bauplan</h2><pre>MI   Wie tickt das Ding?\nDO   WAS baust du?     ← der schwerste Tag\nFR   Bauen\nSA   Jemand benutzt es. Du reparierst.\nSO   Aufs Handy. Vorführen.</pre>',
+    '<p class="gross">Am Sonntag hast du: ein Icon auf deinem Handy. Und eine Adresse, die Mama öffnen kann.</p>',
+    '<p class="gross">Mittwoch und Donnerstag baut niemand. Erst muss klar sein, WAS.</p>',
     '<p class="kicker">DIE BUTTERBROT-CHALLENGE</p><p class="gross">Ich bin ein Roboter. Ich mache genau das, was ihr sagt.</p>',
     '<p class="gross">Was war schwerer? Das Brot machen — oder erklären, wie man\'s macht?</p>',
     '<p class="riesig">Wer es nicht erklären kann, kann es nicht bauen lassen.</p>',
-    '<h2>Was steht hier eigentlich?</h2><pre class="klein">        ┌─────────────────────────────────────────┐\n        │           PAPAS COMPUTER                │\n        │   ┌────────┐        ┌──────────────┐    │\n        │   │ Claude │───────▶│  DEIN FACH   │    │\n        │   │  Code  │  baut  │    mila/     │    │\n        │   └────────┘        └──────┬───────┘    │\n        │        ▲                   │            │\n        └────────┼───────────────────┼────────────┘\n                 │                   │\n            du sagst          ┌──────┴──────────┐\n            was du willst     ▼                 ▼\n                      stebookpro.local   …github.io/…\n                       DEIN iPAD            OMA\n                       (zuhause)          (überall)</pre>',
+    '<h2>Was steht hier eigentlich?</h2><pre class="klein">        ┌─────────────────────────────────────────┐\n        │           PAPAS COMPUTER                │\n        │   ┌────────┐        ┌──────────────┐    │\n        │   │ Claude │───────▶│  DEIN FACH   │    │\n        │   │  Code  │  baut  │    mila/     │    │\n        │   └────────┘        └──────┬───────┘    │\n        │        ▲                   │            │\n        └────────┼───────────────────┼────────────┘\n                 │                   │\n            du sagst          ┌──────┴──────────┐\n            was du willst     ▼                 ▼\n                      stebookpro.local   …github.io/…\n                       DEIN iPAD            MAMA\n                       (zuhause)          (überall)</pre>',
     '<h2>Zwei Adressen, nicht eine.</h2><pre>stebookpro.local:8000   →  zuhause, sofort\n…github.io/workshop/    →  die ganze Welt,\n                           nach dem Veröffentlichen</pre>',
     '<p class="riesig">„Bei mir geht\'s doch!"</p><p class="sub">— ja. Bei dir.</p>',
     '<p class="gross">Der Versions-Stempel: <code>v7 · 14:32</code></p><p class="sub">Alte Nummer = du siehst was Altes. Runterziehen zum Neuladen.</p>',
@@ -140,7 +140,7 @@ const TAGE = [
     'Bei S14 zehn Sekunden Stille aushalten. Nicht auflösen.',
     'Werkstatt-Moment: iPad rumgeben, jedes Kind sieht „Hier baut Mila".',
     'Bei der Umgebung an echten Dingen auf dem Bildschirm zeigen, nicht abstrakt reden.',
-    'Prüffrage am Ende: Kann jedes Kind erklären, warum erst Mittwoch gebaut wird?',
+    'Prüffrage am Ende: Kann jedes Kind erklären, warum erst Freitag gebaut wird?',
     'Nachbereitung: Welches Kind war am stillsten? Das wird morgen dein Interviewpartner beim Vormachen.'
   ]
 },
@@ -158,7 +158,7 @@ const TAGE = [
     '<h2>Zwei Prüffragen:</h2><pre>1. Steht da ein echter Name?\n   „Kinder" und „Leute" gelten nicht.\n2. Steht da schon eine Lösung drin?\n   Wenn „App" vorkommt → nochmal.</pre>',
     '<p class="kicker">DER PROBLEM-PASS</p><p class="gross">Ohne Pass kein Claude Code.</p>',
     '<h2>Feld 4: Woran merkst du, dass es geklappt hat?</h2><pre>✗  „Wenn die App gut ist."\n✓  „Wenn Levi in unter 15 Sekunden\n    etwas eingetragen hat, ohne zu fragen."</pre>',
-    '<p class="gross">Feld 5: Das Kleinste, was schon hilft.</p><p class="sub">Am Mittwoch hast du 20 Minuten.</p>',
+    '<p class="gross">Feld 5: Das Kleinste, was schon hilft.</p><p class="sub">Am Freitag hast du 20 Minuten.</p>',
     '<p class="gross">Wie tickt Claude eigentlich?</p><p class="sub">„Der Hund bellt im …" · „Es war einmal eine …" · „2, 4, 6, …"</p>',
     '<p class="gross">Genau das macht er: das nächste Stück raten. Er weiß nicht, ob es stimmt. Er weiß nur, was gut klingt.</p>',
     '<p class="gross">Wenn er etwas nicht weiß, sagt er selten „keine Ahnung". Er rät weiter — und das klingt genauso überzeugend.</p><p class="sub">Das heißt <b>Halluzination</b>.</p>',
@@ -170,7 +170,7 @@ const TAGE = [
     'Beim Vormachen das stillste Kind von gestern interviewen.',
     'Bei S9 hart sein. Sätze mit „App" oder ohne echten Namen gehen zurück. Das ist die einzige Härte, die die Woche braucht.',
     'Feld 5 <b>kleiner machen, als das Kind will.</b> Deine Hauptaufgabe heute. Ein soziales Netzwerk für Hunde wird zu einem Knopf.',
-    'Pass feierlich unterschreiben. Ernst gemeint — das Ritual trägt bis Freitag.',
+    'Pass feierlich unterschreiben. Ernst gemeint — das Ritual trägt bis Sonntag.',
     'Der Lösungs-Parkplatz aus Auftrag 1 wird jetzt wieder geöffnet: geparkte Ideen dürfen zurück ins Spiel.',
     'Wenn die Zeit knapp wird: S13–S17 kürzen, nicht den Pass.'
   ]
@@ -195,7 +195,7 @@ const TAGE = [
     '<b>Nicht selbst tippen.</b> Auch nicht, wenn es schneller ginge. Besonders dann nicht.',
     'Kinder ihren Prompt aussprechen lassen, bevor sie ihn tippen. Halbe Fehler lösen sich dabei von selbst.',
     'Fehler nicht wegräumen, bevor das Kind sie bemerkt hat.',
-    'Wenn v1 um Minute 25 nicht läuft: Feldtest mit der Papierskizze machen. Donnerstag 5 Minuten fertigbauen. Kein Drama.',
+    'Wenn v1 um Minute 25 nicht läuft: Feldtest mit der Papierskizze machen. Samstag 5 Minuten fertigbauen. Kein Drama.',
     'Versions-Stempel gleich nach der ersten Version einbauen lassen.',
     'Während des Sprints <b>nicht</b> veröffentlichen — kostet pro Änderung eine Minute. Nur am Ende.'
   ]
@@ -217,7 +217,7 @@ const TAGE = [
   ],
   notizen: [
     'Bei S5 die Stille aushalten. Der Moment trägt den ganzen Design-Thinking-Anspruch der Woche.',
-    'Die Später-Liste kommt an die Wand — sie ist am Freitag Ausstellungsmaterial und zeigt, dass bewusst ausgewählt wurde.',
+    'Die Später-Liste kommt an die Wand — sie ist am Sonntag Ausstellungsmaterial und zeigt, dass bewusst ausgewählt wurde.',
     'Wenn ein Kind lustlos ist: Auftrag 4 vorziehen, Einladung schreiben und <b>sofort persönlich übergeben</b>. Zugesagtes Publikum wirkt besser als jede Motivationsrede.',
     'Am Ende veröffentlichen lassen, damit der Stand gesichert ist.'
   ]
@@ -243,7 +243,7 @@ const TAGE = [
     'Beim Homescreen-Schritt alle gleichzeitig, laut mitzählen. Zeit zum Ausflippen ist eingeplant.',
     'Erst heute das Icon — vorher wäre es vier Tage lang eine Zwischenspeicher-Fehlerquelle gewesen.',
     'Zwei Titel am Abend, den ersten zuerst und ernst gemeint: <b>Fehler-Held</b> (lehrreichster Absturz) · <b>Problem-Jäger</b> (schärfste Problemformulierung, nicht schönste App)',
-    'Schlusssatz: „Das Coden übernimmt die Maschine immer mehr. Das Herausfinden, was gebaut werden sollte, bleibt bei euch. Deshalb waren Montag und Dienstag die wichtigsten Tage."'
+    'Schlusssatz: „Das Coden übernimmt die Maschine immer mehr. Das Herausfinden, was gebaut werden sollte, bleibt bei euch. Deshalb waren Mittwoch und Donnerstag die wichtigsten Tage."'
   ]
 }
 ];

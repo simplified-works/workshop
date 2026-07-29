@@ -13,12 +13,12 @@
 
 | Tag | Titel | In der Sitzung | Auftrag bis morgen |
 |---|---|---|---|
-| 1 · Mo | Der Roboter, der nichts weiß | Hook, Butterbrot, Umgebung, Gesetz | Ärger-Jagd: 10 echte Ärgernisse |
-| 2 · Di | Das Problem jagen | Fünfmal Warum, Problem-Pass | Interview + 8 Skizzen |
-| 3 · Mi | Bauen | Sprint 1, die kleinste Version | Feldtest bei der echten Person |
-| 4 · Do | Der echte Test | Beobachtungen einbauen | Name, Icon, Einladung |
-| 5 · Fr | Ausliefern | Politur, aufs Handy, QR | — |
-| Fr Abend | Die Vorführung | 15 Min. mit Publikum | |
+| 1 · Mi | Der Roboter, der nichts weiß | Hook, Butterbrot, Umgebung, Gesetz | Ärger-Jagd: 10 echte Ärgernisse |
+| 2 · Do | Das Problem jagen | Fünfmal Warum, Problem-Pass | Interview + 8 Skizzen |
+| 3 · Fr | Bauen | Sprint 1, die kleinste Version | Feldtest bei der echten Person |
+| 4 · Sa | Der echte Test | Beobachtungen einbauen | Name, Icon, Einladung |
+| 5 · So | Ausliefern | Politur, aufs Handy, QR | — |
+| So Abend | Die Vorführung | 15 Min. mit Publikum | |
 
 **Jeden Tag 30 Minuten.** Die eigentliche Arbeit passiert zwischen den Sitzungen.
 
@@ -77,16 +77,16 @@ Sichtbarer Timer. Harter Stopp bei 30 Minuten — auch mitten im spannendsten Mo
 
 **S3** — Der Bauplan
 ```
-MO   Wie tickt das Ding?
-DI   WAS baust du?     ← der schwerste Tag
-MI   Bauen
-DO   Jemand benutzt es. Du reparierst.
-FR   Aufs Handy. Vorführen.
+MI   Wie tickt das Ding?
+DO   WAS baust du?     ← der schwerste Tag
+FR   Bauen
+SA   Jemand benutzt es. Du reparierst.
+SO   Aufs Handy. Vorführen.
 ```
 
-**S4** — Am Freitag hast du: ein Icon auf deinem Handy. Und eine Adresse, die Oma öffnen kann.
+**S4** — Am Sonntag hast du: ein Icon auf deinem Handy. Und eine Adresse, die Mama öffnen kann.
 
-**S5** — Montag und Dienstag baut niemand. Erst muss klar sein, WAS.
+**S5** — Mittwoch und Donnerstag baut niemand. Erst muss klar sein, WAS.
 
 **S6** — DIE BUTTERBROT-CHALLENGE · Ich bin ein Roboter. Ich mache genau das, was ihr sagt.
 
@@ -129,7 +129,7 @@ stebookpro.local:8000   →  zuhause, sofort
             du sagst          ┌──────┴──────────┐
             was du willst     ▼                 ▼
                       stebookpro.local   …github.io/…
-                       DEIN iPAD            OMA
+                       DEIN iPAD            MAMA
                        (zuhause)          (überall)
 ```
 
@@ -140,14 +140,14 @@ stebookpro.local:8000   →  zuhause, sofort
 - Bei S14 zehn Sekunden Stille aushalten. Nicht auflösen.
 - Werkstatt-Moment: iPad rumgeben, jedes Kind sieht „Hier baut Mila".
 - Bei der Umgebung an echten Dingen auf dem Bildschirm zeigen, nicht abstrakt reden.
-- Prüffrage am Ende: Kann jedes Kind erklären, warum erst Mittwoch gebaut wird?
+- Prüffrage am Ende: Kann jedes Kind erklären, warum erst Freitag gebaut wird?
 - Nachbereitung: Welches Kind war am stillsten? Das wird morgen dein Interviewpartner beim Vormachen.
 
 ---
 
 # TAG 2 · Das Problem jagen
 
-Der schwerste und wichtigste Tag. Wenn hier schlampig gearbeitet wird, baut das Kind am Mittwoch etwas, das niemand braucht.
+Der schwerste und wichtigste Tag. Wenn hier schlampig gearbeitet wird, baut das Kind am Freitag etwas, das niemand braucht.
 
 **Ablauf:** Logbuch (0–4) · Fünfmal Warum (4–12) · Zuspitzen + Pass (12–22) · Feld 4 & 5 (22–27) · Cliffhanger + Auftrag (27–30)
 
@@ -197,7 +197,7 @@ weil [ÜBERRASCHUNG].
     etwas eingetragen hat, ohne zu fragen."
 ```
 
-**S12** — Feld 5: Das Kleinste, was schon hilft. Am Mittwoch hast du 20 Minuten.
+**S12** — Feld 5: Das Kleinste, was schon hilft. Am Freitag hast du 20 Minuten.
 
 **S13** — Wie tickt Claude eigentlich? „Der Hund bellt im …" · „Es war einmal eine …" · „2, 4, 6, …"
 
@@ -216,7 +216,7 @@ weil [ÜBERRASCHUNG].
 - Beim Vormachen das stillste Kind von gestern interviewen.
 - Bei S9 hart sein. Sätze mit „App" oder ohne echten Namen gehen zurück. Das ist die einzige Härte, die die Woche braucht.
 - Feld 5 **kleiner machen, als das Kind will.** Deine Hauptaufgabe heute. Ein soziales Netzwerk für Hunde wird zu einem Knopf.
-- Pass feierlich unterschreiben. Ernst gemeint — das Ritual trägt bis Freitag.
+- Pass feierlich unterschreiben. Ernst gemeint — das Ritual trägt bis Sonntag.
 - Der Lösungs-Parkplatz aus Auftrag 1 wird jetzt wieder geöffnet: geparkte Ideen dürfen zurück ins Spiel.
 - Wenn die Zeit knapp wird: S13–S17 kürzen, nicht den Pass.
 
@@ -274,7 +274,7 @@ Passiert ist:  [was wirklich kam]
 - **Nicht selbst tippen.** Auch nicht, wenn es schneller ginge. Besonders dann nicht.
 - Kinder ihren Prompt aussprechen lassen, bevor sie ihn tippen. Halbe Fehler lösen sich dabei von selbst.
 - Fehler nicht wegräumen, bevor das Kind sie bemerkt hat.
-- Wenn v1 um Minute 25 nicht läuft: Feldtest mit der Papierskizze machen. Donnerstag 5 Minuten fertigbauen. Kein Drama.
+- Wenn v1 um Minute 25 nicht läuft: Feldtest mit der Papierskizze machen. Samstag 5 Minuten fertigbauen. Kein Drama.
 - Versions-Stempel gleich nach der ersten Version einbauen lassen.
 - Während des Sprints **nicht** veröffentlichen — kostet pro Änderung eine Minute. Nur am Ende.
 
@@ -322,7 +322,7 @@ Sag WAS, nicht WIE.
 ### Presenter-Notizen
 
 - Bei S5 die Stille aushalten. Der Moment trägt den ganzen Design-Thinking-Anspruch der Woche.
-- Die Später-Liste kommt an die Wand — sie ist am Freitag Ausstellungsmaterial und zeigt, dass bewusst ausgewählt wurde.
+- Die Später-Liste kommt an die Wand — sie ist am Sonntag Ausstellungsmaterial und zeigt, dass bewusst ausgewählt wurde.
 - Wenn ein Kind lustlos ist: Auftrag 4 vorziehen, Einladung schreiben und **sofort persönlich übergeben**. Zugesagtes Publikum wirkt besser als jede Motivationsrede.
 - Am Ende veröffentlichen lassen, damit der Stand gesichert ist.
 
@@ -386,7 +386,7 @@ KEIN Service Worker.
 - Erst heute das Icon — vorher wäre es vier Tage lang eine Zwischenspeicher-Fehlerquelle gewesen.
 - Zwei Titel am Abend, den ersten zuerst und ernst gemeint:
   **Fehler-Held** (lehrreichster Absturz) · **Problem-Jäger** (schärfste Problemformulierung, nicht schönste App)
-- Schlusssatz: „Das Coden übernimmt die Maschine immer mehr. Das Herausfinden, was gebaut werden sollte, bleibt bei euch. Deshalb waren Montag und Dienstag die wichtigsten Tage."
+- Schlusssatz: „Das Coden übernimmt die Maschine immer mehr. Das Herausfinden, was gebaut werden sollte, bleibt bei euch. Deshalb waren Mittwoch und Donnerstag die wichtigsten Tage."
 
 ---
 
@@ -414,7 +414,7 @@ KEIN Service Worker.
 
 # Die Auftragskarten
 
-### Auftrag 1 · Montag — Die Ärger-Jagd
+### Auftrag 1 · Mittwoch — Die Ärger-Jagd
 
 Sammle bis morgen 10 Sachen, die nerven. Eine pro Eintrag.
 
@@ -425,7 +425,7 @@ Schreib dazu: **wer** hat sich geärgert und **wann**.
 
 → Fällt dir eine Lösung ein? Ab auf den **Parkplatz**. Nicht jetzt.
 
-### Auftrag 2 · Dienstag — Das echte Interview
+### Auftrag 2 · Donnerstag — Das echte Interview
 
 **A)** Sprich mit der Person aus deinem Pass. Frag fünfmal „Warum?". Schreib möglichst wörtlich mit, was sie sagt. *(Nicht da? Ruf an. Ernsthaft.)*
 
@@ -433,7 +433,7 @@ Schreib dazu: **wer** hat sich geärgert und **wann**.
 
 **C)** Zeig ihr deine beste Skizze. Schreib auf, was sie sagt. Besonders, wenn sie etwas nicht versteht.
 
-### Auftrag 3 · Mittwoch — Der Feldtest ⚠ Schweigepflicht
+### Auftrag 3 · Freitag — Der Feldtest ⚠ Schweigepflicht
 
 Gib deine App der echten Person. Sag nur **einen** Satz — die Aufgabe. Zum Beispiel: „Trag mal eine Hausaufgabe ein."
 
@@ -442,7 +442,7 @@ Gib deine App der echten Person. Sag nur **einen** Satz — die Aufgabe. Zum Bei
 Notiere: *Ich mag … / Ich wünschte … / Was wäre, wenn …*
 Und: Wo hat sie gezögert? Wo hat sie geklickt, wo du es nicht erwartet hast?
 
-### Auftrag 4 · Donnerstag — Fertig machen
+### Auftrag 4 · Samstag — Fertig machen
 
 1. Finde einen Namen. Höchstens 12 Zeichen.
 2. Zeichne dein App-Icon. Einfach. Muss auch ganz klein erkennbar sein.
