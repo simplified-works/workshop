@@ -1,34 +1,332 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Henry</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Langeweile? Weg damit!</title>
 <style>
-  body {
-    font-family: -apple-system, sans-serif;
-    font-size: 28px;
+  * {
     margin: 0;
-    padding: 48px 32px;
-    min-height: 100vh;
+    padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
   }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
+    background: linear-gradient(160deg, #ffdf6b 0%, #ff9e5e 35%, #ff6b9d 70%, #a06bff 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: calc(env(safe-area-inset-top) + 16px) 20px calc(env(safe-area-inset-bottom) + 20px);
+    text-align: center;
+    color: #3a2a4d;
+  }
+
   h1 {
-    font-size: 44px;
-    line-height: 1.3;
-    margin: 0;
+    font-size: clamp(26px, 6vw, 44px);
+    color: #fff;
+    text-shadow: 0 3px 0 rgba(0,0,0,0.15);
+    margin-top: 8px;
   }
-  .version {
-    position: fixed;
-    bottom: 12px;
-    right: 16px;
+
+  .untertitel {
+    color: rgba(255,255,255,0.9);
+    font-size: clamp(15px, 3.5vw, 20px);
+    margin-top: 6px;
+    font-weight: 600;
+  }
+
+  /* Die Karte, auf der die Idee steht */
+  .karte {
+    background: #fff;
+    border-radius: 28px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+    padding: 28px 24px;
+    width: 100%;
+    max-width: 520px;
+    min-height: 240px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    transition: transform 0.15s ease;
+  }
+
+  .karte.wackeln {
+    animation: reinhuepfen 0.4s ease;
+  }
+
+  @keyframes reinhuepfen {
+    0%   { transform: scale(0.7) rotate(-4deg); opacity: 0; }
+    60%  { transform: scale(1.08) rotate(2deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+
+  .emoji-gross {
+    font-size: clamp(56px, 14vw, 90px);
+    line-height: 1;
+  }
+
+  .ideen-text {
+    font-size: clamp(20px, 5vw, 30px);
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .witz-hinweis {
     font-size: 14px;
-    color: #999;
+    font-weight: 700;
+    color: #a06bff;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* Daumen hoch / runter */
+  .bewertung {
+    display: flex;
+    gap: 18px;
+    margin-top: 6px;
+  }
+
+  .bewertung button {
+    font-size: 34px;
+    background: #f2edfa;
+    border: none;
+    border-radius: 50%;
+    width: 68px;
+    height: 68px;
+    cursor: pointer;
+    transition: transform 0.1s ease, background 0.2s ease;
+  }
+
+  .bewertung button:active {
+    transform: scale(1.25);
+  }
+
+  .bewertung button.gewaehlt-gut { background: #baf5c4; }
+  .bewertung button.gewaehlt-schlecht { background: #ffc9c9; }
+
+  .danke {
+    font-size: 15px;
+    color: #8a7aa0;
+    font-weight: 600;
+    min-height: 20px;
+  }
+
+  /* Der grosse Knopf */
+  .idee-knopf {
+    background: #4dcb7c;
+    color: #fff;
+    font-size: clamp(22px, 5.5vw, 30px);
+    font-weight: 800;
+    border: none;
+    border-radius: 999px;
+    padding: 22px 44px;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 8px 0 #359c5c, 0 14px 24px rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+    margin-top: 16px;
+  }
+
+  .idee-knopf:active {
+    transform: translateY(6px);
+    box-shadow: 0 2px 0 #359c5c, 0 6px 12px rgba(0,0,0,0.2);
+  }
+
+  .zaehler {
+    color: rgba(255,255,255,0.85);
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 12px;
   }
 </style>
 </head>
 <body>
-  <h1>Hier baut Henry</h1>
-  <div class="version">v1 · 08:48</div>
+
+  <div>
+    <h1>🚀 Langeweile? Weg damit!</h1>
+    <div class="untertitel">Drück den Knopf und du weisst, was du machen kannst!</div>
+  </div>
+
+  <div class="karte" id="karte">
+    <div class="witz-hinweis" id="witzHinweis" style="display:none">😂 Witz-Pause!</div>
+    <div class="emoji-gross" id="emoji">🎈</div>
+    <div class="ideen-text" id="ideenText">Bereit? Drück auf den grünen Knopf!</div>
+    <div class="bewertung" id="bewertung" style="display:none">
+      <button id="daumenHoch" onclick="bewerten(1)">👍</button>
+      <button id="daumenRunter" onclick="bewerten(-1)">👎</button>
+    </div>
+    <div class="danke" id="danke"></div>
+  </div>
+
+  <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+    <button class="idee-knopf" onclick="neueIdee()">✨ Gib mir eine Idee!</button>
+    <div class="zaehler" id="zaehler"></div>
+  </div>
+
+<script>
+  // ─────────────────────────────────────────────
+  // Hier stehen alle Ideen. Du kannst selber welche dazuschreiben!
+  // ─────────────────────────────────────────────
+  const IDEEN = [
+    { emoji: "🏰", text: "Bau eine Höhle aus Decken und Kissen!" },
+    { emoji: "🎨", text: "Mal ein Bild von deinem Lieblingstier!" },
+    { emoji: "📚", text: "Lies ein Buch an einem geheimen Ort!" },
+    { emoji: "🧩", text: "Mach ein Puzzle – auf Zeit!" },
+    { emoji: "🕵️", text: "Spiel Detektiv: Versteck etwas und schreib eine Schatzkarte!" },
+    { emoji: "🍪", text: "Frag, ob ihr zusammen Guetzli backen könnt!" },
+    { emoji: "🎭", text: "Erfinde ein Theaterstück und führ es der Familie vor!" },
+    { emoji: "🚲", text: "Mach eine Velotour um den Block!" },
+    { emoji: "🎵", text: "Erfinde einen eigenen Song und nimm ihn auf!" },
+    { emoji: "🏗️", text: "Bau den höchsten Turm, den du kannst – aus Lego oder Bauklötzen!" },
+    { emoji: "🔬", text: "Mach ein Experiment: Was schwimmt, was sinkt? Teste es mit Sachen aus der Küche!" },
+    { emoji: "🎪", text: "Übe einen Zaubertrick und zeig ihn jemandem!" },
+    { emoji: "🐜", text: "Geh raus und beobachte Insekten – wie viele verschiedene findest du?" },
+    { emoji: "✉️", text: "Schreib einen Brief an deine Grosseltern oder einen Freund!" },
+    { emoji: "🏃", text: "Bau einen Hindernis-Parcours und stopp deine Zeit!" },
+    { emoji: "📸", text: "Mach eine Foto-Safari: Fotografiere 10 rote Dinge!" },
+    { emoji: "🃏", text: "Bau ein Kartenhaus – wie hoch schaffst du es?" },
+    { emoji: "🌱", text: "Pflanz etwas ein und schau ihm beim Wachsen zu!" },
+    { emoji: "🎲", text: "Erfinde dein eigenes Brettspiel mit eigenen Regeln!" },
+    { emoji: "📖", text: "Schreib eine Geschichte über einen Superhelden – du bist der Held!" },
+    { emoji: "🧦", text: "Sockentheater! Mach aus alten Socken Handpuppen!" },
+    { emoji: "🎯", text: "Bau eine Wurfbude mit Bechern und einem Ball!" },
+    { emoji: "🗺️", text: "Zeichne eine Karte von deinem Zimmer oder deiner Wohnung!" },
+    { emoji: "💃", text: "Mach eine Tanzparty – dreh die Musik auf!" },
+    { emoji: "🔭", text: "Schau am Abend die Sterne an – findest du den grossen Wagen?" },
+    { emoji: "🏴‍☠️", text: "Spiel Pirat: Dein Bett ist das Schiff, der Boden ist das Meer!" },
+    { emoji: "🧊", text: "Frier kleine Spielsachen in Eiswürfel ein und befreie sie!" },
+    { emoji: "📞", text: "Ruf jemanden an, den du gern hast!" },
+    { emoji: "🎬", text: "Dreh einen kurzen Film mit deinen Spielsachen!" },
+    { emoji: "🍋", text: "Mach selber Zitronen-Limonade!" },
+    { emoji: "🪁", text: "Bastle etwas aus Papier: Flieger, Schiff oder Hut!" },
+    { emoji: "🤸", text: "Lern einen neuen Trick: Handstand, Rad oder Jonglieren!" },
+    { emoji: "🔍", text: "Mach eine Schnitzeljagd für jemanden aus deiner Familie!" },
+    { emoji: "🎹", text: "Erfinde ein Instrument aus Sachen, die du findest!" },
+    { emoji: "🐾", text: "Denk dir ein Fantasie-Tier aus und zeichne es!" },
+    { emoji: "🏠", text: "Bau ein Haus für deine Kuscheltiere!" },
+    { emoji: "⏰", text: "Räum dein Zimmer auf – aber auf Zeit, wie ein Wettkampf!" },
+    { emoji: "🌈", text: "Sammle draussen Sachen in allen Regenbogenfarben!" },
+    { emoji: "🥷", text: "Schleich-Training: Beweg dich durchs Haus, ohne dass dich jemand hört!" },
+    { emoji: "🧠", text: "Lern 5 neue Wörter in einer anderen Sprache!" }
+  ];
+
+  // ─────────────────────────────────────────────
+  // Die Witze für die Witz-Pause
+  // ─────────────────────────────────────────────
+  const WITZE = [
+    { emoji: "🐄", text: "Was macht eine Kuh, wenn ihr langweilig ist? – Muuuhsik hören!" },
+    { emoji: "🍝", text: "Was ist gelb und kann nicht schwimmen? – Ein Bagger. Und warum? – Weil er nur einen Arm hat!" },
+    { emoji: "🦈", text: "Was ist der Lieblingssport von Haien? – Zähneputzen... äh nein: Menschen-Schwimmen!" },
+    { emoji: "🐧", text: "Was sagt ein Pinguin in der Wüste? – «Ich glaub, ich bin falsch abgebogen!»" },
+    { emoji: "🍞", text: "Treffen sich zwei Brote. Sagt das eine: «Du siehst heute aber alt aus!» – «Ja, ich bin von gestern.»" },
+    { emoji: "👻", text: "Warum können Geister so schlecht lügen? – Weil man durch sie hindurchsieht!" },
+    { emoji: "🐘", text: "Warum haben Elefanten rote Augen? – Damit sie sich besser im Kirschbaum verstecken können!" },
+    { emoji: "🧛", text: "Was trinkt ein Vampir am liebsten? – Tomatensaft mit ganz viel O!" },
+    { emoji: "🐌", text: "Sagt eine Schnecke zur anderen: «Wow, du bist aber schnell heute!» – «Ja, ich hab Turnschuhe an!»" },
+    { emoji: "🦒", text: "Warum hat die Giraffe so einen langen Hals? – Weil ihr Kopf so weit oben ist!" },
+    { emoji: "🍕", text: "Was sagt eine Pizza, die zu spät kommt? – «Sorry, ich war noch im Ofen!»" },
+    { emoji: "🐟", text: "Was macht ein Fisch am Computer? – Er surft im Netz!" },
+    { emoji: "🤖", text: "Warum ging der Roboter zum Arzt? – Er hatte einen Virus!" },
+    { emoji: "🐝", text: "Was sagt eine Biene zur Blume? – «Hallo Süsse!»" },
+    { emoji: "⚽", text: "Warum können Skelette so schlecht Fussball spielen? – Weil ihnen der Mumm fehlt!" }
+  ];
+
+  // ─────────────────────────────────────────────
+  // Hier merkt sich die App deine Bewertungen (👍 = +1, 👎 = -1).
+  // Das bleibt gespeichert, auch wenn du die App schliesst!
+  // ─────────────────────────────────────────────
+  let punkte = JSON.parse(localStorage.getItem("ideenPunkte") || "{}");
+  let klickZahl = 0;
+  let aktuelleIdee = null;
+  let letzteIdeen = []; // damit nicht 2x hintereinander das Gleiche kommt
+
+  function speichern() {
+    localStorage.setItem("ideenPunkte", JSON.stringify(punkte));
+  }
+
+  // Ideen mit vielen 👍 kommen öfter, Ideen mit vielen 👎 fast nie.
+  function gewichtVon(idee) {
+    const p = punkte[idee.text] || 0;
+    if (p <= -2) return 0.05;   // fast nie
+    if (p < 0)   return 0.3;    // selten
+    return 1 + p * 0.5;          // je mehr 👍, desto öfter
+  }
+
+  function zufaelligeIdee() {
+    const auswahl = IDEEN.filter(i => !letzteIdeen.includes(i.text));
+    let summe = 0;
+    for (const i of auswahl) summe += gewichtVon(i);
+    let los = Math.random() * summe;
+    for (const i of auswahl) {
+      los -= gewichtVon(i);
+      if (los <= 0) return i;
+    }
+    return auswahl[auswahl.length - 1];
+  }
+
+  function neueIdee() {
+    klickZahl++;
+
+    const karte = document.getElementById("karte");
+    karte.classList.remove("wackeln");
+    void karte.offsetWidth; // Trick, damit die Animation neu startet
+    karte.classList.add("wackeln");
+
+    document.getElementById("danke").textContent = "";
+    document.getElementById("daumenHoch").className = "";
+    document.getElementById("daumenRunter").className = "";
+
+    // Jedes 4. Mal gibt es einen Witz statt einer Idee!
+    if (klickZahl % 4 === 0) {
+      const witz = WITZE[Math.floor(Math.random() * WITZE.length)];
+      document.getElementById("witzHinweis").style.display = "block";
+      document.getElementById("emoji").textContent = witz.emoji;
+      document.getElementById("ideenText").textContent = witz.text;
+      document.getElementById("bewertung").style.display = "none";
+      aktuelleIdee = null;
+    } else {
+      aktuelleIdee = zufaelligeIdee();
+      letzteIdeen.push(aktuelleIdee.text);
+      if (letzteIdeen.length > 5) letzteIdeen.shift();
+
+      document.getElementById("witzHinweis").style.display = "none";
+      document.getElementById("emoji").textContent = aktuelleIdee.emoji;
+      document.getElementById("ideenText").textContent = aktuelleIdee.text;
+      document.getElementById("bewertung").style.display = "flex";
+    }
+
+    document.getElementById("zaehler").textContent =
+      "Schon " + klickZahl + (klickZahl === 1 ? " Idee geholt" : " Ideen geholt");
+  }
+
+  function bewerten(wert) {
+    if (!aktuelleIdee) return;
+    punkte[aktuelleIdee.text] = (punkte[aktuelleIdee.text] || 0) + wert;
+    speichern();
+
+    if (wert === 1) {
+      document.getElementById("daumenHoch").className = "gewaehlt-gut";
+      document.getElementById("danke").textContent = "Super! Die Idee kommt jetzt öfter. 🎉";
+    } else {
+      document.getElementById("daumenRunter").className = "gewaehlt-schlecht";
+      document.getElementById("danke").textContent = "Okay, die zeig ich dir fast nicht mehr.";
+    }
+  }
+</script>
 </body>
 </html>
