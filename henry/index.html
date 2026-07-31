@@ -5,8 +5,36 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Langeweile? Weg damit!</title>
+<meta name="apple-mobile-web-app-title" content="IdeenBlitz">
+<meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<link rel="apple-touch-icon" href="icon.png">
+<title>IdeenBlitz – Nie mehr Langeweile</title>
 <style>
+  :root {
+    --hintergrund: #f2f2f7;
+    --karte: #ffffff;
+    --text: #1c1c2e;
+    --text-leise: #8e8e93;
+    --akzent1: #7c3aed;
+    --akzent2: #f43f5e;
+    --chip: #eeeaf9;
+    --daumen-bg: #f2f2f7;
+    --schatten: 0 8px 24px rgba(28, 28, 46, 0.10), 0 2px 6px rgba(28, 28, 46, 0.06);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --hintergrund: #000000;
+      --karte: #1c1c1e;
+      --text: #f2f2f7;
+      --text-leise: #98989e;
+      --chip: #2c2440;
+      --daumen-bg: #2c2c2e;
+      --schatten: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+  }
+
   * {
     margin: 0;
     padding: 0;
@@ -22,161 +50,220 @@
   }
 
   body {
-    font-family: -apple-system, "Helvetica Neue", Arial, sans-serif;
-    background: linear-gradient(160deg, #ffdf6b 0%, #ff9e5e 35%, #ff6b9d 70%, #a06bff 100%);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+    background: var(--hintergrund);
+    color: var(--text);
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    padding: calc(env(safe-area-inset-top) + 16px) 20px calc(env(safe-area-inset-bottom) + 20px);
+    padding: calc(env(safe-area-inset-top) + 14px) 20px calc(env(safe-area-inset-bottom) + 18px);
     text-align: center;
-    color: #3a2a4d;
   }
 
-  h1 {
-    font-size: clamp(26px, 6vw, 44px);
-    color: #fff;
-    text-shadow: 0 3px 0 rgba(0,0,0,0.15);
-    margin-top: 8px;
-  }
-
-  .untertitel {
-    color: rgba(255,255,255,0.9);
-    font-size: clamp(15px, 3.5vw, 20px);
-    margin-top: 6px;
-    font-weight: 600;
-  }
-
-  /* Die Karte, auf der die Idee steht */
-  .karte {
-    background: #fff;
-    border-radius: 28px;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.2);
-    padding: 28px 24px;
+  /* ── Kopfzeile mit Logo ───────────────────── */
+  header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
     width: 100%;
-    max-width: 520px;
-    min-height: 240px;
+    max-width: 560px;
+  }
+
+  .logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 11px;
+    flex-shrink: 0;
+    box-shadow: 0 3px 10px rgba(124, 58, 237, 0.35);
+  }
+
+  .app-name {
+    text-align: left;
+  }
+
+  .app-name b {
+    display: block;
+    font-size: 21px;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+  }
+
+  .app-name span {
+    font-size: 13px;
+    color: var(--text-leise);
+    font-weight: 500;
+  }
+
+  /* ── Bühne (Mitte) ────────────────────────── */
+  main {
+    flex: 1;
+    width: 100%;
+    max-width: 560px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 14px;
-    transition: transform 0.15s ease;
+    min-height: 0;
   }
 
-  .karte.wackeln {
-    animation: reinhuepfen 0.4s ease;
+  .karte {
+    background: var(--karte);
+    border-radius: 26px;
+    box-shadow: var(--schatten);
+    padding: clamp(24px, 5vh, 40px) 26px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
   }
 
-  @keyframes reinhuepfen {
-    0%   { transform: scale(0.7) rotate(-4deg); opacity: 0; }
-    60%  { transform: scale(1.08) rotate(2deg); opacity: 1; }
-    100% { transform: scale(1) rotate(0deg); }
+  .karte.neu {
+    animation: reinschweben 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
-  .emoji-gross {
-    font-size: clamp(56px, 14vw, 90px);
+  @keyframes reinschweben {
+    from { transform: translateY(24px) scale(0.94); opacity: 0; }
+    to   { transform: translateY(0) scale(1); opacity: 1; }
+  }
+
+  .abzeichen {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--akzent1);
+    background: var(--chip);
+    padding: 6px 14px;
+    border-radius: 999px;
+  }
+
+  .emoji-kreis {
+    width: clamp(88px, 20vh, 128px);
+    height: clamp(88px, 20vh, 128px);
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 25%, rgba(124,58,237,0.16), rgba(244,63,94,0.12));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(48px, 11vh, 72px);
     line-height: 1;
   }
 
   .ideen-text {
-    font-size: clamp(20px, 5vw, 30px);
+    font-size: clamp(19px, 4.6vw, 27px);
     font-weight: 700;
-    line-height: 1.3;
+    letter-spacing: -0.3px;
+    line-height: 1.35;
+    min-height: 2.7em;
+    display: flex;
+    align-items: center;
   }
 
-  .witz-hinweis {
-    font-size: 14px;
-    font-weight: 700;
-    color: #a06bff;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-
-  /* Daumen hoch / runter */
+  /* ── Bewertung ────────────────────────────── */
   .bewertung {
     display: flex;
-    gap: 18px;
-    margin-top: 6px;
+    gap: 16px;
   }
 
   .bewertung button {
-    font-size: 34px;
-    background: #f2edfa;
+    font-size: 26px;
+    background: var(--daumen-bg);
     border: none;
     border-radius: 50%;
-    width: 68px;
-    height: 68px;
+    width: 58px;
+    height: 58px;
     cursor: pointer;
-    transition: transform 0.1s ease, background 0.2s ease;
+    transition: transform 0.12s ease, background 0.2s ease, box-shadow 0.2s ease;
   }
 
-  .bewertung button:active {
-    transform: scale(1.25);
-  }
-
-  .bewertung button.gewaehlt-gut { background: #baf5c4; }
-  .bewertung button.gewaehlt-schlecht { background: #ffc9c9; }
+  .bewertung button:active { transform: scale(1.2); }
+  .bewertung button.gut     { background: #30d158; box-shadow: 0 4px 12px rgba(48,209,88,0.4); }
+  .bewertung button.schlecht{ background: #ff453a; box-shadow: 0 4px 12px rgba(255,69,58,0.4); }
 
   .danke {
-    font-size: 15px;
-    color: #8a7aa0;
+    font-size: 14px;
     font-weight: 600;
-    min-height: 20px;
+    color: var(--text-leise);
+    min-height: 18px;
   }
 
-  /* Der grosse Knopf */
-  .idee-knopf {
-    background: #4dcb7c;
-    color: #fff;
-    font-size: clamp(22px, 5.5vw, 30px);
-    font-weight: 800;
-    border: none;
-    border-radius: 999px;
-    padding: 22px 44px;
+  /* ── Grosser Knopf unten ──────────────────── */
+  footer {
     width: 100%;
-    max-width: 520px;
-    box-shadow: 0 8px 0 #359c5c, 0 14px 24px rgba(0,0,0,0.2);
+    max-width: 560px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .idee-knopf {
+    width: 100%;
+    border: none;
+    border-radius: 20px;
+    padding: 19px;
+    font-family: inherit;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.2px;
+    color: #fff;
+    background: linear-gradient(135deg, var(--akzent1), var(--akzent2));
+    box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35);
     cursor: pointer;
-    transition: transform 0.08s ease, box-shadow 0.08s ease;
-    margin-top: 16px;
+    transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.1s ease;
   }
 
   .idee-knopf:active {
-    transform: translateY(6px);
-    box-shadow: 0 2px 0 #359c5c, 0 6px 12px rgba(0,0,0,0.2);
+    transform: scale(0.97);
+    filter: brightness(1.1);
+    box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3);
   }
 
   .zaehler {
-    color: rgba(255,255,255,0.85);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
-    margin-top: 12px;
+    color: var(--text-leise);
   }
 </style>
 </head>
 <body>
 
-  <div>
-    <h1>🚀 Langeweile? Weg damit!</h1>
-    <div class="untertitel">Drück den Knopf und du weisst, was du machen kannst!</div>
-  </div>
-
-  <div class="karte" id="karte">
-    <div class="witz-hinweis" id="witzHinweis" style="display:none">😂 Witz-Pause!</div>
-    <div class="emoji-gross" id="emoji">🎈</div>
-    <div class="ideen-text" id="ideenText">Bereit? Drück auf den grünen Knopf!</div>
-    <div class="bewertung" id="bewertung" style="display:none">
-      <button id="daumenHoch" onclick="bewerten(1)">👍</button>
-      <button id="daumenRunter" onclick="bewerten(-1)">👎</button>
+  <header>
+    <!-- Das Logo: ein Blitz, weil die Ideen blitzschnell kommen -->
+    <svg class="logo" viewBox="0 0 100 100" aria-hidden="true">
+      <defs>
+        <linearGradient id="logoVerlauf" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#7c3aed"/>
+          <stop offset="1" stop-color="#f43f5e"/>
+        </linearGradient>
+      </defs>
+      <rect width="100" height="100" rx="24" fill="url(#logoVerlauf)"/>
+      <path d="M60 12 L24 56 L45 56 L40 88 L76 44 L55 44 Z" fill="#fff"/>
+    </svg>
+    <div class="app-name">
+      <b>IdeenBlitz</b>
+      <span>Nie mehr Langeweile</span>
     </div>
-    <div class="danke" id="danke"></div>
-  </div>
+  </header>
 
-  <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
-    <button class="idee-knopf" onclick="neueIdee()">✨ Gib mir eine Idee!</button>
-    <div class="zaehler" id="zaehler"></div>
-  </div>
+  <main>
+    <div class="karte" id="karte">
+      <div class="abzeichen" id="abzeichen">Deine Idee</div>
+      <div class="emoji-kreis" id="emoji">⚡️</div>
+      <div class="ideen-text" id="ideenText">Bereit? Hol dir deinen ersten Ideen&#8203;blitz!</div>
+      <div class="bewertung" id="bewertung" style="visibility:hidden">
+        <button id="daumenHoch" onclick="bewerten(1)" aria-label="Gute Idee">👍</button>
+        <button id="daumenRunter" onclick="bewerten(-1)" aria-label="Schlechte Idee">👎</button>
+      </div>
+      <div class="danke" id="danke"></div>
+    </div>
+  </main>
+
+  <footer>
+    <button class="idee-knopf" onclick="neueIdee()">⚡️ Ideenblitz!</button>
+    <div class="zaehler" id="zaehler">Drück den Knopf, wenn dir langweilig ist</div>
+  </footer>
 
 <script>
   // ─────────────────────────────────────────────
@@ -230,8 +317,7 @@
   // ─────────────────────────────────────────────
   const WITZE = [
     { emoji: "🐄", text: "Was macht eine Kuh, wenn ihr langweilig ist? – Muuuhsik hören!" },
-    { emoji: "🍝", text: "Was ist gelb und kann nicht schwimmen? – Ein Bagger. Und warum? – Weil er nur einen Arm hat!" },
-    { emoji: "🦈", text: "Was ist der Lieblingssport von Haien? – Zähneputzen... äh nein: Menschen-Schwimmen!" },
+    { emoji: "🚜", text: "Was ist gelb und kann nicht schwimmen? – Ein Bagger. Und warum? – Weil er nur einen Arm hat!" },
     { emoji: "🐧", text: "Was sagt ein Pinguin in der Wüste? – «Ich glaub, ich bin falsch abgebogen!»" },
     { emoji: "🍞", text: "Treffen sich zwei Brote. Sagt das eine: «Du siehst heute aber alt aus!» – «Ja, ich bin von gestern.»" },
     { emoji: "👻", text: "Warum können Geister so schlecht lügen? – Weil man durch sie hindurchsieht!" },
@@ -283,35 +369,37 @@
     klickZahl++;
 
     const karte = document.getElementById("karte");
-    karte.classList.remove("wackeln");
+    karte.classList.remove("neu");
     void karte.offsetWidth; // Trick, damit die Animation neu startet
-    karte.classList.add("wackeln");
+    karte.classList.add("neu");
 
     document.getElementById("danke").textContent = "";
     document.getElementById("daumenHoch").className = "";
     document.getElementById("daumenRunter").className = "";
 
+    const abzeichen = document.getElementById("abzeichen");
+
     // Jedes 4. Mal gibt es einen Witz statt einer Idee!
     if (klickZahl % 4 === 0) {
       const witz = WITZE[Math.floor(Math.random() * WITZE.length)];
-      document.getElementById("witzHinweis").style.display = "block";
+      abzeichen.textContent = "😂 Witz-Pause";
       document.getElementById("emoji").textContent = witz.emoji;
       document.getElementById("ideenText").textContent = witz.text;
-      document.getElementById("bewertung").style.display = "none";
+      document.getElementById("bewertung").style.visibility = "hidden";
       aktuelleIdee = null;
     } else {
       aktuelleIdee = zufaelligeIdee();
       letzteIdeen.push(aktuelleIdee.text);
       if (letzteIdeen.length > 5) letzteIdeen.shift();
 
-      document.getElementById("witzHinweis").style.display = "none";
+      abzeichen.textContent = "⚡️ Deine Idee";
       document.getElementById("emoji").textContent = aktuelleIdee.emoji;
       document.getElementById("ideenText").textContent = aktuelleIdee.text;
-      document.getElementById("bewertung").style.display = "flex";
+      document.getElementById("bewertung").style.visibility = "visible";
     }
 
     document.getElementById("zaehler").textContent =
-      "Schon " + klickZahl + (klickZahl === 1 ? " Idee geholt" : " Ideen geholt");
+      klickZahl + (klickZahl === 1 ? " Ideenblitz geholt" : " Ideenblitze geholt");
   }
 
   function bewerten(wert) {
@@ -320,10 +408,10 @@
     speichern();
 
     if (wert === 1) {
-      document.getElementById("daumenHoch").className = "gewaehlt-gut";
+      document.getElementById("daumenHoch").className = "gut";
       document.getElementById("danke").textContent = "Super! Die Idee kommt jetzt öfter. 🎉";
     } else {
-      document.getElementById("daumenRunter").className = "gewaehlt-schlecht";
+      document.getElementById("daumenRunter").className = "schlecht";
       document.getElementById("danke").textContent = "Okay, die zeig ich dir fast nicht mehr.";
     }
   }
