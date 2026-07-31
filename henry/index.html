@@ -14,13 +14,15 @@
   :root {
     --hintergrund: #f2f2f7;
     --karte: #ffffff;
-    --text: #1c1c2e;
+    --text: #16162a;
     --text-leise: #8e8e93;
     --akzent1: #7c3aed;
     --akzent2: #f43f5e;
     --chip: #eeeaf9;
-    --daumen-bg: #f2f2f7;
-    --schatten: 0 8px 24px rgba(28, 28, 46, 0.10), 0 2px 6px rgba(28, 28, 46, 0.06);
+    --feld: #f2f2f7;
+    --linie: rgba(60, 60, 67, 0.12);
+    --tabbar: rgba(255, 255, 255, 0.82);
+    --schatten: 0 10px 30px rgba(22, 22, 42, 0.10), 0 2px 8px rgba(22, 22, 42, 0.05);
   }
 
   @media (prefers-color-scheme: dark) {
@@ -30,8 +32,10 @@
       --text: #f2f2f7;
       --text-leise: #98989e;
       --chip: #2c2440;
-      --daumen-bg: #2c2c2e;
-      --schatten: 0 8px 24px rgba(0, 0, 0, 0.5);
+      --feld: #2c2c2e;
+      --linie: rgba(255, 255, 255, 0.12);
+      --tabbar: rgba(22, 22, 24, 0.82);
+      --schatten: 0 10px 30px rgba(0, 0, 0, 0.55);
     }
   }
 
@@ -40,14 +44,9 @@
     padding: 0;
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
-    -webkit-user-select: none;
-    user-select: none;
   }
 
-  html, body {
-    height: 100%;
-    overflow: hidden;
-  }
+  html, body { height: 100%; }
 
   body {
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
@@ -55,50 +54,86 @@
     color: var(--text);
     display: flex;
     flex-direction: column;
-    align-items: center;
-    padding: calc(env(safe-area-inset-top) + 14px) 20px calc(env(safe-area-inset-bottom) + 18px);
-    text-align: center;
+    overflow: hidden;
+    -webkit-user-select: none;
+    user-select: none;
   }
 
-  /* ── Kopfzeile mit Logo ───────────────────── */
+  /* Weiche Farbwolken im Hintergrund */
+  .wolke {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(70px);
+    opacity: 0.16;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .wolke.eins  { width: 320px; height: 320px; background: var(--akzent1); top: -80px; right: -100px; }
+  .wolke.zwei  { width: 280px; height: 280px; background: var(--akzent2); bottom: 60px; left: -120px; }
+
+  /* ── Kopfzeile ────────────────────────────── */
   header {
     display: flex;
     align-items: center;
     gap: 12px;
+    padding: calc(env(safe-area-inset-top) + 14px) 22px 12px;
     width: 100%;
-    max-width: 560px;
+    max-width: 620px;
+    margin: 0 auto;
+    z-index: 2;
   }
 
   .logo {
-    width: 44px;
-    height: 44px;
-    border-radius: 11px;
+    width: 42px;
+    height: 42px;
+    border-radius: 10.5px;
     flex-shrink: 0;
     box-shadow: 0 3px 10px rgba(124, 58, 237, 0.35);
   }
 
-  .app-name {
-    text-align: left;
-  }
-
   .app-name b {
     display: block;
-    font-size: 21px;
+    font-size: 20px;
     font-weight: 800;
     letter-spacing: -0.4px;
   }
 
   .app-name span {
-    font-size: 13px;
+    font-size: 12.5px;
     color: var(--text-leise);
     font-weight: 500;
   }
 
-  /* ── Bühne (Mitte) ────────────────────────── */
+  /* ── Ansichten ────────────────────────────── */
   main {
     flex: 1;
     width: 100%;
-    max-width: 560px;
+    max-width: 620px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+    min-height: 0;
+  }
+
+  .ansicht {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    padding: 6px 20px 0;
+    animation: einblenden 0.25s ease;
+  }
+
+  .ansicht.aktiv { display: flex; }
+
+  @keyframes einblenden {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Ansicht 1: Ideen ─────────────────────── */
+  .buehne {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -108,27 +143,35 @@
 
   .karte {
     background: var(--karte);
-    border-radius: 26px;
+    border-radius: 28px;
     box-shadow: var(--schatten);
-    padding: clamp(24px, 5vh, 40px) 26px;
+    padding: clamp(22px, 4.5vh, 38px) 26px;
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
+    gap: 15px;
+    position: relative;
+    overflow: hidden;
   }
 
-  .karte.neu {
-    animation: reinschweben 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  .karte::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, var(--akzent1), var(--akzent2));
   }
+
+  .karte.neu { animation: reinschweben 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); }
 
   @keyframes reinschweben {
-    from { transform: translateY(24px) scale(0.94); opacity: 0; }
+    from { transform: translateY(26px) scale(0.94); opacity: 0; }
     to   { transform: translateY(0) scale(1); opacity: 1; }
   }
 
   .abzeichen {
-    font-size: 12px;
+    font-size: 11.5px;
     font-weight: 700;
     letter-spacing: 1.2px;
     text-transform: uppercase;
@@ -138,78 +181,79 @@
     border-radius: 999px;
   }
 
+  .abzeichen.persoenlich {
+    color: #fff;
+    background: linear-gradient(90deg, var(--akzent1), var(--akzent2));
+  }
+
   .emoji-kreis {
-    width: clamp(88px, 20vh, 128px);
-    height: clamp(88px, 20vh, 128px);
+    width: clamp(82px, 17vh, 120px);
+    height: clamp(82px, 17vh, 120px);
     border-radius: 50%;
     background: radial-gradient(circle at 30% 25%, rgba(124,58,237,0.16), rgba(244,63,94,0.12));
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: clamp(48px, 11vh, 72px);
+    font-size: clamp(44px, 9.5vh, 66px);
     line-height: 1;
   }
 
   .ideen-text {
-    font-size: clamp(19px, 4.6vw, 27px);
+    font-size: clamp(18px, 4.4vw, 26px);
     font-weight: 700;
     letter-spacing: -0.3px;
     line-height: 1.35;
     min-height: 2.7em;
     display: flex;
     align-items: center;
+    text-align: center;
   }
 
-  /* ── Bewertung ────────────────────────────── */
-  .bewertung {
-    display: flex;
-    gap: 16px;
-  }
+  .bewertung { display: flex; gap: 16px; }
 
   .bewertung button {
-    font-size: 26px;
-    background: var(--daumen-bg);
+    font-size: 25px;
+    background: var(--feld);
     border: none;
     border-radius: 50%;
-    width: 58px;
-    height: 58px;
+    width: 56px;
+    height: 56px;
     cursor: pointer;
     transition: transform 0.12s ease, background 0.2s ease, box-shadow 0.2s ease;
   }
 
   .bewertung button:active { transform: scale(1.2); }
-  .bewertung button.gut     { background: #30d158; box-shadow: 0 4px 12px rgba(48,209,88,0.4); }
-  .bewertung button.schlecht{ background: #ff453a; box-shadow: 0 4px 12px rgba(255,69,58,0.4); }
+  .bewertung button.gut      { background: #30d158; box-shadow: 0 4px 12px rgba(48,209,88,0.4); }
+  .bewertung button.schlecht { background: #ff453a; box-shadow: 0 4px 12px rgba(255,69,58,0.4); }
 
   .danke {
-    font-size: 14px;
+    font-size: 13.5px;
     font-weight: 600;
     color: var(--text-leise);
-    min-height: 18px;
+    min-height: 17px;
+    text-align: center;
   }
 
-  /* ── Grosser Knopf unten ──────────────────── */
-  footer {
-    width: 100%;
-    max-width: 560px;
+  .knopf-bereich {
+    padding: 14px 0 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
   }
 
   .idee-knopf {
     width: 100%;
     border: none;
     border-radius: 20px;
-    padding: 19px;
+    padding: 18px;
     font-family: inherit;
-    font-size: 20px;
+    font-size: 19px;
     font-weight: 800;
     letter-spacing: -0.2px;
     color: #fff;
     background: linear-gradient(135deg, var(--akzent1), var(--akzent2));
-    box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35);
+    box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35), inset 0 1px 0 rgba(255,255,255,0.25);
     cursor: pointer;
     transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.1s ease;
   }
@@ -221,13 +265,200 @@
   }
 
   .zaehler {
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 600;
     color: var(--text-leise);
   }
+
+  /* Konfetti beim Daumen hoch */
+  .konfetti {
+    position: fixed;
+    font-size: 18px;
+    pointer-events: none;
+    z-index: 50;
+    animation: fliegen 0.9s ease-out forwards;
+  }
+
+  @keyframes fliegen {
+    to {
+      transform: translate(var(--dx), var(--dy)) rotate(var(--dreh));
+      opacity: 0;
+    }
+  }
+
+  /* ── Ansicht 2: Meine Welt ────────────────── */
+  .welt-scroll {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 16px;
+    min-height: 0;
+  }
+
+  .welt-titel {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.6px;
+    text-align: left;
+    margin: 6px 2px 2px;
+  }
+
+  .welt-hinweis {
+    font-size: 14px;
+    color: var(--text-leise);
+    font-weight: 500;
+    text-align: left;
+    margin: 0 2px 16px;
+    line-height: 1.4;
+  }
+
+  .sektion {
+    background: var(--karte);
+    border-radius: 20px;
+    box-shadow: var(--schatten);
+    padding: 18px;
+    margin-bottom: 14px;
+    text-align: left;
+  }
+
+  .sektion-kopf {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+
+  .sektion-kopf .icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--chip);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+  }
+
+  .sektion-kopf b { font-size: 17px; font-weight: 700; letter-spacing: -0.2px; }
+
+  .sektion-kopf span {
+    font-size: 12.5px;
+    color: var(--text-leise);
+    display: block;
+    font-weight: 500;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 12px 0 2px;
+  }
+
+  .chips:empty { margin: 0; }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--chip);
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 600;
+    padding: 8px 10px 8px 14px;
+    border-radius: 999px;
+    animation: einblenden 0.2s ease;
+  }
+
+  .chip button {
+    border: none;
+    background: rgba(124, 58, 237, 0.18);
+    color: var(--akzent1);
+    width: 21px;
+    height: 21px;
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .eingabe-zeile {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .eingabe-zeile input {
+    flex: 1;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text);
+    background: var(--feld);
+    border: 1px solid var(--linie);
+    border-radius: 13px;
+    padding: 11px 14px;
+    outline: none;
+    min-width: 0;
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  .eingabe-zeile input:focus { border-color: var(--akzent1); }
+
+  .eingabe-zeile button {
+    border: none;
+    border-radius: 13px;
+    width: 46px;
+    flex-shrink: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, var(--akzent1), var(--akzent2));
+    cursor: pointer;
+    transition: transform 0.1s ease;
+  }
+
+  .eingabe-zeile button:active { transform: scale(0.92); }
+
+  /* ── Tab-Leiste unten ─────────────────────── */
+  nav {
+    display: flex;
+    justify-content: space-around;
+    background: var(--tabbar);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--linie);
+    padding: 8px 0 calc(env(safe-area-inset-bottom) + 8px);
+    z-index: 3;
+  }
+
+  nav button {
+    border: none;
+    background: none;
+    font-family: inherit;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--text-leise);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    width: 100px;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+  }
+
+  nav button:active { transform: scale(0.94); }
+  nav button svg { width: 26px; height: 26px; fill: currentColor; }
+  nav button.aktiv { color: var(--akzent1); }
 </style>
 </head>
 <body>
+
+  <div class="wolke eins"></div>
+  <div class="wolke zwei"></div>
 
   <header>
     <!-- Das Logo: ein Blitz, weil die Ideen blitzschnell kommen -->
@@ -248,22 +479,81 @@
   </header>
 
   <main>
-    <div class="karte" id="karte">
-      <div class="abzeichen" id="abzeichen">Deine Idee</div>
-      <div class="emoji-kreis" id="emoji">⚡️</div>
-      <div class="ideen-text" id="ideenText">Bereit? Hol dir deinen ersten Ideen&#8203;blitz!</div>
-      <div class="bewertung" id="bewertung" style="visibility:hidden">
-        <button id="daumenHoch" onclick="bewerten(1)" aria-label="Gute Idee">👍</button>
-        <button id="daumenRunter" onclick="bewerten(-1)" aria-label="Schlechte Idee">👎</button>
+    <!-- Ansicht 1: Ideen holen -->
+    <section class="ansicht aktiv" id="ansichtIdeen">
+      <div class="buehne">
+        <div class="karte" id="karte">
+          <div class="abzeichen" id="abzeichen">Bereit?</div>
+          <div class="emoji-kreis" id="emoji">⚡️</div>
+          <div class="ideen-text" id="ideenText">Hol dir deinen ersten Ideen&#8203;blitz!</div>
+          <div class="bewertung" id="bewertung" style="visibility:hidden">
+            <button id="daumenHoch" onclick="bewerten(1)" aria-label="Gute Idee">👍</button>
+            <button id="daumenRunter" onclick="bewerten(-1)" aria-label="Schlechte Idee">👎</button>
+          </div>
+          <div class="danke" id="danke"></div>
+        </div>
       </div>
-      <div class="danke" id="danke"></div>
-    </div>
+      <div class="knopf-bereich">
+        <button class="idee-knopf" onclick="neueIdee()">⚡️ Ideenblitz!</button>
+        <div class="zaehler" id="zaehler"></div>
+      </div>
+    </section>
+
+    <!-- Ansicht 2: Meine Welt -->
+    <section class="ansicht" id="ansichtWelt">
+      <div class="welt-scroll">
+        <div class="welt-titel">Meine Welt</div>
+        <div class="welt-hinweis">Trag hier ein, was du hast und magst. Die App baut daraus persönliche Ideen nur für dich!</div>
+
+        <div class="sektion">
+          <div class="sektion-kopf">
+            <div class="icon">🧸</div>
+            <div><b>Meine Spielsachen</b><span>z.B. Lego, Fussball, Kapla</span></div>
+          </div>
+          <div class="chips" id="chips-spielsachen"></div>
+          <form class="eingabe-zeile" onsubmit="hinzufuegen(event, 'spielsachen')">
+            <input id="eingabe-spielsachen" type="text" placeholder="Spielsache eintragen…" maxlength="30" autocomplete="off">
+            <button type="submit" aria-label="Hinzufügen">+</button>
+          </form>
+        </div>
+
+        <div class="sektion">
+          <div class="sektion-kopf">
+            <div class="icon">👫</div>
+            <div><b>Meine Freunde</b><span>Wen magst du? Wen könntest du fragen?</span></div>
+          </div>
+          <div class="chips" id="chips-freunde"></div>
+          <form class="eingabe-zeile" onsubmit="hinzufuegen(event, 'freunde')">
+            <input id="eingabe-freunde" type="text" placeholder="Name eintragen…" maxlength="30" autocomplete="off">
+            <button type="submit" aria-label="Hinzufügen">+</button>
+          </form>
+        </div>
+
+        <div class="sektion">
+          <div class="sektion-kopf">
+            <div class="icon">⚽</div>
+            <div><b>Meine Hobbys</b><span>z.B. Fussball, Zeichnen, Schwimmen</span></div>
+          </div>
+          <div class="chips" id="chips-hobbys"></div>
+          <form class="eingabe-zeile" onsubmit="hinzufuegen(event, 'hobbys')">
+            <input id="eingabe-hobbys" type="text" placeholder="Hobby eintragen…" maxlength="30" autocomplete="off">
+            <button type="submit" aria-label="Hinzufügen">+</button>
+          </form>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <footer>
-    <button class="idee-knopf" onclick="neueIdee()">⚡️ Ideenblitz!</button>
-    <div class="zaehler" id="zaehler">Drück den Knopf, wenn dir langweilig ist</div>
-  </footer>
+  <nav>
+    <button id="tabIdeen" class="aktiv" onclick="zeigeAnsicht('Ideen')">
+      <svg viewBox="0 0 24 24"><path d="M13.5 2 5 13h5l-1.5 9L17 11h-5l1.5-9z"/></svg>
+      Ideen
+    </button>
+    <button id="tabWelt" onclick="zeigeAnsicht('Welt')">
+      <svg viewBox="0 0 24 24"><path d="M12 21.35c-.4 0-.8-.14-1.11-.42C7.14 17.6 3 13.9 3 9.9 3 6.64 5.46 4.2 8.5 4.2c1.35 0 2.6.53 3.5 1.44a4.93 4.93 0 0 1 3.5-1.44c3.04 0 5.5 2.44 5.5 5.7 0 4-4.14 7.7-7.89 11.03-.31.28-.71.42-1.11.42z"/></svg>
+      Meine Welt
+    </button>
+  </nav>
 
 <script>
   // ─────────────────────────────────────────────
@@ -279,11 +569,11 @@
     { emoji: "🎭", text: "Erfinde ein Theaterstück und führ es der Familie vor!" },
     { emoji: "🚲", text: "Mach eine Velotour um den Block!" },
     { emoji: "🎵", text: "Erfinde einen eigenen Song und nimm ihn auf!" },
-    { emoji: "🏗️", text: "Bau den höchsten Turm, den du kannst – aus Lego oder Bauklötzen!" },
+    { emoji: "🏗️", text: "Bau den höchsten Turm, den du kannst!" },
     { emoji: "🔬", text: "Mach ein Experiment: Was schwimmt, was sinkt? Teste es mit Sachen aus der Küche!" },
     { emoji: "🎪", text: "Übe einen Zaubertrick und zeig ihn jemandem!" },
     { emoji: "🐜", text: "Geh raus und beobachte Insekten – wie viele verschiedene findest du?" },
-    { emoji: "✉️", text: "Schreib einen Brief an deine Grosseltern oder einen Freund!" },
+    { emoji: "✉️", text: "Schreib einen Brief an deine Grosseltern!" },
     { emoji: "🏃", text: "Bau einen Hindernis-Parcours und stopp deine Zeit!" },
     { emoji: "📸", text: "Mach eine Foto-Safari: Fotografiere 10 rote Dinge!" },
     { emoji: "🃏", text: "Bau ein Kartenhaus – wie hoch schaffst du es?" },
@@ -312,6 +602,31 @@
     { emoji: "🧠", text: "Lern 5 neue Wörter in einer anderen Sprache!" }
   ];
 
+  // Vorlagen für persönliche Ideen. {x} wird ersetzt durch
+  // deine Spielsachen, Freunde oder Hobbys aus «Meine Welt».
+  const VORLAGEN = {
+    spielsachen: [
+      { emoji: "🧸", text: "Erfinde ein ganz neues Spiel mit {x}!" },
+      { emoji: "🎬", text: "Dreh einen Mini-Film mit {x} in der Hauptrolle!" },
+      { emoji: "🏆", text: "Mach einen Wettkampf mit {x} – schaffst du einen neuen Rekord?" },
+      { emoji: "🔎", text: "Versteck {x} und schreib eine Schatzkarte dazu!" },
+      { emoji: "🛠️", text: "Bau mit {x} etwas, das es noch nie gab!" }
+    ],
+    freunde: [
+      { emoji: "📞", text: "Ruf {x} an und fragt euch gegenseitig Rätsel!" },
+      { emoji: "🏡", text: "Frag, ob {x} zum Spielen kommen kann!" },
+      { emoji: "💌", text: "Mal ein Bild oder schreib eine Nachricht für {x}!" },
+      { emoji: "🤫", text: "Denk dir eine Geheimsprache aus, die nur du und {x} versteht!" },
+      { emoji: "🎁", text: "Bastle eine kleine Überraschung für {x}!" }
+    ],
+    hobbys: [
+      { emoji: "⭐", text: "Übe 15 Minuten {x} – Profis üben jeden Tag!" },
+      { emoji: "🎓", text: "Bring jemandem aus der Familie etwas über {x} bei!" },
+      { emoji: "🚀", text: "Erfinde eine neue Übung oder einen Trick für {x}!" },
+      { emoji: "📋", text: "Mach ein Plakat über {x} mit allem, was du weisst!" }
+    ]
+  };
+
   // ─────────────────────────────────────────────
   // Die Witze für die Witz-Pause
   // ─────────────────────────────────────────────
@@ -333,40 +648,72 @@
   ];
 
   // ─────────────────────────────────────────────
-  // Hier merkt sich die App deine Bewertungen (👍 = +1, 👎 = -1).
-  // Das bleibt gespeichert, auch wenn du die App schliesst!
+  // Gespeicherte Daten (bleiben auch nach dem Schliessen da)
   // ─────────────────────────────────────────────
   let punkte = JSON.parse(localStorage.getItem("ideenPunkte") || "{}");
-  let klickZahl = 0;
+  let meineWelt = JSON.parse(localStorage.getItem("meineWelt") || '{"spielsachen":[],"freunde":[],"hobbys":[]}');
+  let klickZahl = parseInt(localStorage.getItem("klickZahl") || "0");
   let aktuelleIdee = null;
   let letzteIdeen = []; // damit nicht 2x hintereinander das Gleiche kommt
 
   function speichern() {
     localStorage.setItem("ideenPunkte", JSON.stringify(punkte));
+    localStorage.setItem("meineWelt", JSON.stringify(meineWelt));
+    localStorage.setItem("klickZahl", klickZahl);
   }
 
-  // Ideen mit vielen 👍 kommen öfter, Ideen mit vielen 👎 fast nie.
-  function gewichtVon(idee) {
-    const p = punkte[idee.text] || 0;
+  // ─────────────────────────────────────────────
+  // Ideen auswählen: 👍 = kommt öfter, 👎 = fast nie
+  // ─────────────────────────────────────────────
+  function gewichtVon(schluessel) {
+    const p = punkte[schluessel] || 0;
     if (p <= -2) return 0.05;   // fast nie
     if (p < 0)   return 0.3;    // selten
     return 1 + p * 0.5;          // je mehr 👍, desto öfter
   }
 
-  function zufaelligeIdee() {
-    const auswahl = IDEEN.filter(i => !letzteIdeen.includes(i.text));
-    let summe = 0;
-    for (const i of auswahl) summe += gewichtVon(i);
-    let los = Math.random() * summe;
-    for (const i of auswahl) {
-      los -= gewichtVon(i);
-      if (los <= 0) return i;
-    }
-    return auswahl[auswahl.length - 1];
+  function zufallAus(liste) {
+    return liste[Math.floor(Math.random() * liste.length)];
   }
 
+  // Baut eine persönliche Idee aus «Meine Welt», z.B. mit einem Freund
+  function persoenlicheIdee() {
+    const arten = ["spielsachen", "freunde", "hobbys"].filter(a => meineWelt[a].length > 0);
+    if (arten.length === 0) return null;
+    const art = zufallAus(arten);
+    const vorlage = zufallAus(VORLAGEN[art]);
+    return {
+      emoji: vorlage.emoji,
+      text: vorlage.text.replace("{x}", zufallAus(meineWelt[art])),
+      schluessel: vorlage.text,   // bewertet wird die Vorlage
+      persoenlich: true
+    };
+  }
+
+  function zufaelligeIdee() {
+    // Wenn etwas in «Meine Welt» steht: jede 3. Idee ist persönlich
+    if (Math.random() < 0.35) {
+      const p = persoenlicheIdee();
+      if (p && !letzteIdeen.includes(p.text) && Math.random() < gewichtVon(p.schluessel)) return p;
+    }
+    const auswahl = IDEEN.filter(i => !letzteIdeen.includes(i.text));
+    let summe = 0;
+    for (const i of auswahl) summe += gewichtVon(i.text);
+    let los = Math.random() * summe;
+    for (const i of auswahl) {
+      los -= gewichtVon(i.text);
+      if (los <= 0) return { ...i, schluessel: i.text };
+    }
+    const letzte = auswahl[auswahl.length - 1];
+    return { ...letzte, schluessel: letzte.text };
+  }
+
+  // ─────────────────────────────────────────────
+  // Der grosse Knopf
+  // ─────────────────────────────────────────────
   function neueIdee() {
     klickZahl++;
+    speichern();
 
     const karte = document.getElementById("karte");
     karte.classList.remove("neu");
@@ -381,8 +728,9 @@
 
     // Jedes 4. Mal gibt es einen Witz statt einer Idee!
     if (klickZahl % 4 === 0) {
-      const witz = WITZE[Math.floor(Math.random() * WITZE.length)];
+      const witz = zufallAus(WITZE);
       abzeichen.textContent = "😂 Witz-Pause";
+      abzeichen.className = "abzeichen";
       document.getElementById("emoji").textContent = witz.emoji;
       document.getElementById("ideenText").textContent = witz.text;
       document.getElementById("bewertung").style.visibility = "hidden";
@@ -392,7 +740,8 @@
       letzteIdeen.push(aktuelleIdee.text);
       if (letzteIdeen.length > 5) letzteIdeen.shift();
 
-      abzeichen.textContent = "⚡️ Deine Idee";
+      abzeichen.textContent = aktuelleIdee.persoenlich ? "💜 Extra für dich" : "⚡️ Deine Idee";
+      abzeichen.className = aktuelleIdee.persoenlich ? "abzeichen persoenlich" : "abzeichen";
       document.getElementById("emoji").textContent = aktuelleIdee.emoji;
       document.getElementById("ideenText").textContent = aktuelleIdee.text;
       document.getElementById("bewertung").style.visibility = "visible";
@@ -404,16 +753,88 @@
 
   function bewerten(wert) {
     if (!aktuelleIdee) return;
-    punkte[aktuelleIdee.text] = (punkte[aktuelleIdee.text] || 0) + wert;
+    punkte[aktuelleIdee.schluessel] = (punkte[aktuelleIdee.schluessel] || 0) + wert;
     speichern();
 
     if (wert === 1) {
       document.getElementById("daumenHoch").className = "gut";
       document.getElementById("danke").textContent = "Super! Die Idee kommt jetzt öfter. 🎉";
+      konfettiRegen(document.getElementById("daumenHoch"));
     } else {
       document.getElementById("daumenRunter").className = "schlecht";
       document.getElementById("danke").textContent = "Okay, die zeig ich dir fast nicht mehr.";
     }
+  }
+
+  function konfettiRegen(vonElement) {
+    const start = vonElement.getBoundingClientRect();
+    const teile = ["🎉", "⭐", "✨", "💜", "⚡️"];
+    for (let i = 0; i < 14; i++) {
+      const k = document.createElement("span");
+      k.className = "konfetti";
+      k.textContent = zufallAus(teile);
+      k.style.left = (start.left + start.width / 2) + "px";
+      k.style.top = (start.top + start.height / 2) + "px";
+      k.style.setProperty("--dx", (Math.random() * 240 - 120) + "px");
+      k.style.setProperty("--dy", (-40 - Math.random() * 160) + "px");
+      k.style.setProperty("--dreh", (Math.random() * 360 - 180) + "deg");
+      document.body.appendChild(k);
+      setTimeout(() => k.remove(), 950);
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // Meine Welt: eintragen, anzeigen, löschen
+  // ─────────────────────────────────────────────
+  function hinzufuegen(event, art) {
+    event.preventDefault();
+    const feld = document.getElementById("eingabe-" + art);
+    const wert = feld.value.trim();
+    if (!wert) return;
+    if (!meineWelt[art].includes(wert)) {
+      meineWelt[art].push(wert);
+      speichern();
+      zeigeChips(art);
+    }
+    feld.value = "";
+  }
+
+  function loeschen(art, index) {
+    meineWelt[art].splice(index, 1);
+    speichern();
+    zeigeChips(art);
+  }
+
+  function zeigeChips(art) {
+    const behaelter = document.getElementById("chips-" + art);
+    behaelter.innerHTML = "";
+    meineWelt[art].forEach((wert, index) => {
+      const chip = document.createElement("span");
+      chip.className = "chip";
+      chip.textContent = wert;
+      const weg = document.createElement("button");
+      weg.textContent = "✕";
+      weg.setAttribute("aria-label", wert + " entfernen");
+      weg.onclick = () => loeschen(art, index);
+      chip.appendChild(weg);
+      behaelter.appendChild(chip);
+    });
+  }
+
+  // ─────────────────────────────────────────────
+  // Tabs unten
+  // ─────────────────────────────────────────────
+  function zeigeAnsicht(name) {
+    document.getElementById("ansichtIdeen").classList.toggle("aktiv", name === "Ideen");
+    document.getElementById("ansichtWelt").classList.toggle("aktiv", name === "Welt");
+    document.getElementById("tabIdeen").classList.toggle("aktiv", name === "Ideen");
+    document.getElementById("tabWelt").classList.toggle("aktiv", name === "Welt");
+  }
+
+  // Beim Start: gespeicherte Chips und Zähler anzeigen
+  ["spielsachen", "freunde", "hobbys"].forEach(zeigeChips);
+  if (klickZahl > 0) {
+    document.getElementById("zaehler").textContent = "Schon " + klickZahl + " Ideenblitze geholt";
   }
 </script>
 </body>
