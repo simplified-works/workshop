@@ -539,7 +539,7 @@
   <button class="knopf" onclick="zurueckZumStart()">Neuer Fall 📂</button>
 </section>
 
-<div class="version">v5 · 18:03</div>
+<div class="version">v6 · 18:09</div>
 
 <script>
 // ================= Konto (nur auf diesem Gerät) =================
@@ -701,7 +701,9 @@ const THEMEN = [
   { name: 'bildschirm', titel: 'Streit um Bildschirmzeit', woerter: ['handy', 'ipad', 'tablet', 'konsole', 'playstation', 'switch', 'nintendo', 'fernseher', 'zocken', 'gamen', '\\bgame\\b', 'controller', 'bildschirm', 'computer'] },
   { name: 'koerper',    titel: 'Körperlicher Streit', woerter: ['geschlagen', 'gehauen', 'geschubst', 'getreten', 'gekniffen', 'wehgetan', 'weh getan', 'gebissen'] },
   { name: 'worte',      titel: 'Streit um Worte und Vertrauen', woerter: ['ausgelacht', 'beleidigt', 'gelästert', 'gelaestert', 'petze', 'verpetzt', 'angelogen', 'gelogen', 'geheimnis', 'weitererzählt', 'weitererzaehlt', 'ausgeschlossen', 'ignoriert'] },
-  { name: 'raum',       titel: 'Streit um Raum und Ruhe', woerter: ['zimmer', 'aufräumen', 'aufraeumen', 'unordnung', '\\blaut\\b', 'lärm', 'laerm', 'musik', 'gestört', 'gestoert', 'privatsphäre', 'privatsphaere', 'reingekommen'] }
+  { name: 'raum',       titel: 'Streit um Raum und Ruhe', woerter: ['zimmer', 'aufräumen', 'aufraeumen', 'unordnung', '\\blaut\\b', 'lärm', 'laerm', 'musik', 'gestört', 'gestoert', 'privatsphäre', 'privatsphaere', 'reingekommen'] },
+  { name: 'geld',       titel: 'Streit um Geld', woerter: ['miete', 'nebenkosten', '\\bgeld\\b', 'bezahlt', 'bezahlen', 'schulden', 'schuldet', 'rechnung', 'franken', '\\bchf\\b', 'euro', 'kosten', 'ausgegeben', 'zurückzahlen', 'zurueckzahlen', 'taschengeld', 'gekauft'] },
+  { name: 'arbeit',     titel: 'Streit am Arbeitsplatz', woerter: ['arbeit', '\\bchef\\b', 'chefin', 'kollege', 'kollegin', 'büro', 'buero', 'schicht', 'überstunden', 'ueberstunden', 'projekt', 'aufgabe', 'termin', 'meeting', 'kunde'] }
 ];
 
 const OBJEKTE = ['handy', 'ipad', 'tablet', 'playstation', 'switch', 'nintendo', 'konsole', 'controller', 'fernseher', 'computer', 'velo', 'fahrrad', 'ball', 'stift', 'buch', 'jacke', 'pullover', 'kopfhörer', 'kopfhoerer', 'zimmer', 'spiel', 'karten', 'lego', 'roller'];
@@ -721,6 +723,17 @@ function findeObjekt(beide) {
   }
   const m = beide.match(/(?:mein|meine|meinen|dein|deine|deinen)\s+([a-zäöüéè]{3,})/i);
   return m ? m[1].charAt(0).toUpperCase() + m[1].slice(1) : null;
+}
+
+// Findet einen Geldbetrag im Text, z.B. «600 Franken» oder «CHF 50».
+function findeBetrag(beide) {
+  const m = beide.match(/(\d+(?:[.,]\d{1,2})?)\s*(?:franken|fr\.?|chf|euro|€|stutz)/i)
+         || beide.match(/(?:chf|fr\.?|€)\s*(\d+(?:[.,]\d{1,2})?)/i);
+  return m ? parseFloat(m[1].replace(',', '.')) : null;
+}
+
+function alsGeld(zahl) {
+  return (zahl % 1 === 0 ? zahl : zahl.toFixed(2)) + ' Franken';
 }
 
 // ---------- Individuelle Lösungen bauen ----------
@@ -769,6 +782,29 @@ function baueLoesungen(f) {
     l.push(['Ruhezeiten',
       'Vereinbart feste Zeiten, in denen es leise sein muss (zum Beispiel bei Hausaufgaben). Ausserhalb davon darf Musik laufen — mit Kopfhörern als Kompromiss.']);
   }
+  if (f.thema === 'geld') {
+    if (f.betrag) {
+      l.push([f.miete ? 'Die halbe Miete' : 'Halbe-halbe',
+        'Es geht um ' + alsGeld(f.betrag) + (f.miete ? ' Miete' : '') + '. Der faire Mittelweg: ' + f.nameA + ' und ' + f.nameB + ' teilen den Betrag — je ' + alsGeld(f.betrag / 2) + '. Wer klar mehr Nutzen hatte, legt freiwillig etwas drauf.']);
+      l.push(['Der Ratenplan',
+        'Wer ' + alsGeld(f.betrag) + ' schuldet, zahlt in festen Raten zurück — zum Beispiel ' + alsGeld(Math.ceil(f.betrag / 4)) + ' pro Woche, vier Wochen lang. Jede Zahlung wird abgehakt.']);
+    } else {
+      l.push(['Halbe-halbe',
+        'Gemeinsame Kosten werden fair geteilt: ' + f.nameA + ' und ' + f.nameB + ' zahlen je die Hälfte. Wer klar mehr Nutzen hatte, legt freiwillig etwas drauf.']);
+      l.push(['Der Ratenplan',
+        'Wer etwas schuldet, zahlt in festen Raten zurück — jede Woche ein Teil, bis alles beglichen ist. Jede Zahlung wird abgehakt.']);
+    }
+    l.push(['Alles aufschreiben',
+      'Ab jetzt wird jede gemeinsame Ausgabe sofort notiert (Zettel oder Handy-Notiz). Am Monatsende wird abgerechnet — dann gibt es keine Diskussionen mehr über «wer hat was bezahlt».']);
+  }
+  if (f.thema === 'arbeit') {
+    l.push(['Aufgaben klar verteilen',
+      f.nameA + ' und ' + f.nameB + ' schreiben gemeinsam auf, wer wofür zuständig ist — schwarz auf weiss. Was auf der Liste steht, gilt. Neues wird nur gemeinsam ergänzt.']);
+    l.push(['Das Klärungsgespräch',
+      '15 Minuten, nur ihr zwei: Jede Person sagt ungestört 5 Minuten ihre Sicht, die andere hört nur zu. Danach sucht ihr gemeinsam einen Punkt, in dem ihr euch sofort einig seid — und startet dort.']);
+    l.push(['Abwechseln bei Unbeliebtem',
+      'Die unbeliebte Aufgabe (Schicht, Termin, Zusatzarbeit) wird abgewechselt: diese Woche ' + f.nameA + ', nächste Woche ' + f.nameB + '. Ein Plan an der Wand macht es sichtbar.']);
+  }
 
   // 3. Wenn jemand einen Wunsch geäussert hat, wird er Teil der Lösung.
   const wuenscher = f.a.wunsch > 0 ? f.nameA : (f.b.wunsch > 0 ? f.nameB : null);
@@ -807,7 +843,9 @@ function urteilen() {
   fall = {
     nameA, nameB, textA, textB, a, b,
     thema: thema.name, themaTitel: thema.titel,
-    objekt: findeObjekt(beide)
+    objekt: findeObjekt(beide),
+    betrag: findeBetrag(beide),
+    miete: beide.includes('miete')
   };
 
   // Waage der Verantwortung
