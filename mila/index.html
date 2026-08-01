@@ -111,6 +111,39 @@
 
   .kommentar { display: flex; gap: 8px; margin-top: 10px; font-size: 15px; line-height: 1.4; }
   .kommentar b { color: var(--akzent); }
+  .kommentar span { flex: 1; min-width: 0; overflow-wrap: break-word; }
+  .kommentar-weg {
+    border: none; background: var(--hg); color: var(--grau);
+    border-radius: 50%; width: 28px; height: 28px; flex-shrink: 0; font-size: 13px;
+  }
+  .dauer-reihe { display: flex; gap: 8px; margin-top: 10px; }
+  .dauer-reihe button {
+    flex: 1; border: none; border-radius: 12px;
+    background: var(--hg); color: var(--text);
+    font-size: 15px; font-weight: 600; padding: 12px 4px; min-height: 46px;
+  }
+  .dauer-reihe button.gewaehlt { background: var(--akzent); color: white; }
+  .schalter-zeile { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .schalter {
+    border: none; border-radius: 999px; flex-shrink: 0;
+    width: 62px; height: 36px; position: relative;
+    background: var(--linie); transition: background 0.2s;
+  }
+  .schalter.an { background: #34c759; }
+  .schalter::after {
+    content: ''; position: absolute; top: 3px; left: 3px;
+    width: 30px; height: 30px; border-radius: 50%;
+    background: white; transition: left 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+  .schalter.an::after { left: 29px; }
+  .ort-vorschlag {
+    border: none; border-radius: 999px;
+    background: var(--hg); color: var(--text);
+    font-size: 15px; font-weight: 600; padding: 10px 14px; min-height: 44px;
+  }
+  .ort-vorschlag.gewaehlt { background: var(--akzent-hell); color: var(--akzent); }
+  .vorschlaege { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
   .kommentar-zeile { display: flex; gap: 8px; margin-top: 12px; }
   .kommentar-zeile input {
     flex: 1; border: none; border-radius: 999px;
@@ -224,7 +257,7 @@
 <main id="inhalt"></main>
 
 <nav id="leiste"></nav>
-<div class="version">v2 · 11:36</div>
+<div class="version">v3 · 19:10</div>
 
 <dialog id="info">
   <h3>💜 So funktioniert Famigram</h3>
@@ -245,7 +278,7 @@ const h = 3600000, min = 60000; // eine Stunde / Minute in Millisekunden
 function startDaten() {
   const jetzt = Date.now();
   return {
-    ich: { name: 'Mila', emoji: '🦄', ort: 'Zuhause', ortEmoji: '🏠' },
+    ich: { name: 'Mila', emoji: '🦄', ort: 'Zuhause', ortEmoji: '🏠', ortBis: null, ortPrivat: false },
     freunde: [
       { id: 'mama',  name: 'Mama',        emoji: '🌻', ort: 'Im Büro',          ortEmoji: '🏢' },
       { id: 'papa',  name: 'Papa',        emoji: '🧔', ort: 'Am Zmittag kochen', ortEmoji: '🍝' },
@@ -346,6 +379,7 @@ function feedZeichnen() {
     const person = wer(p.autor);
     if (!person) return '';
     const geliked = p.likes.includes(daten.ich.name);
+    const ortZeigen = person.ort && !(p.autor === 'ich' && daten.ich.ortPrivat);
     return `
     <div class="karte">
       <div class="post-kopf">
@@ -353,7 +387,7 @@ function feedZeichnen() {
         <div>
           <div class="post-wer">${sicher(person.name)}</div>
           <div class="post-wann">${zeitText(p.zeit)}</div>
-          ${person.ort ? `<span class="ort-chip">${person.ortEmoji || '📍'} ${sicher(person.ort)}</span>` : ''}
+          ${ortZeigen ? `<span class="ort-chip">${person.ortEmoji || '📍'} ${sicher(person.ort)}</span>` : ''}
         </div>
       </div>
       ${fotoHtml(p.foto)}
@@ -362,8 +396,12 @@ function feedZeichnen() {
         <button class="aktion ${geliked ? 'geliked' : ''}" onclick="likeDruecken('${p.id}')">
           ${geliked ? '❤️' : '🤍'} ${p.likes.length || ''}
         </button>
+        ${p.autor === 'ich' ? `<button class="aktion" onclick="postLoeschen('${p.id}')">🗑️</button>` : ''}
       </div>
-      ${p.kommentare.map(k => `<div class="kommentar"><b>${sicher(k.von)}</b><span>${sicher(k.text)}</span></div>`).join('')}
+      ${p.kommentare.map((k, i) => `
+        <div class="kommentar"><b>${sicher(k.von)}</b><span>${sicher(k.text)}</span>
+          ${k.von === daten.ich.name ? `<button class="kommentar-weg" onclick="kommentarLoeschen('${p.id}', ${i})">✕</button>` : ''}
+        </div>`).join('')}
       <div class="kommentar-zeile">
         <input type="text" id="k-${p.id}" placeholder="Kommentar schreiben …" enterkeyhint="send"
                onkeydown="if(event.key==='Enter')kommentarSenden('${p.id}')">
@@ -384,6 +422,16 @@ function kommentarSenden(postId) {
   if (!text) return;
   const p = daten.posts.find(x => x.id === postId);
   p.kommentare.push({ von: daten.ich.name, text: text });
+  speichern(); zeichnen();
+}
+function postLoeschen(postId) {
+  if (!confirm('Diesen Beitrag wirklich löschen?')) return;
+  daten.posts = daten.posts.filter(p => p.id !== postId);
+  speichern(); zeichnen();
+}
+function kommentarLoeschen(postId, nr) {
+  const p = daten.posts.find(x => x.id === postId);
+  p.kommentare.splice(nr, 1);
   speichern(); zeichnen();
 }
 
@@ -470,6 +518,30 @@ function postSenden() {
 // ─────────────────────────────────────────────
 // ORTE — wo ist gerade wer?
 // ─────────────────────────────────────────────
+const ortVorschlaege = [
+  { text: 'Zuhause', emoji: '🏠' },
+  { text: 'Koche Mittag', emoji: '🍝' },
+  { text: 'Am Fussballplatz', emoji: '⚽' },
+  { text: 'Am Lernen', emoji: '📚' },
+  { text: 'Bin am Sofa', emoji: '🛋️' },
+  { text: 'Unterwegs', emoji: '🚆' }
+];
+const dauern = [
+  { text: '30 Min', minuten: 30 },
+  { text: '1 Std', minuten: 60 },
+  { text: '3 Std', minuten: 180 },
+  { text: 'Offen', minuten: null }
+];
+let gewaehlteDauer = null; // null = bleibt, bis du es änderst
+
+function restText() {
+  if (!daten.ich.ortBis) return '';
+  const rest = daten.ich.ortBis - Date.now();
+  if (rest <= 0) return '';
+  const minuten = Math.ceil(rest / min);
+  const anzeige = minuten >= 60 ? Math.round(minuten / 60 * 10) / 10 + ' Std.' : minuten + ' Min.';
+  return `<div class="warum">⏱️ noch ${anzeige}, dann wieder «Zuhause»</div>`;
+}
 function orteZeichnen() {
   const alle = [{ ...daten.ich, id: 'ich' }, ...daten.freunde];
   return `
@@ -479,19 +551,68 @@ function orteZeichnen() {
       <div class="avatar">${p.emoji}</div>
       <div class="anfrage-text">
         <div class="post-wer">${sicher(p.name)}${p.id === 'ich' ? ' (du)' : ''}</div>
-        <div class="warum">${p.ortEmoji || '📍'} ${sicher(p.ort || 'Kein Ort angegeben')}</div>
+        ${p.id === 'ich' && daten.ich.ortPrivat
+          ? '<div class="warum">🔒 Dein Standort wird gerade nicht geteilt</div>'
+          : `<div class="warum">${p.ortEmoji || '📍'} ${sicher(p.ort || 'Kein Ort angegeben')}</div>`}
+        ${p.id === 'ich' && !daten.ich.ortPrivat ? restText() : ''}
       </div>
     </div>`).join('')}
+
+  <div class="karte">
+    <div class="schalter-zeile">
+      <div>
+        <div class="post-wer">Standort teilen</div>
+        <div class="warum" style="color:var(--grau);font-size:14px">
+          ${daten.ich.ortPrivat ? 'Aus — niemand sieht, wo du bist' : 'An — deine Familie sieht deinen Ort'}
+        </div>
+      </div>
+      <button class="schalter ${daten.ich.ortPrivat ? '' : 'an'}" onclick="ortPrivatUmschalten()" aria-label="Standort teilen umschalten"></button>
+    </div>
+  </div>
+
+  ${daten.ich.ortPrivat ? '' : `
   <div class="karte">
     <h2 style="margin-top:0">Deinen Ort ändern</h2>
-    <input type="text" id="ort-neu" placeholder="z.B. In den Ferien am Meer" value="${sicher(daten.ich.ort)}">
+    <div class="vorschlaege">
+      ${ortVorschlaege.map((v, i) => `
+        <button class="ort-vorschlag" onclick="vorschlagWaehlen(${i})">${v.emoji} ${v.text}</button>`).join('')}
+    </div>
+    <div style="margin-top:12px">
+      <input type="text" id="ort-neu" placeholder="Oder selber schreiben …" value="${sicher(daten.ich.ort)}">
+    </div>
     <div class="szenen" style="margin-top:10px">
-      ${['🏠','🏫','⛰️','🏖️','🚆','🎉'].map(e => `
+      ${['🏠','🍝','⚽','📚','🛋️','🚆'].map(e => `
         <button class="szene-wahl ${daten.ich.ortEmoji === e ? 'gewaehlt' : ''}" style="background:var(--hg)"
                 onclick="ortEmojiWaehlen('${e}')">${e}</button>`).join('')}
     </div>
+    <h2>Wie lange gilt das?</h2>
+    <div class="dauer-reihe">
+      ${dauern.map((d, i) => `
+        <button class="${gewaehlteDauer === i ? 'gewaehlt' : ''}" onclick="dauerWaehlen(${i})">${d.text}</button>`).join('')}
+    </div>
+    <p style="color:var(--grau);font-size:14px;margin:10px 2px 0">
+      Mit einer Zeit schaltet dein Ort nachher automatisch zurück auf «Zuhause» — du musst nicht dran denken.
+    </p>
     <button class="gross-knopf" onclick="ortSpeichern()">Ort speichern</button>
-  </div>`;
+  </div>`}`;
+}
+function ortPrivatUmschalten() {
+  daten.ich.ortPrivat = !daten.ich.ortPrivat;
+  speichern(); zeichnen();
+}
+function vorschlagWaehlen(i) {
+  const v = ortVorschlaege[i];
+  daten.ich.ortEmoji = v.emoji;
+  zeichnen();
+  document.getElementById('ort-neu').value = v.text;
+}
+function dauerWaehlen(i) {
+  gewaehlteDauer = (gewaehlteDauer === i) ? null : i;
+  const feld = document.getElementById('ort-neu');
+  const text = feld ? feld.value : daten.ich.ort;
+  zeichnen();
+  const neuFeld = document.getElementById('ort-neu');
+  if (neuFeld) neuFeld.value = text;
 }
 function ortEmojiWaehlen(e) {
   daten.ich.ortEmoji = e;
@@ -502,7 +623,20 @@ function ortEmojiWaehlen(e) {
 }
 function ortSpeichern() {
   daten.ich.ort = document.getElementById('ort-neu').value.trim();
+  const d = gewaehlteDauer !== null ? dauern[gewaehlteDauer] : null;
+  daten.ich.ortBis = (d && d.minuten) ? Date.now() + d.minuten * min : null;
+  gewaehlteDauer = null;
   speichern(); zeichnen();
+}
+// Läuft die Zeit ab, gehts automatisch zurück auf «Zuhause»
+function ortPruefen() {
+  if (daten.ich.ortBis && Date.now() > daten.ich.ortBis) {
+    daten.ich.ort = 'Zuhause';
+    daten.ich.ortEmoji = '🏠';
+    daten.ich.ortBis = null;
+    speichern();
+    if (aktiverTab === 'orte') zeichnen();
+  }
 }
 
 // ─────────────────────────────────────────────
@@ -542,9 +676,27 @@ function anfragenZeichnen() {
         ${a.status === 'wartet' ? '⏳ Wartet' : '✓ Angenommen'}
       </span>
     </div>`).join('')}
+
+  <h2>Deine Familie</h2>
+  ${daten.freunde.length ? daten.freunde.map(f => `
+    <div class="karte anfrage">
+      <div class="avatar">${f.emoji}</div>
+      <div class="anfrage-text"><div class="post-wer">${sicher(f.name)}</div></div>
+      <button class="ort-vorschlag" style="color:var(--rot)" onclick="freundEntfernen('${f.id}')">Entfernen</button>
+    </div>`).join('')
+    : '<div class="leer">Noch niemand dabei.</div>'}
   <p style="color:var(--grau);font-size:14px;text-align:center;line-height:1.5">
-    So bleibt alles privat: Nur wer <b>angenommen</b> wurde,<br>sieht deine Beiträge und deinen Ort.
+    So bleibt alles privat: Nur wer <b>angenommen</b> wurde,<br>sieht deine Beiträge und deinen Ort.<br>
+    Entfernte Personen kannst du später jederzeit wieder anfragen.
   </p>`;
+}
+function freundEntfernen(id) {
+  const f = daten.freunde.find(x => x.id === id);
+  if (!confirm(f.name + ' wirklich entfernen? Ihre Beiträge verschwinden aus deinem Feed. Du kannst die Person später wieder anfragen.')) return;
+  daten.freunde = daten.freunde.filter(x => x.id !== id);
+  daten.posts = daten.posts.filter(p => p.autor !== id);
+  daten.anfragenRaus = daten.anfragenRaus.filter(a => a.name !== f.name);
+  speichern(); zeichnen();
 }
 function anfrageAnnehmen(id) {
   const i = daten.anfragenRein.findIndex(a => a.id === id);
@@ -594,7 +746,7 @@ function anfragenPruefen() {
   });
   if (geaendert) { speichern(); zeichnen(); }
 }
-setInterval(anfragenPruefen, 3000);
+setInterval(() => { anfragenPruefen(); ortPruefen(); }, 3000);
 
 // ─────────────────────────────────────────────
 // PROFIL
