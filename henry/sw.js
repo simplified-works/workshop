@@ -1,7 +1,7 @@
 // Offline-Speicher für IdeenBlitz.
 // Merkt sich die App auf dem Gerät, damit sie auch ohne Internet startet.
 // Bei jeder neuen Version hier die Nummer erhöhen!
-const CACHE = "ideenblitz-v3";
+const CACHE = "ideenblitz-v4";
 
 self.addEventListener("install", (e) => {
   e.waitUntil(
