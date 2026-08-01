@@ -59,6 +59,67 @@
     user-select: none;
   }
 
+  /* ── Blitz-Einschlag beim Start ───────────── */
+  .splash {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: #180f2e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: splash-weg 0.5s ease 1.25s forwards;
+    pointer-events: none;
+  }
+
+  .splash svg {
+    width: 130px;
+    height: 130px;
+    filter: drop-shadow(0 0 28px rgba(250, 204, 21, 0.9));
+    animation: einschlagen 0.5s cubic-bezier(0.6, 0, 1, 1) both;
+  }
+
+  .splash .donnerlicht {
+    position: absolute;
+    inset: 0;
+    background: #fff;
+    opacity: 0;
+    animation: aufblitzen 0.5s ease 0.5s;
+  }
+
+  .splash b {
+    position: absolute;
+    bottom: 22%;
+    color: #fff;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.4px;
+    opacity: 0;
+    animation: name-zeigen 0.4s ease 0.65s forwards;
+  }
+
+  @keyframes einschlagen {
+    from { transform: translateY(-120vh) scale(1.6); }
+    to   { transform: translateY(0) scale(1); }
+  }
+
+  @keyframes aufblitzen {
+    0%   { opacity: 0; }
+    15%  { opacity: 1; }
+    40%  { opacity: 0.2; }
+    55%  { opacity: 0.7; }
+    100% { opacity: 0; }
+  }
+
+  @keyframes name-zeigen {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes splash-weg {
+    to { opacity: 0; visibility: hidden; }
+  }
+
   /* Weiche Farbwolken im Hintergrund */
   .wolke {
     position: fixed;
@@ -68,8 +129,8 @@
     pointer-events: none;
     z-index: 0;
   }
-  .wolke.eins  { width: 320px; height: 320px; background: var(--akzent1); top: -80px; right: -100px; }
-  .wolke.zwei  { width: 280px; height: 280px; background: var(--akzent2); bottom: 60px; left: -120px; }
+  .wolke.eins { width: 320px; height: 320px; background: var(--akzent1); top: -80px; right: -100px; }
+  .wolke.zwei { width: 280px; height: 280px; background: var(--akzent2); bottom: 60px; left: -120px; }
 
   /* ── Kopfzeile ────────────────────────────── */
   header {
@@ -145,12 +206,12 @@
     background: var(--karte);
     border-radius: 28px;
     box-shadow: var(--schatten);
-    padding: clamp(22px, 4.5vh, 38px) 26px;
+    padding: clamp(20px, 4vh, 34px) 26px;
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 15px;
+    gap: 14px;
     position: relative;
     overflow: hidden;
   }
@@ -187,19 +248,19 @@
   }
 
   .emoji-kreis {
-    width: clamp(82px, 17vh, 120px);
-    height: clamp(82px, 17vh, 120px);
+    width: clamp(74px, 15vh, 112px);
+    height: clamp(74px, 15vh, 112px);
     border-radius: 50%;
     background: radial-gradient(circle at 30% 25%, rgba(124,58,237,0.16), rgba(244,63,94,0.12));
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: clamp(44px, 9.5vh, 66px);
+    font-size: clamp(40px, 8.5vh, 62px);
     line-height: 1;
   }
 
   .ideen-text {
-    font-size: clamp(18px, 4.4vw, 26px);
+    font-size: clamp(17px, 4.2vw, 25px);
     font-weight: 700;
     letter-spacing: -0.3px;
     line-height: 1.35;
@@ -212,12 +273,12 @@
   .bewertung { display: flex; gap: 16px; }
 
   .bewertung button {
-    font-size: 25px;
+    font-size: 24px;
     background: var(--feld);
     border: none;
     border-radius: 50%;
-    width: 56px;
-    height: 56px;
+    width: 54px;
+    height: 54px;
     cursor: pointer;
     transition: transform 0.12s ease, background 0.2s ease, box-shadow 0.2s ease;
   }
@@ -225,6 +286,45 @@
   .bewertung button:active { transform: scale(1.2); }
   .bewertung button.gut      { background: #30d158; box-shadow: 0 4px 12px rgba(48,209,88,0.4); }
   .bewertung button.schlecht { background: #ff453a; box-shadow: 0 4px 12px rgba(255,69,58,0.4); }
+
+  /* Kommentar nach dem Bewerten */
+  .kommentar-zeile {
+    display: none;
+    gap: 8px;
+    width: 100%;
+    animation: einblenden 0.25s ease;
+  }
+
+  .kommentar-zeile.sichtbar { display: flex; }
+
+  .kommentar-zeile input {
+    flex: 1;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text);
+    background: var(--feld);
+    border: 1px solid var(--linie);
+    border-radius: 13px;
+    padding: 10px 14px;
+    outline: none;
+    min-width: 0;
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  .kommentar-zeile input:focus { border-color: var(--akzent1); }
+
+  .kommentar-zeile button {
+    border: none;
+    border-radius: 13px;
+    width: 44px;
+    flex-shrink: 0;
+    font-size: 18px;
+    color: #fff;
+    background: linear-gradient(135deg, var(--akzent1), var(--akzent2));
+    cursor: pointer;
+  }
 
   .danke {
     font-size: 13.5px;
@@ -242,8 +342,30 @@
     gap: 8px;
   }
 
-  .idee-knopf {
+  .knopf-reihe {
+    display: flex;
+    gap: 10px;
     width: 100%;
+  }
+
+  .zurueck-knopf {
+    border: none;
+    border-radius: 20px;
+    width: 62px;
+    flex-shrink: 0;
+    font-size: 24px;
+    color: var(--akzent1);
+    background: var(--karte);
+    box-shadow: var(--schatten);
+    cursor: pointer;
+    transition: transform 0.1s ease, opacity 0.2s ease;
+  }
+
+  .zurueck-knopf:active { transform: scale(0.92); }
+  .zurueck-knopf:disabled { opacity: 0.35; }
+
+  .idee-knopf {
+    flex: 1;
     border: none;
     border-radius: 20px;
     padding: 18px;
@@ -469,6 +591,15 @@
 </head>
 <body>
 
+  <!-- Der Blitz schlägt beim Start ein! -->
+  <div class="splash" id="splash">
+    <div class="donnerlicht"></div>
+    <svg viewBox="0 0 100 100" aria-hidden="true">
+      <path d="M60 4 L18 58 L43 58 L37 96 L82 40 L56 40 Z" fill="#facc15"/>
+    </svg>
+    <b>IdeenBlitz</b>
+  </div>
+
   <div class="wolke eins"></div>
   <div class="wolke zwei"></div>
 
@@ -502,11 +633,18 @@
             <button id="daumenHoch" onclick="bewerten(1)" aria-label="Gute Idee">👍</button>
             <button id="daumenRunter" onclick="bewerten(-1)" aria-label="Schlechte Idee">👎</button>
           </div>
+          <form class="kommentar-zeile" id="kommentarZeile" onsubmit="kommentarSenden(event)">
+            <input id="kommentarFeld" type="text" placeholder="Magst du noch etwas dazu sagen?" maxlength="100" autocomplete="off">
+            <button type="submit" aria-label="Kommentar senden">➤</button>
+          </form>
           <div class="danke" id="danke"></div>
         </div>
       </div>
       <div class="knopf-bereich">
-        <button class="idee-knopf" onclick="neueIdee()">⚡️ Ideenblitz!</button>
+        <div class="knopf-reihe">
+          <button class="zurueck-knopf" id="zurueckKnopf" onclick="zurueck()" disabled aria-label="Zurück zur letzten Idee">↩︎</button>
+          <button class="idee-knopf" onclick="neueIdee()">⚡️ Ideenblitz!</button>
+        </div>
         <div class="zaehler" id="zaehler"></div>
       </div>
     </section>
@@ -532,7 +670,7 @@
         <div class="sektion">
           <div class="sektion-kopf">
             <div class="icon">👫</div>
-            <div><b>Meine Freunde</b><span>Wen magst du? Wen könntest du fragen?</span></div>
+            <div><b>Meine Freunde</b><span>Auch Familie zählt: Bruder, Mami, Grosi …</span></div>
           </div>
           <div class="chips" id="chips-freunde"></div>
           <form class="eingabe-zeile" onsubmit="hinzufuegen(event, 'freunde')">
@@ -552,6 +690,30 @@
             <button type="submit" aria-label="Hinzufügen">+</button>
           </form>
         </div>
+
+        <div class="sektion">
+          <div class="sektion-kopf">
+            <div class="icon">🌳</div>
+            <div><b>Meine Orte</b><span>z.B. Garten, Spielplatz, Wald</span></div>
+          </div>
+          <div class="chips" id="chips-orte"></div>
+          <form class="eingabe-zeile" onsubmit="hinzufuegen(event, 'orte')">
+            <input id="eingabe-orte" type="text" placeholder="Ort eintragen…" maxlength="30" autocomplete="off">
+            <button type="submit" aria-label="Hinzufügen">+</button>
+          </form>
+        </div>
+
+        <div class="sektion">
+          <div class="sektion-kopf">
+            <div class="icon">📦</div>
+            <div><b>Andere Sachen</b><span>Alles, was sonst noch zu dir gehört!</span></div>
+          </div>
+          <div class="chips" id="chips-anderes"></div>
+          <form class="eingabe-zeile" onsubmit="hinzufuegen(event, 'anderes')">
+            <input id="eingabe-anderes" type="text" placeholder="Etwas eintragen…" maxlength="30" autocomplete="off">
+            <button type="submit" aria-label="Hinzufügen">+</button>
+          </form>
+        </div>
       </div>
     </section>
   </main>
@@ -567,7 +729,7 @@
     </button>
   </nav>
 
-  <div class="version">v3</div>
+  <div class="version">v4</div>
 
 <script>
   // ─────────────────────────────────────────────
@@ -578,12 +740,12 @@
     { emoji: "🎨", text: "Mal ein Bild von deinem Lieblingstier!" },
     { emoji: "📚", text: "Lies ein Buch an einem geheimen Ort!" },
     { emoji: "🧩", text: "Mach ein Puzzle – auf Zeit!" },
-    { emoji: "🕵️", text: "Spiel Detektiv: Versteck etwas und schreib eine Schatzkarte!" },
+    { emoji: "🕵️", text: "Spiel Detektiv: Versteck etwas und zeichne eine Schatzkarte dazu!" },
     { emoji: "🍪", text: "Frag, ob ihr zusammen Guetzli backen könnt!" },
     { emoji: "🎭", text: "Erfinde ein Theaterstück und führ es der Familie vor!" },
     { emoji: "🚲", text: "Mach eine Velotour um den Block!" },
     { emoji: "🎵", text: "Erfinde einen eigenen Song und nimm ihn auf!" },
-    { emoji: "🏗️", text: "Bau den höchsten Turm, den du kannst!" },
+    { emoji: "🏗️", text: "Bau den höchsten Turm, den du schaffst!" },
     { emoji: "🔬", text: "Mach ein Experiment: Was schwimmt, was sinkt? Teste es mit Sachen aus der Küche!" },
     { emoji: "🎪", text: "Übe einen Zaubertrick und zeig ihn jemandem!" },
     { emoji: "🐜", text: "Geh raus und beobachte Insekten – wie viele verschiedene findest du?" },
@@ -604,10 +766,10 @@
     { emoji: "📞", text: "Ruf jemanden an, den du gern hast!" },
     { emoji: "🎬", text: "Dreh einen kurzen Film mit deinen Spielsachen!" },
     { emoji: "🍋", text: "Mach selber Zitronen-Limonade!" },
-    { emoji: "🪁", text: "Bastle etwas aus Papier: Flieger, Schiff oder Hut!" },
+    { emoji: "🪁", text: "Bastle etwas aus Papier: einen Flieger, ein Schiff oder einen Hut!" },
     { emoji: "🤸", text: "Lern einen neuen Trick: Handstand, Rad oder Jonglieren!" },
     { emoji: "🔍", text: "Mach eine Schnitzeljagd für jemanden aus deiner Familie!" },
-    { emoji: "🎹", text: "Erfinde ein Instrument aus Sachen, die du findest!" },
+    { emoji: "🎹", text: "Bau ein Instrument aus Sachen, die du findest!" },
     { emoji: "🐾", text: "Denk dir ein Fantasie-Tier aus und zeichne es!" },
     { emoji: "🏠", text: "Bau ein Haus für deine Kuscheltiere!" },
     { emoji: "⏰", text: "Räum dein Zimmer auf – aber auf Zeit, wie ein Wettkampf!" },
@@ -617,17 +779,17 @@
   ];
 
   // Vorlagen für persönliche Ideen. {x} wird ersetzt durch
-  // deine Spielsachen, Freunde oder Hobbys aus «Meine Welt».
+  // deine Einträge aus «Meine Welt».
   const VORLAGEN = {
     spielsachen: [
       { emoji: "🧸", text: "Erfinde ein ganz neues Spiel mit {x}!" },
       { emoji: "🎬", text: "Dreh einen Mini-Film mit {x} in der Hauptrolle!" },
       { emoji: "🏆", text: "Mach einen Wettkampf mit {x} – schaffst du einen neuen Rekord?" },
-      { emoji: "🔎", text: "Versteck {x} und schreib eine Schatzkarte dazu!" },
+      { emoji: "🔎", text: "Versteck {x} und zeichne eine Schatzkarte dazu!" },
       { emoji: "🛠️", text: "Bau mit {x} etwas, das es noch nie gab!" }
     ],
     freunde: [
-      { emoji: "📞", text: "Ruf {x} an und fragt euch gegenseitig Rätsel!" },
+      { emoji: "📞", text: "Ruf {x} an und stellt euch gegenseitig Rätsel!" },
       { emoji: "🏡", text: "Frag, ob {x} zum Spielen kommen kann!" },
       { emoji: "💌", text: "Mal ein Bild oder schreib eine Nachricht für {x}!" },
       { emoji: "🤫", text: "Denk dir eine Geheimsprache aus, die nur du und {x} versteht!" },
@@ -638,6 +800,18 @@
       { emoji: "🎓", text: "Bring jemandem aus der Familie etwas über {x} bei!" },
       { emoji: "🚀", text: "Erfinde eine neue Übung oder einen Trick für {x}!" },
       { emoji: "📋", text: "Mach ein Plakat über {x} mit allem, was du weisst!" }
+    ],
+    orte: [
+      { emoji: "🧭", text: "Mach eine Expedition zu deinem Ort «{x}» – was entdeckst du dort Neues?" },
+      { emoji: "📸", text: "Foto-Safari bei «{x}»: Fotografiere 5 spannende Dinge!" },
+      { emoji: "🏴‍☠️", text: "Versteck einen kleinen Schatz bei «{x}» und zeichne eine Schatzkarte!" },
+      { emoji: "🧺", text: "Pack ein Znüni ein und mach ein Picknick bei «{x}»!" }
+    ],
+    anderes: [
+      { emoji: "📦", text: "Mach heute etwas mit {x} – dir fällt sicher etwas Cooles ein!" },
+      { emoji: "📖", text: "Erfinde eine Geschichte, in der {x} vorkommt!" },
+      { emoji: "✏️", text: "Zeichne {x} – aber mit geschlossenen Augen!" },
+      { emoji: "🧱", text: "Bau {x} aus Lego oder Papier nach!" }
     ]
   };
 
@@ -658,77 +832,135 @@
     { emoji: "🐟", text: "Was macht ein Fisch am Computer? – Er surft im Netz!" },
     { emoji: "🤖", text: "Warum ging der Roboter zum Arzt? – Er hatte einen Virus!" },
     { emoji: "🐝", text: "Was sagt eine Biene zur Blume? – «Hallo Süsse!»" },
-    { emoji: "⚽", text: "Warum können Skelette so schlecht Fussball spielen? – Weil ihnen der Mumm fehlt!" }
+    { emoji: "⚽", text: "Warum können Skelette so schlecht Fussball spielen? – Weil ihnen der Mumm fehlt!" },
+    { emoji: "🦈", text: "Warum ging der Hai nicht zur Schule? – Er war schon Klassen-Bester im Schwimmen!" },
+    { emoji: "🌙", text: "Was sagt der grosse Stift zum kleinen Stift? – «Wachs-mal-Stift!»" },
+    { emoji: "🐔", text: "Warum ging das Huhn über die Strasse? – Um auf die andere Seite zu kommen!" },
+    { emoji: "🦁", text: "Was ist gestreift und hüpft durch die Savanne? – Ein Zebra auf dem Trampolin!" },
+    { emoji: "🧀", text: "Was sagt der Käse vor dem Foto? – Nichts, er lächelt einfach!" },
+    { emoji: "🐸", text: "Was trinkt ein Frosch am liebsten? – Kroko-Cola!" },
+    { emoji: "🎈", text: "Warum platzen Ballone nie vor Lachen? – Weil sie sonst aus der Luft gehen!" },
+    { emoji: "🚗", text: "Was sagt ein Auto mit Schnupfen? – «Hatschi-way!»" }
   ];
 
   // ─────────────────────────────────────────────
   // Gespeicherte Daten (bleiben auch nach dem Schliessen da)
   // ─────────────────────────────────────────────
   let punkte = JSON.parse(localStorage.getItem("ideenPunkte") || "{}");
-  let meineWelt = JSON.parse(localStorage.getItem("meineWelt") || '{"spielsachen":[],"freunde":[],"hobbys":[]}');
+  let meineWelt = JSON.parse(localStorage.getItem("meineWelt") || "{}");
+  for (const art of ["spielsachen", "freunde", "hobbys", "orte", "anderes"]) {
+    if (!meineWelt[art]) meineWelt[art] = [];
+  }
+  let kommentare = JSON.parse(localStorage.getItem("kommentare") || "[]");
+  let witzStapel = JSON.parse(localStorage.getItem("witzStapel") || "[]");
   let klickZahl = parseInt(localStorage.getItem("klickZahl") || "0");
+
   let aktuelleIdee = null;
-  let letzteIdeen = []; // damit nicht 2x hintereinander das Gleiche kommt
+  let letzteBewertung = 0;
+  let letzteIdeen = [];  // die letzten 12 Ideen, damit nichts doppelt kommt
+  let verlauf = [];      // alles, was gezeigt wurde – für den Zurück-Knopf
 
   function speichern() {
     localStorage.setItem("ideenPunkte", JSON.stringify(punkte));
     localStorage.setItem("meineWelt", JSON.stringify(meineWelt));
+    localStorage.setItem("kommentare", JSON.stringify(kommentare));
+    localStorage.setItem("witzStapel", JSON.stringify(witzStapel));
     localStorage.setItem("klickZahl", klickZahl);
-  }
-
-  // ─────────────────────────────────────────────
-  // Ideen auswählen: 👍 = kommt öfter, 👎 = fast nie
-  // ─────────────────────────────────────────────
-  function gewichtVon(schluessel) {
-    const p = punkte[schluessel] || 0;
-    if (p <= -2) return 0.05;   // fast nie
-    if (p < 0)   return 0.3;    // selten
-    return 1 + p * 0.5;          // je mehr 👍, desto öfter
   }
 
   function zufallAus(liste) {
     return liste[Math.floor(Math.random() * liste.length)];
   }
 
-  // Baut eine persönliche Idee aus «Meine Welt», z.B. mit einem Freund
-  function persoenlicheIdee() {
-    const arten = ["spielsachen", "freunde", "hobbys"].filter(a => meineWelt[a].length > 0);
-    if (arten.length === 0) return null;
-    const art = zufallAus(arten);
-    const vorlage = zufallAus(VORLAGEN[art]);
+  // ─────────────────────────────────────────────
+  // Witze: wie ein Kartenstapel – erst wenn alle
+  // erzählt sind, wird neu gemischt. Nichts doppelt!
+  // ─────────────────────────────────────────────
+  function naechsterWitz() {
+    if (witzStapel.length === 0) {
+      witzStapel = WITZE.map((w, i) => i);
+      for (let i = witzStapel.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [witzStapel[i], witzStapel[j]] = [witzStapel[j], witzStapel[i]];
+      }
+    }
+    return WITZE[witzStapel.pop()];
+  }
+
+  // ─────────────────────────────────────────────
+  // Ideen auswählen: 👍 = kommt öfter,
+  // 👎 = verschwindet ganz aus dem Stapel!
+  // ─────────────────────────────────────────────
+  function gewichtVon(schluessel) {
+    const p = punkte[schluessel] || 0;
+    if (p < 0) return 0;         // Daumen runter: weg damit!
+    return 1 + p * 0.5;          // je mehr 👍, desto öfter
+  }
+
+  // Baut eine persönliche Idee aus «Meine Welt»
+  function persoenlicheIdee(wunschArt, wunschDing) {
+    let art = wunschArt;
+    if (art && meineWelt[art].length === 0) art = null;
+    if (!art) {
+      const arten = Object.keys(VORLAGEN).filter(a => meineWelt[a].length > 0);
+      if (arten.length === 0) return null;
+      art = zufallAus(arten);
+    }
+    const brauchbar = VORLAGEN[art].filter(v => gewichtVon(v.text) > 0);
+    if (brauchbar.length === 0) return null;
+    const vorlage = zufallAus(brauchbar);
     return {
       emoji: vorlage.emoji,
-      text: vorlage.text.replace("{x}", zufallAus(meineWelt[art])),
+      text: vorlage.text.replace("{x}", wunschDing || zufallAus(meineWelt[art])),
       schluessel: vorlage.text,   // bewertet wird die Vorlage
       persoenlich: true
     };
   }
 
-  function zufaelligeIdee() {
-    // Wenn etwas in «Meine Welt» steht: jede 3. Idee ist persönlich
+  function zufaelligeIdee(wunsch) {
+    // Wenn du im Kommentar einen Wunsch geäussert hast, kommt er zuerst!
+    if (wunsch) {
+      const p = persoenlicheIdee(wunsch.art, wunsch.ding);
+      if (p && !letzteIdeen.includes(p.text)) return p;
+    }
+    // Wenn etwas in «Meine Welt» steht: etwa jede 3. Idee ist persönlich
     if (Math.random() < 0.35) {
       const p = persoenlicheIdee();
-      if (p && !letzteIdeen.includes(p.text) && Math.random() < gewichtVon(p.schluessel)) return p;
+      if (p && !letzteIdeen.includes(p.text)) return p;
     }
-    const auswahl = IDEEN.filter(i => !letzteIdeen.includes(i.text));
+    let auswahl = IDEEN.filter(i => !letzteIdeen.includes(i.text) && gewichtVon(i.text) > 0);
+    if (auswahl.length === 0) auswahl = IDEEN.filter(i => gewichtVon(i.text) > 0);
+    if (auswahl.length === 0) auswahl = IDEEN;   // falls du wirklich alles weggeklickt hast
     let summe = 0;
-    for (const i of auswahl) summe += gewichtVon(i.text);
+    for (const i of auswahl) summe += Math.max(gewichtVon(i.text), 0.01);
     let los = Math.random() * summe;
     for (const i of auswahl) {
-      los -= gewichtVon(i.text);
+      los -= Math.max(gewichtVon(i.text), 0.01);
       if (los <= 0) return { ...i, schluessel: i.text };
     }
     const letzte = auswahl[auswahl.length - 1];
     return { ...letzte, schluessel: letzte.text };
   }
 
-  // ─────────────────────────────────────────────
-  // Der grosse Knopf
-  // ─────────────────────────────────────────────
-  function neueIdee() {
-    klickZahl++;
-    speichern();
+  // Erkennt Wünsche im Kommentar, z.B. «etwas mit meinem Freund machen»
+  function wunschErkennen(text) {
+    const t = text.toLowerCase();
+    for (const art of Object.keys(meineWelt)) {
+      for (const ding of meineWelt[art]) {
+        if (t.includes(ding.toLowerCase())) return { art: art, ding: ding };
+      }
+    }
+    if (/freund|kolleg|zusammen|jemand/.test(t)) return { art: "freunde" };
+    if (/drauss|raus|garten|park|wald|spielplatz/.test(t)) return { art: "orte" };
+    if (/hobby/.test(t)) return { art: "hobbys" };
+    if (/spielsach|spielzeug|lego/.test(t)) return { art: "spielsachen" };
+    return null;
+  }
 
+  // ─────────────────────────────────────────────
+  // Anzeigen auf der Karte + Verlauf für Zurück
+  // ─────────────────────────────────────────────
+  function zeigeEintrag(eintrag) {
     const karte = document.getElementById("karte");
     karte.classList.remove("neu");
     void karte.offsetWidth; // Trick, damit die Animation neu startet
@@ -737,46 +969,107 @@
     document.getElementById("danke").textContent = "";
     document.getElementById("daumenHoch").className = "";
     document.getElementById("daumenRunter").className = "";
+    document.getElementById("kommentarZeile").classList.remove("sichtbar");
+    document.getElementById("kommentarFeld").value = "";
 
     const abzeichen = document.getElementById("abzeichen");
+    abzeichen.textContent = eintrag.abzeichen;
+    abzeichen.className = eintrag.persoenlich ? "abzeichen persoenlich" : "abzeichen";
+    document.getElementById("emoji").textContent = eintrag.emoji;
+    document.getElementById("ideenText").textContent = eintrag.text;
+    document.getElementById("bewertung").style.visibility = eintrag.idee ? "visible" : "hidden";
+    aktuelleIdee = eintrag.idee;
 
-    // Jedes 4. Mal gibt es einen Witz statt einer Idee!
-    if (klickZahl % 4 === 0) {
-      const witz = zufallAus(WITZE);
-      abzeichen.textContent = "😂 Witz-Pause";
-      abzeichen.className = "abzeichen";
-      document.getElementById("emoji").textContent = witz.emoji;
-      document.getElementById("ideenText").textContent = witz.text;
-      document.getElementById("bewertung").style.visibility = "hidden";
-      aktuelleIdee = null;
+    document.getElementById("zurueckKnopf").disabled = verlauf.length < 2;
+  }
+
+  function neueIdee(wunsch) {
+    klickZahl++;
+
+    let eintrag;
+    // Jedes 4. Mal gibt es einen Witz statt einer Idee
+    // (ausser du hast gerade einen Wunsch geäussert)
+    if (klickZahl % 4 === 0 && !wunsch) {
+      const witz = naechsterWitz();
+      eintrag = { abzeichen: "😂 Witz-Pause", emoji: witz.emoji, text: witz.text, idee: null, persoenlich: false };
     } else {
-      aktuelleIdee = zufaelligeIdee();
-      letzteIdeen.push(aktuelleIdee.text);
-      if (letzteIdeen.length > 5) letzteIdeen.shift();
-
-      abzeichen.textContent = aktuelleIdee.persoenlich ? "💜 Extra für dich" : "⚡️ Deine Idee";
-      abzeichen.className = aktuelleIdee.persoenlich ? "abzeichen persoenlich" : "abzeichen";
-      document.getElementById("emoji").textContent = aktuelleIdee.emoji;
-      document.getElementById("ideenText").textContent = aktuelleIdee.text;
-      document.getElementById("bewertung").style.visibility = "visible";
+      const idee = zufaelligeIdee(wunsch);
+      letzteIdeen.push(idee.text);
+      if (letzteIdeen.length > 12) letzteIdeen.shift();
+      eintrag = {
+        abzeichen: idee.persoenlich ? "💜 Extra für dich" : "⚡️ Deine Idee",
+        emoji: idee.emoji,
+        text: idee.text,
+        idee: idee,
+        persoenlich: !!idee.persoenlich
+      };
     }
+
+    verlauf.push(eintrag);
+    if (verlauf.length > 30) verlauf.shift();
+    speichern();
+    zeigeEintrag(eintrag);
 
     document.getElementById("zaehler").textContent =
       klickZahl + (klickZahl === 1 ? " Ideenblitz geholt" : " Ideenblitze geholt");
   }
 
+  function zurueck() {
+    if (verlauf.length < 2) return;
+    verlauf.pop();
+    zeigeEintrag(verlauf[verlauf.length - 1]);
+  }
+
+  // ─────────────────────────────────────────────
+  // Bewerten + Kommentar schreiben
+  // ─────────────────────────────────────────────
   function bewerten(wert) {
     if (!aktuelleIdee) return;
+    letzteBewertung = wert;
     punkte[aktuelleIdee.schluessel] = (punkte[aktuelleIdee.schluessel] || 0) + wert;
     speichern();
 
+    document.getElementById("kommentarZeile").classList.add("sichtbar");
+
     if (wert === 1) {
       document.getElementById("daumenHoch").className = "gut";
+      document.getElementById("daumenRunter").className = "";
       document.getElementById("danke").textContent = "Super! Die Idee kommt jetzt öfter. 🎉";
       konfettiRegen(document.getElementById("daumenHoch"));
     } else {
       document.getElementById("daumenRunter").className = "schlecht";
-      document.getElementById("danke").textContent = "Okay, die zeig ich dir fast nicht mehr.";
+      document.getElementById("daumenHoch").className = "";
+      document.getElementById("danke").textContent = "Okay, die ist jetzt weg. Gleich kommt eine neue!";
+      // Nach dem Daumen runter kommt automatisch eine neue Idee –
+      // ausser du willst noch einen Kommentar schreiben.
+      setTimeout(() => {
+        if (letzteBewertung === -1 && document.getElementById("kommentarFeld").value === "") {
+          neueIdee();
+        }
+      }, 2500);
+    }
+  }
+
+  function kommentarSenden(event) {
+    event.preventDefault();
+    const feld = document.getElementById("kommentarFeld");
+    const text = feld.value.trim();
+    if (!text) return;
+
+    kommentare.push({ idee: aktuelleIdee ? aktuelleIdee.text : "", bewertung: letzteBewertung, kommentar: text });
+    speichern();
+    feld.value = "";
+    feld.blur();
+    document.getElementById("kommentarZeile").classList.remove("sichtbar");
+
+    if (letzteBewertung === -1) {
+      const wunsch = wunschErkennen(text);
+      document.getElementById("danke").textContent = wunsch
+        ? "Gute Idee! Ich such dir genau so etwas… 💜"
+        : "Danke! Hier kommt eine neue Idee…";
+      setTimeout(() => neueIdee(wunsch), 900);
+    } else {
+      document.getElementById("danke").textContent = "Danke für deinen Kommentar! 💜";
     }
   }
 
@@ -845,11 +1138,16 @@
     document.getElementById("tabWelt").classList.toggle("aktiv", name === "Welt");
   }
 
-  // Beim Start: gespeicherte Chips und Zähler anzeigen
-  ["spielsachen", "freunde", "hobbys"].forEach(zeigeChips);
+  // ─────────────────────────────────────────────
+  // Beim Start
+  // ─────────────────────────────────────────────
+  ["spielsachen", "freunde", "hobbys", "orte", "anderes"].forEach(zeigeChips);
   if (klickZahl > 0) {
     document.getElementById("zaehler").textContent = "Schon " + klickZahl + " Ideenblitze geholt";
   }
+
+  // Blitz-Einschlag wegräumen, wenn er fertig ist
+  setTimeout(() => document.getElementById("splash").remove(), 1900);
 
   // Offline-Speicher: dank dem Service Worker startet die App
   // auch ohne Internet – wie eine echte App!
