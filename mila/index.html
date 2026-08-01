@@ -2,33 +2,658 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mila</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Famigram</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>💜</text></svg>">
 <style>
+  :root {
+    --hg: #f2f2f7;        /* Hintergrund */
+    --karte: #ffffff;     /* Karten */
+    --text: #1c1c1e;
+    --grau: #8e8e93;
+    --linie: #e5e5ea;
+    --akzent: #7c3aed;    /* Lila */
+    --akzent-hell: #ede9fe;
+    --rot: #ff3b30;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --hg: #000000;
+      --karte: #1c1c1e;
+      --text: #f2f2f7;
+      --grau: #98989e;
+      --linie: #2c2c2e;
+      --akzent: #a78bfa;
+      --akzent-hell: #2e1065;
+    }
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html { -webkit-text-size-adjust: 100%; }
   body {
-    font-family: -apple-system, sans-serif;
-    font-size: 28px;
     margin: 0;
-    padding: 48px 32px;
-    min-height: 100vh;
-    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 17px;
+    background: var(--hg);
+    color: var(--text);
   }
-  h1 {
-    font-size: 44px;
-    line-height: 1.3;
-    margin: 0;
+
+  /* Kopfzeile oben */
+  header {
+    position: sticky; top: 0; z-index: 10;
+    background: var(--hg);
+    padding: calc(env(safe-area-inset-top) + 10px) 16px 10px;
+    display: flex; align-items: center; justify-content: space-between;
   }
+  header h1 { margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+  header h1 span { color: var(--akzent); }
+  .hinweis-knopf {
+    border: none; background: var(--karte); color: var(--grau);
+    width: 40px; height: 40px; border-radius: 50%; font-size: 20px;
+  }
+
+  main {
+    max-width: 560px; margin: 0 auto;
+    padding: 4px 12px calc(env(safe-area-inset-bottom) + 96px);
+  }
+
+  /* Karten */
+  .karte {
+    background: var(--karte);
+    border-radius: 18px;
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+  .post-kopf { display: flex; align-items: center; gap: 10px; }
+  .avatar {
+    width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0;
+    background: var(--akzent-hell);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+  }
+  .post-wer { font-weight: 700; }
+  .post-wann { color: var(--grau); font-size: 14px; }
+  .ort-chip {
+    display: inline-block; margin-top: 2px;
+    font-size: 13px; color: var(--akzent);
+    background: var(--akzent-hell);
+    padding: 2px 8px; border-radius: 999px;
+  }
+
+  /* "Foto" — eine bunte Szene mit grossem Emoji */
+  .foto-szene {
+    margin-top: 12px; border-radius: 14px;
+    height: 200px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 84px;
+  }
+  .foto-bild { margin-top: 12px; border-radius: 14px; width: 100%; display: block; }
+  .g0 { background: linear-gradient(135deg, #fbbf24, #f97316); }
+  .g1 { background: linear-gradient(135deg, #60a5fa, #2563eb); }
+  .g2 { background: linear-gradient(135deg, #34d399, #059669); }
+  .g3 { background: linear-gradient(135deg, #f472b6, #db2777); }
+  .g4 { background: linear-gradient(135deg, #a78bfa, #6d28d9); }
+  .g5 { background: linear-gradient(135deg, #38bdf8, #0e7490); }
+
+  .post-text { margin: 12px 2px 4px; line-height: 1.45; overflow-wrap: break-word; }
+
+  /* Like + Kommentar */
+  .aktionen { display: flex; gap: 8px; margin-top: 10px; }
+  .aktion {
+    border: none; border-radius: 999px;
+    background: var(--hg); color: var(--text);
+    font-size: 16px; font-weight: 600;
+    padding: 10px 16px; min-height: 44px;
+  }
+  .aktion.geliked { background: #ffe4e6; color: var(--rot); }
+  @media (prefers-color-scheme: dark) { .aktion.geliked { background: #4c0519; } }
+
+  .kommentar { display: flex; gap: 8px; margin-top: 10px; font-size: 15px; line-height: 1.4; }
+  .kommentar b { color: var(--akzent); }
+  .kommentar-zeile { display: flex; gap: 8px; margin-top: 12px; }
+  .kommentar-zeile input {
+    flex: 1; border: none; border-radius: 999px;
+    background: var(--hg); color: var(--text);
+    padding: 12px 16px; font-size: 16px; min-height: 44px;
+  }
+  .kommentar-zeile button {
+    border: none; border-radius: 999px;
+    background: var(--akzent); color: white;
+    font-size: 16px; font-weight: 700; padding: 0 18px; min-height: 44px;
+  }
+
+  /* Formulare */
+  textarea, input[type=text] {
+    width: 100%; border: none; border-radius: 14px;
+    background: var(--hg); color: var(--text);
+    padding: 14px; font-size: 17px; font-family: inherit;
+  }
+  textarea { min-height: 110px; resize: none; }
+  .gross-knopf {
+    width: 100%; border: none; border-radius: 16px;
+    background: var(--akzent); color: white;
+    font-size: 19px; font-weight: 700;
+    padding: 16px; margin-top: 12px; min-height: 54px;
+  }
+  .gross-knopf:disabled { opacity: 0.4; }
+  .neben-knopf {
+    border: none; border-radius: 16px;
+    background: var(--hg); color: var(--text);
+    font-size: 16px; font-weight: 600;
+    padding: 14px; min-height: 50px; width: 100%;
+  }
+  h2 { font-size: 20px; margin: 22px 6px 10px; }
+  .leer { color: var(--grau); text-align: center; padding: 30px 10px; line-height: 1.5; }
+
+  /* Szenen-Auswahl beim neuen Post */
+  .szenen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+  .szene-wahl {
+    border: 3px solid transparent; border-radius: 14px;
+    height: 74px; font-size: 34px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .szene-wahl.gewaehlt { border-color: var(--akzent); }
+
+  /* Anfragen */
+  .anfrage { display: flex; align-items: center; gap: 12px; }
+  .anfrage-text { flex: 1; min-width: 0; }
+  .anfrage-text .warum { color: var(--grau); font-size: 14px; margin-top: 2px; }
+  .ja-nein { display: flex; gap: 8px; margin-top: 12px; }
+  .ja-nein button {
+    flex: 1; border: none; border-radius: 14px;
+    font-size: 17px; font-weight: 700; padding: 14px; min-height: 50px;
+  }
+  .ja { background: var(--akzent); color: white; }
+  .nein { background: var(--hg); color: var(--text); }
+  .status-chip { font-size: 14px; font-weight: 600; padding: 6px 12px; border-radius: 999px; flex-shrink: 0; }
+  .wartet { background: #fef3c7; color: #92400e; }
+  .angenommen { background: #d1fae5; color: #065f46; }
+  @media (prefers-color-scheme: dark) {
+    .wartet { background: #451a03; color: #fbbf24; }
+    .angenommen { background: #022c22; color: #34d399; }
+  }
+
+  /* Tab-Leiste unten */
+  nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 10;
+    background: var(--karte);
+    border-top: 1px solid var(--linie);
+    display: flex;
+    padding: 6px 8px calc(env(safe-area-inset-bottom) + 6px);
+  }
+  nav button {
+    flex: 1; border: none; background: none; color: var(--grau);
+    font-size: 11px; font-weight: 600; font-family: inherit;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    padding: 6px 0; min-height: 50px; position: relative;
+  }
+  nav button .tab-icon { font-size: 24px; }
+  nav button.aktiv { color: var(--akzent); }
+  .badge {
+    position: absolute; top: 0; right: calc(50% - 22px);
+    background: var(--rot); color: white;
+    font-size: 11px; font-weight: 700;
+    min-width: 18px; height: 18px; border-radius: 999px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
   .version {
-    position: fixed;
-    bottom: 12px;
-    right: 16px;
-    font-size: 14px;
-    color: #999;
+    position: fixed; bottom: calc(env(safe-area-inset-bottom) + 84px);
+    right: 12px; font-size: 11px; color: var(--grau); z-index: 5;
   }
+
+  /* Info-Fenster */
+  dialog {
+    border: none; border-radius: 20px;
+    background: var(--karte); color: var(--text);
+    padding: 22px; max-width: 340px; width: calc(100% - 48px);
+    line-height: 1.5;
+  }
+  dialog::backdrop { background: rgba(0,0,0,0.45); }
+  dialog h3 { margin-top: 0; }
 </style>
 </head>
 <body>
-  <h1>Hier baut Mila</h1>
-  <div class="version">v1 · 08:48</div>
+
+<header>
+  <h1>Fami<span>gram</span></h1>
+  <button class="hinweis-knopf" onclick="document.getElementById('info').showModal()">?</button>
+</header>
+
+<main id="inhalt"></main>
+
+<nav id="leiste"></nav>
+<div class="version">v2 · 11:36</div>
+
+<dialog id="info">
+  <h3>💜 So funktioniert Famigram</h3>
+  <p>Das ist dein Übungs-Netzwerk. Alles wird nur <b>auf deinem Gerät</b> gespeichert — niemand sonst kann es sehen.</p>
+  <p>Die Familienmitglieder hier sind ausgedacht. Ein echtes Netzwerk, bei dem sich mehrere Geräte verbinden, braucht einen Server — das wäre der nächste Schritt!</p>
+  <button class="gross-knopf" onclick="document.getElementById('info').close()">Alles klar</button>
+</dialog>
+
+<script>
+// ─────────────────────────────────────────────
+// DATEN: alles wird im Browser gespeichert (localStorage)
+// ─────────────────────────────────────────────
+const SPEICHER = 'famigram-v1';
+let daten = null;
+let aktiverTab = 'feed';
+const h = 3600000, min = 60000; // eine Stunde / Minute in Millisekunden
+
+function startDaten() {
+  const jetzt = Date.now();
+  return {
+    ich: { name: 'Mila', emoji: '🦄', ort: 'Zuhause', ortEmoji: '🏠' },
+    freunde: [
+      { id: 'mama',  name: 'Mama',        emoji: '🌻', ort: 'Im Büro',          ortEmoji: '🏢' },
+      { id: 'papa',  name: 'Papa',        emoji: '🧔', ort: 'Am Zmittag kochen', ortEmoji: '🍝' },
+      { id: 'oma',   name: 'Oma',         emoji: '👵', ort: 'Ferien in Italien', ortEmoji: '🇮🇹' },
+      { id: 'cous',  name: 'Cousine Jo',  emoji: '⚽', ort: 'Fussballtraining',  ortEmoji: '🥅' }
+    ],
+    posts: [
+      { id: 'p1', autor: 'oma', zeit: jetzt - 2*h,
+        text: 'Buongiorno aus Italien! Heute waren wir am Meer und haben die beste Glace der Welt gegessen. 🍦',
+        foto: { art: 'szene', farbe: 1, emoji: '🏖️' },
+        likes: ['Mama', 'Papa'], kommentare: [ { von: 'Mama', text: 'Wie schön! Grüsse ans Meer!' } ] },
+      { id: 'p2', autor: 'cous', zeit: jetzt - 5*h,
+        text: 'Wir haben das Turnier gewonnen!! 3:1 im Final 🎉',
+        foto: { art: 'szene', farbe: 2, emoji: '🏆' },
+        likes: ['Papa'], kommentare: [] },
+      { id: 'p3', autor: 'papa', zeit: jetzt - 26*h,
+        text: 'Heute Abend gibts Pizza aus dem eigenen Ofen. Wer will ein Stück?',
+        foto: { art: 'szene', farbe: 0, emoji: '🍕' },
+        likes: ['Oma', 'Cousine Jo'], kommentare: [ { von: 'Oma', text: 'Ich! Leg mir eins beiseite 😄' } ] },
+      { id: 'p4', autor: 'mama', zeit: jetzt - 49*h,
+        text: 'Sonntagsspaziergang am See. Es war so friedlich heute Morgen.',
+        foto: { art: 'szene', farbe: 5, emoji: '🦢' },
+        likes: [], kommentare: [] }
+    ],
+    anfragenRein: [
+      { id: 'a1', name: 'Tante Vera', emoji: '🎨', warum: 'Möchte deine Beiträge sehen und ihre teilen' }
+    ],
+    anfragenRaus: [],
+    gesehen: true
+  };
+}
+
+function laden() {
+  try { daten = JSON.parse(localStorage.getItem(SPEICHER)); } catch (e) { daten = null; }
+  if (!daten) { daten = startDaten(); speichern(); }
+}
+function speichern() { localStorage.setItem(SPEICHER, JSON.stringify(daten)); }
+
+// ─────────────────────────────────────────────
+// HILFSFUNKTIONEN
+// ─────────────────────────────────────────────
+// Macht Texte sicher, damit niemand Code einschleusen kann
+function sicher(text) {
+  const d = document.createElement('div');
+  d.textContent = text;
+  return d.innerHTML;
+}
+function zeitText(ts) {
+  const diff = Date.now() - ts;
+  if (diff < min) return 'gerade eben';
+  if (diff < h) return 'vor ' + Math.floor(diff / min) + ' Min.';
+  if (diff < 24*h) return 'vor ' + Math.floor(diff / h) + ' Std.';
+  const tage = Math.floor(diff / (24*h));
+  return tage === 1 ? 'gestern' : 'vor ' + tage + ' Tagen';
+}
+function wer(autorId) {
+  if (autorId === 'ich') return daten.ich;
+  return daten.freunde.find(f => f.id === autorId);
+}
+function neueId() { return 'x' + Date.now() + Math.floor(Math.random() * 1000); }
+
+// ─────────────────────────────────────────────
+// TAB-LEISTE
+// ─────────────────────────────────────────────
+const tabs = [
+  { id: 'feed',     icon: '🏠', name: 'Feed' },
+  { id: 'orte',     icon: '📍', name: 'Orte' },
+  { id: 'neu',      icon: '➕', name: 'Neu' },
+  { id: 'anfragen', icon: '👥', name: 'Anfragen' },
+  { id: 'profil',   icon: '🙂', name: 'Ich' }
+];
+function leisteZeichnen() {
+  const offen = daten.anfragenRein.length;
+  document.getElementById('leiste').innerHTML = tabs.map(t => `
+    <button class="${aktiverTab === t.id ? 'aktiv' : ''}" onclick="tabWechseln('${t.id}')">
+      <span class="tab-icon">${t.icon}</span>${t.name}
+      ${t.id === 'anfragen' && offen ? `<span class="badge">${offen}</span>` : ''}
+    </button>`).join('');
+}
+function tabWechseln(id) {
+  aktiverTab = id;
+  zeichnen();
+  window.scrollTo(0, 0);
+}
+
+// ─────────────────────────────────────────────
+// FEED
+// ─────────────────────────────────────────────
+function fotoHtml(foto) {
+  if (!foto) return '';
+  if (foto.art === 'bild') return `<img class="foto-bild" src="${foto.src}" alt="Foto">`;
+  return `<div class="foto-szene g${foto.farbe}">${foto.emoji}</div>`;
+}
+function feedZeichnen() {
+  const posts = [...daten.posts].sort((a, b) => b.zeit - a.zeit);
+  if (!posts.length) return '<div class="leer">Noch keine Beiträge.<br>Tippe unten auf ➕ und schreib den ersten!</div>';
+  return posts.map(p => {
+    const person = wer(p.autor);
+    if (!person) return '';
+    const geliked = p.likes.includes(daten.ich.name);
+    return `
+    <div class="karte">
+      <div class="post-kopf">
+        <div class="avatar">${person.emoji}</div>
+        <div>
+          <div class="post-wer">${sicher(person.name)}</div>
+          <div class="post-wann">${zeitText(p.zeit)}</div>
+          ${person.ort ? `<span class="ort-chip">${person.ortEmoji || '📍'} ${sicher(person.ort)}</span>` : ''}
+        </div>
+      </div>
+      ${fotoHtml(p.foto)}
+      <div class="post-text">${sicher(p.text)}</div>
+      <div class="aktionen">
+        <button class="aktion ${geliked ? 'geliked' : ''}" onclick="likeDruecken('${p.id}')">
+          ${geliked ? '❤️' : '🤍'} ${p.likes.length || ''}
+        </button>
+      </div>
+      ${p.kommentare.map(k => `<div class="kommentar"><b>${sicher(k.von)}</b><span>${sicher(k.text)}</span></div>`).join('')}
+      <div class="kommentar-zeile">
+        <input type="text" id="k-${p.id}" placeholder="Kommentar schreiben …" enterkeyhint="send"
+               onkeydown="if(event.key==='Enter')kommentarSenden('${p.id}')">
+        <button onclick="kommentarSenden('${p.id}')">➤</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function likeDruecken(postId) {
+  const p = daten.posts.find(x => x.id === postId);
+  const i = p.likes.indexOf(daten.ich.name);
+  if (i >= 0) p.likes.splice(i, 1); else p.likes.push(daten.ich.name);
+  speichern(); zeichnen();
+}
+function kommentarSenden(postId) {
+  const feld = document.getElementById('k-' + postId);
+  const text = feld.value.trim();
+  if (!text) return;
+  const p = daten.posts.find(x => x.id === postId);
+  p.kommentare.push({ von: daten.ich.name, text: text });
+  speichern(); zeichnen();
+}
+
+// ─────────────────────────────────────────────
+// NEUER BEITRAG
+// ─────────────────────────────────────────────
+const szenen = [
+  { farbe: 0, emoji: '🌅' }, { farbe: 1, emoji: '🏖️' }, { farbe: 2, emoji: '🌲' },
+  { farbe: 3, emoji: '🎂' }, { farbe: 4, emoji: '🎮' }, { farbe: 5, emoji: '⛷️' }
+];
+let gewaehlteSzene = null;
+let hochgeladenesBild = null;
+
+function neuZeichnen() {
+  return `
+  <div class="karte">
+    <h2 style="margin-top:4px">Was hast du heute gemacht?</h2>
+    <textarea id="neu-text" placeholder="Erzähl es deiner Familie …"></textarea>
+    <h2>Bild dazu? (antippen)</h2>
+    <div class="szenen">
+      ${szenen.map((s, i) => `
+        <button class="szene-wahl g${s.farbe} ${gewaehlteSzene === i ? 'gewaehlt' : ''}"
+                onclick="szeneWaehlen(${i})">${s.emoji}</button>`).join('')}
+    </div>
+    <div style="margin-top:10px">
+      <button class="neben-knopf" onclick="document.getElementById('datei').click()">
+        📷 ${hochgeladenesBild ? 'Eigenes Foto gewählt ✓' : 'Eigenes Foto vom Gerät'}
+      </button>
+      <input type="file" id="datei" accept="image/*" style="display:none" onchange="bildLaden(this)">
+    </div>
+    <button class="gross-knopf" onclick="postSenden()">Teilen 💜</button>
+    <p style="color:var(--grau);font-size:14px;text-align:center;margin-bottom:0">
+      Eigene Fotos bleiben nur auf deinem Gerät gespeichert.
+    </p>
+  </div>`;
+}
+function szeneWaehlen(i) {
+  gewaehlteSzene = (gewaehlteSzene === i) ? null : i;
+  hochgeladenesBild = null;
+  merkTextUndZeichne();
+}
+// Verkleinert das Foto, damit der Speicher nicht voll wird
+function bildLaden(input) {
+  const datei = input.files[0];
+  if (!datei) return;
+  const leser = new FileReader();
+  leser.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      const maxGroesse = 900;
+      const faktor = Math.min(1, maxGroesse / Math.max(img.width, img.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.width * faktor);
+      c.height = Math.round(img.height * faktor);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      hochgeladenesBild = c.toDataURL('image/jpeg', 0.7);
+      gewaehlteSzene = null;
+      merkTextUndZeichne();
+    };
+    img.src = leser.result;
+  };
+  leser.readAsDataURL(datei);
+}
+function merkTextUndZeichne() {
+  const feld = document.getElementById('neu-text');
+  const text = feld ? feld.value : '';
+  zeichnen();
+  const neuFeld = document.getElementById('neu-text');
+  if (neuFeld) neuFeld.value = text;
+}
+function postSenden() {
+  const text = document.getElementById('neu-text').value.trim();
+  if (!text && gewaehlteSzene === null && !hochgeladenesBild) return;
+  let foto = null;
+  if (hochgeladenesBild) foto = { art: 'bild', src: hochgeladenesBild };
+  else if (gewaehlteSzene !== null) foto = { art: 'szene', farbe: szenen[gewaehlteSzene].farbe, emoji: szenen[gewaehlteSzene].emoji };
+  daten.posts.push({ id: neueId(), autor: 'ich', zeit: Date.now(), text: text, foto: foto, likes: [], kommentare: [] });
+  gewaehlteSzene = null;
+  hochgeladenesBild = null;
+  speichern();
+  tabWechseln('feed');
+}
+
+// ─────────────────────────────────────────────
+// ORTE — wo ist gerade wer?
+// ─────────────────────────────────────────────
+function orteZeichnen() {
+  const alle = [{ ...daten.ich, id: 'ich' }, ...daten.freunde];
+  return `
+  <h2>Wo sind gerade alle?</h2>
+  ${alle.map(p => `
+    <div class="karte anfrage">
+      <div class="avatar">${p.emoji}</div>
+      <div class="anfrage-text">
+        <div class="post-wer">${sicher(p.name)}${p.id === 'ich' ? ' (du)' : ''}</div>
+        <div class="warum">${p.ortEmoji || '📍'} ${sicher(p.ort || 'Kein Ort angegeben')}</div>
+      </div>
+    </div>`).join('')}
+  <div class="karte">
+    <h2 style="margin-top:0">Deinen Ort ändern</h2>
+    <input type="text" id="ort-neu" placeholder="z.B. In den Ferien am Meer" value="${sicher(daten.ich.ort)}">
+    <div class="szenen" style="margin-top:10px">
+      ${['🏠','🏫','⛰️','🏖️','🚆','🎉'].map(e => `
+        <button class="szene-wahl ${daten.ich.ortEmoji === e ? 'gewaehlt' : ''}" style="background:var(--hg)"
+                onclick="ortEmojiWaehlen('${e}')">${e}</button>`).join('')}
+    </div>
+    <button class="gross-knopf" onclick="ortSpeichern()">Ort speichern</button>
+  </div>`;
+}
+function ortEmojiWaehlen(e) {
+  daten.ich.ortEmoji = e;
+  const feld = document.getElementById('ort-neu');
+  const text = feld ? feld.value : daten.ich.ort;
+  daten.ich.ort = text;
+  speichern(); zeichnen();
+}
+function ortSpeichern() {
+  daten.ich.ort = document.getElementById('ort-neu').value.trim();
+  speichern(); zeichnen();
+}
+
+// ─────────────────────────────────────────────
+// ANFRAGEN — nur wer genehmigt ist, sieht deine Sachen
+// ─────────────────────────────────────────────
+function anfragenZeichnen() {
+  const rein = daten.anfragenRein;
+  const raus = daten.anfragenRaus;
+  return `
+  <h2>Möchten mit dir teilen</h2>
+  ${rein.length ? rein.map(a => `
+    <div class="karte">
+      <div class="anfrage">
+        <div class="avatar">${a.emoji}</div>
+        <div class="anfrage-text">
+          <div class="post-wer">${sicher(a.name)}</div>
+          <div class="warum">${sicher(a.warum)}</div>
+        </div>
+      </div>
+      <div class="ja-nein">
+        <button class="ja" onclick="anfrageAnnehmen('${a.id}')">Annehmen ✓</button>
+        <button class="nein" onclick="anfrageAblehnen('${a.id}')">Ablehnen</button>
+      </div>
+    </div>`).join('')
+    : '<div class="leer">Keine offenen Anfragen.</div>'}
+
+  <h2>Deine Anfragen an andere</h2>
+  <div class="karte">
+    <input type="text" id="anfrage-name" placeholder="Wen möchtest du hinzufügen?">
+    <button class="gross-knopf" onclick="anfrageSenden()">Anfrage senden</button>
+  </div>
+  ${raus.map(a => `
+    <div class="karte anfrage">
+      <div class="avatar">✉️</div>
+      <div class="anfrage-text"><div class="post-wer">${sicher(a.name)}</div></div>
+      <span class="status-chip ${a.status === 'wartet' ? 'wartet' : 'angenommen'}">
+        ${a.status === 'wartet' ? '⏳ Wartet' : '✓ Angenommen'}
+      </span>
+    </div>`).join('')}
+  <p style="color:var(--grau);font-size:14px;text-align:center;line-height:1.5">
+    So bleibt alles privat: Nur wer <b>angenommen</b> wurde,<br>sieht deine Beiträge und deinen Ort.
+  </p>`;
+}
+function anfrageAnnehmen(id) {
+  const i = daten.anfragenRein.findIndex(a => a.id === id);
+  const a = daten.anfragenRein[i];
+  daten.anfragenRein.splice(i, 1);
+  const neuerFreund = { id: neueId(), name: a.name, emoji: a.emoji, ort: 'Gerade dazugekommen', ortEmoji: '👋' };
+  daten.freunde.push(neuerFreund);
+  daten.posts.push({
+    id: neueId(), autor: neuerFreund.id, zeit: Date.now(),
+    text: 'Hallo zusammen! Schön, bin ich jetzt auch dabei. 👋',
+    foto: { art: 'szene', farbe: 3, emoji: '🎉' }, likes: [], kommentare: []
+  });
+  speichern(); zeichnen();
+}
+function anfrageAblehnen(id) {
+  daten.anfragenRein = daten.anfragenRein.filter(a => a.id !== id);
+  speichern(); zeichnen();
+}
+function anfrageSenden() {
+  const feld = document.getElementById('anfrage-name');
+  const name = feld.value.trim();
+  if (!name) return;
+  daten.anfragenRaus.push({ id: neueId(), name: name, status: 'wartet', zeit: Date.now() });
+  feld.value = '';
+  speichern(); zeichnen();
+}
+// Zur Übung: nach ca. 15 Sekunden nimmt die Person die Anfrage an
+function anfragenPruefen() {
+  let geaendert = false;
+  daten.anfragenRaus.forEach(a => {
+    if (a.status === 'wartet' && Date.now() - a.zeit > 15000) {
+      a.status = 'angenommen';
+      const emojis = ['🐶','🌸','🚴','🎸','🐱','🌟'];
+      const neuerFreund = {
+        id: neueId(), name: a.name,
+        emoji: emojis[Math.floor(Math.random() * emojis.length)],
+        ort: 'Gerade dazugekommen', ortEmoji: '👋'
+      };
+      daten.freunde.push(neuerFreund);
+      daten.posts.push({
+        id: neueId(), autor: neuerFreund.id, zeit: Date.now(),
+        text: 'Danke für die Einladung! Jetzt kann ich mitlesen. 😊',
+        foto: null, likes: [], kommentare: []
+      });
+      geaendert = true;
+    }
+  });
+  if (geaendert) { speichern(); zeichnen(); }
+}
+setInterval(anfragenPruefen, 3000);
+
+// ─────────────────────────────────────────────
+// PROFIL
+// ─────────────────────────────────────────────
+function profilZeichnen() {
+  const meineBeitraege = daten.posts.filter(p => p.autor === 'ich').length;
+  return `
+  <div class="karte" style="text-align:center">
+    <div class="avatar" style="width:80px;height:80px;font-size:44px;margin:8px auto">${daten.ich.emoji}</div>
+    <h2 style="margin:8px 0 2px">${sicher(daten.ich.name)}</h2>
+    <div style="color:var(--grau)">${meineBeitraege} Beiträge · ${daten.freunde.length} Familienmitglieder</div>
+  </div>
+  <div class="karte">
+    <h2 style="margin-top:0">Dein Name</h2>
+    <input type="text" id="profil-name" value="${sicher(daten.ich.name)}">
+    <h2>Dein Avatar</h2>
+    <div class="szenen">
+      ${['🦄','🐼','🦊','🐧','🌈','⚡'].map(e => `
+        <button class="szene-wahl ${daten.ich.emoji === e ? 'gewaehlt' : ''}" style="background:var(--hg)"
+                onclick="avatarWaehlen('${e}')">${e}</button>`).join('')}
+    </div>
+    <button class="gross-knopf" onclick="profilSpeichern()">Speichern</button>
+  </div>
+  <div class="karte">
+    <button class="neben-knopf" style="color:var(--rot)" onclick="allesLoeschen()">Alles zurücksetzen 🗑️</button>
+  </div>`;
+}
+function avatarWaehlen(e) {
+  daten.ich.emoji = e;
+  const feld = document.getElementById('profil-name');
+  if (feld && feld.value.trim()) daten.ich.name = feld.value.trim();
+  speichern(); zeichnen();
+}
+function profilSpeichern() {
+  const name = document.getElementById('profil-name').value.trim();
+  if (name) daten.ich.name = name;
+  speichern(); zeichnen();
+}
+function allesLoeschen() {
+  if (!confirm('Wirklich alles löschen und von vorne beginnen?')) return;
+  localStorage.removeItem(SPEICHER);
+  laden();
+  tabWechseln('feed');
+}
+
+// ─────────────────────────────────────────────
+// ZEICHNEN — baut die Seite je nach Tab neu auf
+// ─────────────────────────────────────────────
+function zeichnen() {
+  const seiten = {
+    feed: feedZeichnen, orte: orteZeichnen, neu: neuZeichnen,
+    anfragen: anfragenZeichnen, profil: profilZeichnen
+  };
+  document.getElementById('inhalt').innerHTML = seiten[aktiverTab]();
+  leisteZeichnen();
+}
+
+laden();
+zeichnen();
+</script>
 </body>
 </html>
