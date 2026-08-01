@@ -4,138 +4,176 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>JudgeAI</title>
 <style>
   * { box-sizing: border-box; }
   :root {
-    --blau: #1e3a5f;
-    --gold: #c9a227;
-    --papier: #f6f1e7;
-    --rot: #b5443c;
-    --gruen: #3d7a4a;
-    --holz: #7a4f2a;
-    --holz-dunkel: #5c3a1e;
+    --navy: #17284d;
+    --blau: #2563eb;
+    --tuerkis: #1fb6c9;
+    --tinte: #0f172a;
+    --grau: #64748b;
+    --linie: #e2e8f0;
+    --flaeche: #f8fafc;
+    --gruen: #16a34a;
+    --rot: #dc2626;
+    --holz: #8a5a32;
+    --holz-dunkel: #6b4423;
   }
+  html { background: #fff; }
   body {
-    font-family: -apple-system, "Helvetica Neue", sans-serif;
+    font-family: -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif;
     margin: 0;
-    background: var(--blau);
-    color: var(--papier);
+    background: #fff;
+    color: var(--tinte);
     min-height: 100vh;
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     -webkit-text-size-adjust: 100%;
   }
+  /* ===== Kopfzeile ===== */
   .kopf {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(255,255,255,.92);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--linie);
+  }
+  .kopf-innen {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 14px 20px 0;
+    padding: 12px 20px;
     max-width: 640px;
     margin: 0 auto;
   }
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: #fff;
-    border-radius: 12px;
-    padding: 5px 12px 5px 8px;
-  }
-  .logo svg { height: 34px; width: auto; display: block; }
-  .logo-wort {
-    font-size: 21px;
-    font-weight: 800;
-    letter-spacing: .3px;
-    color: #17284d;
-  }
+  .logo { display: flex; align-items: center; gap: 9px; }
+  .logo svg { height: 32px; width: auto; display: block; }
+  .logo-wort { font-size: 20px; font-weight: 800; letter-spacing: -.3px; color: var(--navy); }
   .logo-wort span {
-    background: linear-gradient(90deg, #1fb6c9, #2563eb);
+    background: linear-gradient(90deg, var(--tuerkis), var(--blau));
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
   .plus-abzeichen {
     margin-left: auto;
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 700;
-    background: var(--gold);
-    color: #222;
-    padding: 4px 10px;
-    border-radius: 10px;
+    letter-spacing: .4px;
+    color: var(--blau);
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    padding: 5px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
   }
-  .seite {
-    max-width: 640px;
-    margin: 0 auto;
-    padding: 16px 20px 80px;
-    display: none;
-  }
+  /* ===== Seiten ===== */
+  .seite { max-width: 640px; margin: 0 auto; padding: 28px 20px 90px; display: none; }
   .seite.aktiv { display: block; }
-  h1 { font-size: 32px; text-align: center; margin: 8px 0 4px; }
-  .untertitel { text-align: center; font-size: 18px; opacity: .8; margin: 0 0 20px; }
-  .wappen { text-align: center; font-size: 64px; margin: 12px 0 4px; }
-  .karte {
-    background: var(--papier);
-    color: #222;
-    border-radius: 20px;
-    padding: 20px;
-    margin: 16px 0;
+  h1 { font-size: 30px; font-weight: 800; letter-spacing: -.5px; text-align: center; margin: 6px 0 6px; }
+  .untertitel { text-align: center; font-size: 17px; color: var(--grau); margin: 0 0 26px; line-height: 1.5; }
+  .abzeichen {
+    display: flex; justify-content: center; margin-bottom: 14px;
   }
-  .karte h2 { margin: 0 0 4px; font-size: 22px; color: var(--blau); }
-  .hinweis { font-size: 16px; color: #666; margin: 0 0 12px; }
+  .abzeichen .kreis {
+    width: 64px; height: 64px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px;
+    background: linear-gradient(135deg, #e0f4f7, #dbeafe);
+    border: 1px solid #bfdbfe;
+  }
+  .schritt {
+    text-align: center; font-size: 13px; font-weight: 700;
+    letter-spacing: 1.2px; color: var(--blau);
+    text-transform: uppercase; margin: 0 0 6px;
+  }
+  /* ===== Karten ===== */
+  .karte {
+    background: #fff;
+    border: 1px solid var(--linie);
+    border-radius: 18px;
+    padding: 22px;
+    margin: 16px 0;
+    box-shadow: 0 1px 3px rgba(15,23,42,.05), 0 8px 24px rgba(15,23,42,.04);
+  }
+  .karte h2 { margin: 0 0 4px; font-size: 19px; font-weight: 700; color: var(--tinte); }
+  .hinweis { font-size: 15px; color: var(--grau); margin: 0 0 12px; line-height: 1.5; }
+  /* ===== Eingaben ===== */
   input[type=text], textarea {
     width: 100%;
-    font-size: 20px;
+    font-size: 18px;
     font-family: inherit;
-    border: 2px solid #ccc;
+    border: 1.5px solid #cbd5e1;
     border-radius: 12px;
     padding: 14px;
-    background: #fff;
-    color: #222;
+    background: var(--flaeche);
+    color: var(--tinte);
   }
-  input[type=text]:focus, textarea:focus { outline: 3px solid var(--gold); border-color: var(--gold); }
-  textarea { min-height: 150px; resize: vertical; margin-top: 10px; }
+  input[type=text]:focus, textarea:focus {
+    outline: none;
+    border-color: var(--blau);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(37,99,235,.12);
+  }
+  textarea { min-height: 150px; resize: vertical; margin-top: 10px; line-height: 1.5; }
+  /* ===== Knöpfe ===== */
   .knopf {
     display: block;
     width: 100%;
-    font-size: 22px;
+    font-size: 19px;
     font-weight: 700;
     font-family: inherit;
-    padding: 18px;
+    padding: 17px;
     border: none;
-    border-radius: 16px;
-    background: var(--gold);
-    color: #222;
+    border-radius: 14px;
+    background: linear-gradient(90deg, var(--tuerkis), var(--blau));
+    color: #fff;
     margin-top: 16px;
     cursor: pointer;
+    box-shadow: 0 6px 16px rgba(37,99,235,.25);
   }
-  .knopf:active { transform: scale(.97); }
-  .knopf.klein { font-size: 17px; padding: 12px; margin-top: 10px; }
-  .knopf.gruen { background: var(--gruen); color: #fff; }
-  /* Rollenwahl */
+  .knopf:active { transform: scale(.98); }
+  .knopf.klein { font-size: 16px; padding: 12px; margin-top: 10px; box-shadow: none; }
+  .knopf.leise {
+    background: #fff;
+    color: var(--grau);
+    border: 1.5px solid var(--linie);
+    box-shadow: none;
+  }
+  .knopf.gruen { background: var(--gruen); box-shadow: 0 6px 16px rgba(22,163,74,.25); }
+  /* ===== Rollenwahl ===== */
   .rollen { display: flex; gap: 12px; margin-top: 12px; }
   .rolle {
     flex: 1;
     font-family: inherit;
-    font-size: 18px;
-    padding: 16px 8px;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 18px 8px;
     border-radius: 14px;
-    border: 3px solid #ccc;
-    background: #fff;
-    color: #222;
+    border: 1.5px solid var(--linie);
+    background: var(--flaeche);
+    color: var(--tinte);
     cursor: pointer;
   }
-  .rolle .gross { font-size: 40px; display: block; }
-  .rolle.gewaehlt { border-color: var(--gold); background: #fdf6e0; font-weight: 700; }
-  /* Satz-Bausteine */
+  .rolle .gross { font-size: 36px; display: block; margin-bottom: 6px; }
+  .rolle.gewaehlt {
+    border-color: var(--blau);
+    background: #eff6ff;
+    box-shadow: 0 0 0 4px rgba(37,99,235,.12);
+  }
+  /* ===== Satz-Bausteine ===== */
   .bausteine { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
   .baustein {
     font-family: inherit;
-    font-size: 16px;
-    padding: 8px 12px;
+    font-size: 14.5px;
+    font-weight: 600;
+    padding: 8px 13px;
     border-radius: 999px;
-    border: 2px solid var(--blau);
-    background: #fff;
+    border: 1px solid #bfdbfe;
+    background: #eff6ff;
     color: var(--blau);
     cursor: pointer;
   }
@@ -143,42 +181,45 @@
   .mikro {
     display: block;
     width: 100%;
-    font-size: 20px;
+    font-size: 17px;
+    font-weight: 600;
     font-family: inherit;
-    padding: 14px;
-    margin-top: 10px;
+    padding: 13px;
+    margin-top: 12px;
     border-radius: 12px;
-    border: 2px dashed var(--blau);
+    border: 1.5px dashed #94a3b8;
     background: #fff;
-    color: var(--blau);
+    color: var(--grau);
     cursor: pointer;
   }
   .mikro.anhoerung {
-    background: var(--rot); color: #fff;
+    background: #fef2f2; color: var(--rot);
     border-style: solid; border-color: var(--rot);
     animation: pulsieren 1s infinite;
   }
-  @keyframes pulsieren { 50% { opacity: .6; } }
-  .fehler { color: var(--rot); font-size: 16px; margin: 8px 0 0; display: none; }
+  @keyframes pulsieren { 50% { opacity: .55; } }
+  .fehler { color: var(--rot); font-size: 15px; font-weight: 600; margin: 10px 0 0; display: none; }
   /* ===== Gerichtssaal ===== */
   .saal {
     position: relative;
     height: 240px;
-    border-radius: 20px;
+    border-radius: 18px;
     overflow: hidden;
-    background: linear-gradient(#2c4a75 0%, #3a5a88 55%, var(--holz-dunkel) 55%, var(--holz-dunkel) 100%);
-    margin: 8px 0 16px;
+    background: linear-gradient(#20345e 0%, #2c4577 55%, var(--holz-dunkel) 55%, var(--holz-dunkel) 100%);
+    margin: 4px 0 18px;
+    border: 1px solid var(--linie);
+    box-shadow: 0 8px 24px rgba(15,23,42,.10);
   }
   .vorhang-l, .vorhang-r {
-    position: absolute; top: 0; width: 14%; height: 60%;
-    background: repeating-linear-gradient(90deg, #8c2f2f 0 12px, #a53d3d 12px 24px);
+    position: absolute; top: 0; width: 13%; height: 58%;
+    background: repeating-linear-gradient(90deg, #7f1d1d 0 12px, #991b1b 12px 24px);
     border-radius: 0 0 40% 40%;
   }
   .vorhang-l { left: 0; } .vorhang-r { right: 0; }
-  .saal-wappen { position: absolute; top: 8%; left: 50%; transform: translateX(-50%); font-size: 30px; }
+  .saal-wappen { position: absolute; top: 7%; left: 50%; transform: translateX(-50%); font-size: 28px; }
   .richter {
     position: absolute; bottom: 38%; left: 50%; transform: translateX(-50%);
-    font-size: 64px;
+    font-size: 62px;
     animation: nicken 3s ease-in-out infinite;
   }
   @keyframes nicken { 50% { transform: translateX(-50%) translateY(4px); } }
@@ -187,24 +228,22 @@
     width: 78%; height: 42%;
     background: linear-gradient(var(--holz), var(--holz-dunkel));
     border-radius: 14px 14px 0 0;
-    border-top: 5px solid #9a6a3a;
+    border-top: 5px solid #b07a45;
   }
   .pult-schild {
     position: absolute; top: 30%; left: 50%; transform: translateX(-50%);
-    background: var(--gold); color: #222;
-    font-size: 14px; font-weight: 800; letter-spacing: 1px;
-    padding: 4px 14px; border-radius: 8px;
+    background: linear-gradient(90deg, var(--tuerkis), var(--blau));
+    color: #fff;
+    font-size: 13px; font-weight: 800; letter-spacing: 1.5px;
+    padding: 5px 16px; border-radius: 8px;
   }
   .parteien-im-saal {
     position: absolute; bottom: 4%; width: 100%;
-    display: flex; justify-content: space-between; padding: 0 10%;
-    font-size: 34px;
+    display: flex; justify-content: space-between; padding: 0 9%;
+    font-size: 32px;
   }
-  .hammer-halter { position: absolute; bottom: 44%; right: 16%; font-size: 40px; }
-  .hammer {
-    display: inline-block;
-    transform-origin: 80% 80%;
-  }
+  .hammer-halter { position: absolute; bottom: 44%; right: 15%; font-size: 38px; }
+  .hammer { display: inline-block; transform-origin: 80% 80%; }
   .hammer.klopft { animation: klopfen 1.8s ease; }
   @keyframes klopfen {
     0%, 28%, 56% { transform: rotate(0deg); }
@@ -212,89 +251,111 @@
     16%, 44%, 72% { transform: rotate(8deg); }
     84%, 100% { transform: rotate(0deg); }
   }
-  /* Waage + Barometer */
+  /* ===== Waage & Barometer ===== */
   .waage-balken {
-    height: 26px; border-radius: 13px; overflow: hidden;
-    display: flex; margin: 10px 0 6px; border: 2px solid var(--blau);
+    height: 24px; border-radius: 12px; overflow: hidden;
+    display: flex; margin: 12px 0 8px;
+    background: var(--flaeche);
+    border: 1px solid var(--linie);
   }
-  .waage-a { background: #6b8fbf; transition: width 1s; }
-  .waage-b { background: #bf8f6b; transition: width 1s; }
-  .waage-namen { display: flex; justify-content: space-between; font-size: 17px; font-weight: 600; color: #444; }
+  .waage-a { background: linear-gradient(90deg, #60a5fa, var(--blau)); transition: width 1s; }
+  .waage-b { background: linear-gradient(90deg, #fbbf24, #f59e0b); transition: width 1s; }
+  .waage-namen { display: flex; justify-content: space-between; font-size: 15px; font-weight: 700; color: var(--tinte); }
   .baro-rahmen {
-    height: 30px; border-radius: 15px; border: 2px solid var(--blau);
-    background: linear-gradient(90deg, #d66 0%, #dc6 50%, #6b6 100%);
-    position: relative; margin: 14px 0 6px;
+    height: 26px; border-radius: 13px;
+    background: linear-gradient(90deg, #fca5a5 0%, #fde68a 50%, #86efac 100%);
+    position: relative; margin: 16px 6px 10px;
   }
   .baro-nadel {
-    position: absolute; top: -8px; width: 6px; height: 46px;
-    background: #222; border-radius: 3px;
+    position: absolute; top: -8px; width: 5px; height: 42px;
+    background: var(--tinte); border-radius: 3px;
+    box-shadow: 0 1px 4px rgba(15,23,42,.4);
     transition: left 1.2s ease;
   }
-  .baro-text { font-size: 18px; font-weight: 700; text-align: center; color: var(--blau); margin: 6px 0 0; }
-  .beobachtung { font-size: 18px; margin: 8px 0; padding-left: 4px; }
+  .baro-text { font-size: 16.5px; font-weight: 700; text-align: center; color: var(--tinte); margin: 6px 0 0; }
+  .beobachtung { font-size: 16.5px; margin: 10px 0; line-height: 1.5; }
+  /* ===== Lösungen ===== */
   .vorschlag {
-    background: #fff; border-left: 6px solid var(--gold);
-    border-radius: 12px; padding: 14px 16px; margin: 12px 0;
-    font-size: 19px; line-height: 1.45;
+    background: var(--flaeche);
+    border: 1px solid var(--linie);
+    border-left: 4px solid var(--blau);
+    border-radius: 12px;
+    padding: 16px;
+    margin: 12px 0;
+    font-size: 16.5px;
+    line-height: 1.55;
   }
-  .vorschlag b { color: var(--blau); }
+  .vorschlag b { color: var(--navy); }
   .vorschlag .waehlen {
-    display: block; width: 100%; margin-top: 10px;
-    font-family: inherit; font-size: 17px; font-weight: 700;
-    padding: 10px; border-radius: 10px; border: 2px solid var(--gruen);
+    display: block; width: 100%; margin-top: 12px;
+    font-family: inherit; font-size: 16px; font-weight: 700;
+    padding: 11px; border-radius: 10px;
+    border: 1.5px solid var(--gruen);
     background: #fff; color: var(--gruen); cursor: pointer;
   }
-  .vorschlag.gewaehlt { border-left-color: var(--gruen); background: #eef7f0; }
+  .vorschlag.gewaehlt { border-left-color: var(--gruen); background: #f0fdf4; border-color: #bbf7d0; }
   .vorschlag.gewaehlt .waehlen { background: var(--gruen); color: #fff; }
-  /* Protokoll */
+  /* ===== Protokoll ===== */
   .protokoll {
-    background: #fff; color: #222;
-    border: 2px solid var(--blau); border-radius: 6px;
-    padding: 22px; font-size: 17px; line-height: 1.55;
+    background: #fff;
+    border: 1px solid var(--linie);
+    border-top: 5px solid;
+    border-image: linear-gradient(90deg, var(--tuerkis), var(--blau)) 1;
+    border-radius: 6px;
+    padding: 26px 24px;
+    font-size: 16px;
+    line-height: 1.6;
+    box-shadow: 0 1px 3px rgba(15,23,42,.05), 0 8px 24px rgba(15,23,42,.05);
   }
   .protokoll h3 {
-    text-align: center; margin: 0 0 2px; font-size: 22px;
-    color: var(--blau); letter-spacing: 1px;
+    text-align: center; margin: 0 0 2px; font-size: 20px;
+    color: var(--navy); letter-spacing: 2px;
   }
-  .protokoll .aktenzeichen { text-align: center; color: #777; font-size: 14px; margin: 0 0 14px; }
+  .protokoll .aktenzeichen { text-align: center; color: var(--grau); font-size: 13px; margin: 0 0 16px; }
   .protokoll h4 {
-    margin: 14px 0 4px; font-size: 16px; color: var(--blau);
-    text-transform: uppercase; letter-spacing: .5px;
+    margin: 16px 0 4px; font-size: 13px; color: var(--blau);
+    text-transform: uppercase; letter-spacing: 1px;
   }
   .zitat {
-    border-left: 4px solid var(--gold);
-    margin: 8px 0; padding: 6px 12px;
-    font-style: italic; background: #faf7ef;
+    border-left: 3px solid var(--tuerkis);
+    margin: 8px 0; padding: 8px 14px;
+    font-style: italic; color: #334155;
+    background: var(--flaeche);
+    border-radius: 0 8px 8px 0;
   }
+  /* ===== Unterschriften ===== */
   .unterschriften { display: flex; gap: 12px; margin-top: 14px; }
   .u-block { flex: 1; }
   .u-block canvas {
     width: 100%; height: 90px;
-    border: 2px dashed #999; border-radius: 8px;
-    background: #fff; touch-action: none; display: block;
+    border: 1.5px dashed #94a3b8; border-radius: 10px;
+    background: var(--flaeche); touch-action: none; display: block;
   }
-  .u-block .u-name { font-size: 14px; color: #555; margin-top: 4px; text-align: center; }
+  .u-block .u-name { font-size: 14px; font-weight: 600; color: var(--grau); margin: 6px 0 0; text-align: center; }
   .u-loeschen {
-    font-family: inherit; font-size: 13px; margin-top: 4px;
-    border: none; background: none; color: #999; text-decoration: underline; cursor: pointer;
+    display: block; margin: 2px auto 0;
+    font-family: inherit; font-size: 13px;
+    border: none; background: none; color: #94a3b8;
+    text-decoration: underline; cursor: pointer;
   }
   .stempel {
     display: none;
-    margin: 18px auto 0; width: fit-content;
-    border: 4px solid var(--gruen); color: var(--gruen);
-    font-weight: 800; font-size: 20px; letter-spacing: 2px;
-    padding: 8px 18px; border-radius: 8px;
-    transform: rotate(-6deg);
+    margin: 20px auto 0; width: fit-content;
+    border: 3.5px solid var(--gruen); color: var(--gruen);
+    font-weight: 800; font-size: 19px; letter-spacing: 2px;
+    padding: 9px 20px; border-radius: 10px;
+    transform: rotate(-5deg);
+    background: #f0fdf4;
   }
-  .plus-karte { border: 2px solid var(--gold); }
-  .plus-karte .schloss { font-size: 15px; color: #777; }
-  .siegel { text-align: center; font-size: 16px; color: #777; margin-top: 16px; font-style: italic; }
-  .version { position: fixed; bottom: 10px; right: 14px; font-size: 13px; color: rgba(246,241,231,.5); }
+  /* ===== PLUS ===== */
+  .plus-karte { border: 1.5px solid #bfdbfe; background: linear-gradient(180deg, #eff6ff, #fff); }
+  .plus-karte .schloss { font-size: 14px; }
+  .version { position: fixed; bottom: 10px; right: 14px; font-size: 12px; color: #cbd5e1; }
 </style>
 </head>
 <body>
 
-<header class="kopf">
+<header class="kopf"><div class="kopf-innen">
   <div class="logo" id="logo">
     <svg viewBox="0 0 100 108" fill="none" stroke="#17284d" stroke-width="5" stroke-linejoin="round">
       <defs>
@@ -319,18 +380,18 @@
     <div class="logo-wort">Judge<span>AI</span></div>
   </div>
   <div class="plus-abzeichen">TESTVERSION · GRATIS</div>
-</header>
+</div></header>
 
 <!-- ===== Seite 0: Anmeldung ===== -->
 <section class="seite aktiv" id="seite-anmeldung">
-  <div class="wappen">🧑‍⚖️</div>
+  <div class="abzeichen"><div class="kreis">🧑‍⚖️</div></div>
   <h1>Willkommen bei JudgeAI</h1>
-  <p class="untertitel">Der digitale Richter für faire Lösungen</p>
+  <p class="untertitel">Der digitale Richter für faire Lösungen —<br>neutral, präzise und für beide Seiten.</p>
   <div class="karte">
     <h2>Wie heisst du?</h2>
     <p class="hinweis">Dein Name bleibt auf diesem Gerät gespeichert.</p>
     <input type="text" id="anmelde-name" placeholder="Dein Vorname" maxlength="20">
-    <h2 style="margin-top:18px">Wer bist du?</h2>
+    <h2 style="margin-top:20px">Wer bist du?</h2>
     <div class="rollen">
       <button class="rolle" id="rolle-kind" onclick="waehleRolle('kind')"><span class="gross">🧒</span>Kind / Jugendliche:r</button>
       <button class="rolle" id="rolle-erwachsen" onclick="waehleRolle('erwachsen')"><span class="gross">🧑‍💼</span>Erwachsen / Firma</button>
@@ -338,59 +399,59 @@
     <p class="hinweis" style="margin-top:10px">Erwachsene bekommen ein juristischeres Protokoll (Vergleich).</p>
     <p class="fehler" id="fehler-anmeldung">Bitte Name eingeben und eine Rolle wählen.</p>
   </div>
-  <button class="knopf" onclick="anmelden()">Konto erstellen ✅</button>
+  <button class="knopf" onclick="anmelden()">Konto erstellen</button>
 </section>
 
 <!-- ===== Seite 1: Start ===== -->
 <section class="seite" id="seite-start">
-  <div class="wappen">🧑‍⚖️</div>
+  <div class="abzeichen"><div class="kreis">🧑‍⚖️</div></div>
   <h1 id="start-gruss">Hallo!</h1>
   <p class="untertitel" id="start-faelle"></p>
   <div class="karte">
     <h2>So funktioniert es</h2>
-    <p class="beobachtung">1️⃣ Beide Seiten erzählen ihre Sicht — tippen oder sprechen.</p>
-    <p class="beobachtung">2️⃣ JudgeAI bewertet den Fall im Gerichtssaal.</p>
-    <p class="beobachtung">3️⃣ Ihr wählt eine der drei Lösungen.</p>
-    <p class="beobachtung">4️⃣ Beide bestätigen das Protokoll mit Unterschrift.</p>
+    <p class="beobachtung">1️⃣ &nbsp;Beide Seiten erzählen ihre Sicht — tippen oder sprechen.</p>
+    <p class="beobachtung">2️⃣ &nbsp;JudgeAI bewertet den Fall im Gerichtssaal.</p>
+    <p class="beobachtung">3️⃣ &nbsp;Ihr wählt gemeinsam eine der drei Lösungen.</p>
+    <p class="beobachtung">4️⃣ &nbsp;Beide bestätigen das Protokoll mit Unterschrift.</p>
     <p class="hinweis" style="margin-top:12px">Alles bleibt auf diesem Gerät. Nichts wird verschickt.</p>
   </div>
   <div class="karte plus-karte">
     <h2>⭐ JudgeAI PLUS</h2>
     <p class="hinweis" style="margin-bottom:4px">Bald mit Plus-Konto:</p>
-    <p class="beobachtung"><span class="schloss">🔒</span> Risiko-Analyse vor der Verhandlung</p>
-    <p class="beobachtung"><span class="schloss">🔒</span> Unbegrenzte Fälle (gratis: 4 pro Person)</p>
+    <p class="beobachtung"><span class="schloss">🔒</span> &nbsp;Risiko-Analyse vor der Verhandlung</p>
+    <p class="beobachtung"><span class="schloss">🔒</span> &nbsp;Unbegrenzte Fälle (gratis: 4 pro Person)</p>
     <p class="hinweis" style="margin-top:8px">In der Testversion ist noch alles gratis.</p>
   </div>
   <button class="knopf" onclick="neuerFall()">Verhandlung eröffnen 🔨</button>
-  <button class="knopf klein" style="background:transparent;color:var(--papier);border:2px solid var(--papier)" onclick="abmelden()">Anderes Konto</button>
+  <button class="knopf klein leise" onclick="abmelden()">Anderes Konto</button>
 </section>
 
 <!-- ===== Seite 2 + 3: Aussagen ===== -->
 <section class="seite" id="seite-a">
-  <div class="wappen">🗣️</div>
+  <p class="schritt">Schritt 1 von 4</p>
   <h1>Erste Person</h1>
   <p class="untertitel">Erzähl deine Sicht. Die andere Person schaut nicht zu!</p>
   <div class="karte">
     <h2>Wie heisst du?</h2>
     <input type="text" id="name-a" placeholder="z.B. Person 1" maxlength="20">
-    <h2 style="margin-top:18px" id="frage-a">Was ist passiert?</h2>
+    <h2 style="margin-top:20px" id="frage-a">Was ist passiert?</h2>
     <p class="hinweis">Tipp auf einen Baustein, um den Satz zu beginnen:</p>
     <div class="bausteine" data-fuer="a"></div>
     <textarea id="text-a" placeholder="Also, es war so ..."></textarea>
     <button class="mikro" id="mikro-a" onclick="sprechen('a')">🎤 Statt tippen: sprechen</button>
     <p class="fehler" id="fehler-a">Bitte erzähl zuerst, was passiert ist.</p>
   </div>
-  <button class="knopf" onclick="weiterZuB()">Fertig — Gerät weitergeben ➡️</button>
+  <button class="knopf" onclick="weiterZuB()">Fertig — Gerät weitergeben</button>
 </section>
 
 <section class="seite" id="seite-b">
-  <div class="wappen">🗣️</div>
+  <p class="schritt">Schritt 2 von 4</p>
   <h1>Zweite Person</h1>
   <p class="untertitel">Jetzt bist du dran. Erzähl deine Sicht.</p>
   <div class="karte">
     <h2>Wie heisst du?</h2>
     <input type="text" id="name-b" placeholder="z.B. Person 2" maxlength="20">
-    <h2 style="margin-top:18px" id="frage-b">Was ist passiert?</h2>
+    <h2 style="margin-top:20px" id="frage-b">Was ist passiert?</h2>
     <p class="hinweis">Tipp auf einen Baustein, um den Satz zu beginnen:</p>
     <div class="bausteine" data-fuer="b"></div>
     <textarea id="text-b" placeholder="Also, aus meiner Sicht ..."></textarea>
@@ -402,6 +463,7 @@
 
 <!-- ===== Seite 4: Urteil ===== -->
 <section class="seite" id="seite-urteil">
+  <p class="schritt">Schritt 3 von 4</p>
   <h1>Das Urteil</h1>
   <p class="untertitel">Im Namen der Fairness</p>
 
@@ -448,7 +510,7 @@
 
 <!-- ===== Seite 5: Protokoll ===== -->
 <section class="seite" id="seite-protokoll">
-  <div class="wappen">📜</div>
+  <p class="schritt">Schritt 4 von 4</p>
   <h1 id="protokoll-titel">Das Protokoll</h1>
   <p class="untertitel">Neutral, kurz und für beide gültig</p>
 
@@ -477,7 +539,7 @@
   <button class="knopf" onclick="zurueckZumStart()">Neuer Fall 📂</button>
 </section>
 
-<div class="version">v4 · 17:56</div>
+<div class="version">v5 · 18:03</div>
 
 <script>
 // ================= Konto (nur auf diesem Gerät) =================
@@ -645,7 +707,7 @@ const THEMEN = [
 const OBJEKTE = ['handy', 'ipad', 'tablet', 'playstation', 'switch', 'nintendo', 'konsole', 'controller', 'fernseher', 'computer', 'velo', 'fahrrad', 'ball', 'stift', 'buch', 'jacke', 'pullover', 'kopfhörer', 'kopfhoerer', 'zimmer', 'spiel', 'karten', 'lego', 'roller'];
 
 function findeThema(beide) {
-  let bestes = THEMEN[0], beste = 0, gefunden = null;
+  let beste = 0, gefunden = null;
   for (const thema of THEMEN) {
     const p = zaehle(beide, thema.woerter);
     if (p > beste) { beste = p; gefunden = thema; }
@@ -657,13 +719,12 @@ function findeObjekt(beide) {
   for (const o of OBJEKTE) {
     if (beide.includes(o)) return o.charAt(0).toUpperCase() + o.slice(1);
   }
-  // Wort nach «mein/dein» probieren
   const m = beide.match(/(?:mein|meine|meinen|dein|deine|deinen)\s+([a-zäöüéè]{3,})/i);
   return m ? m[1].charAt(0).toUpperCase() + m[1].slice(1) : null;
 }
 
 // ---------- Individuelle Lösungen bauen ----------
-// Jede Lösung ist eine Funktion, die Namen, Objekt und Analyse einbaut.
+// Jede Lösung baut Namen, Objekt und Analyse ein.
 function baueLoesungen(f) {
   const objekt = f.objekt || 'die Sache';
   const l = [];  // Kandidaten, die besten 3 werden genommen
@@ -728,7 +789,7 @@ function baueLoesungen(f) {
 }
 
 // ================= Urteil =================
-let fall = null;            // alle Daten zum aktuellen Fall
+let fall = null;
 let gewaehlteLoesung = null;
 
 function urteilen() {
@@ -841,7 +902,6 @@ function zeigeProtokoll() {
 
   document.getElementById('protokoll-titel').textContent = erw ? 'Vergleichsprotokoll' : 'Das Protokoll';
 
-  const partei = erw ? ['Partei 1', 'Partei 2'] : [f.nameA, f.nameB];
   document.getElementById('protokoll-inhalt').innerHTML =
     '<h3>' + (erw ? 'VERGLEICHSPROTOKOLL' : 'STREIT-PROTOKOLL') + '</h3>' +
     '<p class="aktenzeichen">Fall ' + nr + ' · ' + datum + '</p>' +
@@ -890,7 +950,7 @@ function richteUnterschriftenEin() {
       malt = true;
       unterschrieben[wer] = true;
       const p = punkt(e);
-      ctx.strokeStyle = '#1e3a5f';
+      ctx.strokeStyle = '#17284d';
       ctx.lineWidth = 3;
       ctx.lineCap = 'round';
       ctx.beginPath();
