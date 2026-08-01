@@ -453,6 +453,18 @@
   nav button:active { transform: scale(0.94); }
   nav button svg { width: 26px; height: 26px; fill: currentColor; }
   nav button.aktiv { color: var(--akzent1); }
+
+  /* Versionsnummer unten rechts */
+  .version {
+    position: fixed;
+    right: 10px;
+    bottom: calc(env(safe-area-inset-bottom) + 3px);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-leise);
+    z-index: 4;
+    pointer-events: none;
+  }
 </style>
 </head>
 <body>
@@ -554,6 +566,8 @@
       Meine Welt
     </button>
   </nav>
+
+  <div class="version">v3</div>
 
 <script>
   // ─────────────────────────────────────────────
@@ -835,6 +849,12 @@
   ["spielsachen", "freunde", "hobbys"].forEach(zeigeChips);
   if (klickZahl > 0) {
     document.getElementById("zaehler").textContent = "Schon " + klickZahl + " Ideenblitze geholt";
+  }
+
+  // Offline-Speicher: dank dem Service Worker startet die App
+  // auch ohne Internet – wie eine echte App!
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js");
   }
 </script>
 </body>
