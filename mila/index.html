@@ -4,8 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Famigram">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f2f2f7">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
 <title>Famigram</title>
+<link rel="apple-touch-icon" href="icon.png">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23a78bfa'/><stop offset='1' stop-color='%236d28d9'/></linearGradient></defs><rect width='120' height='120' rx='28' fill='url(%23g)'/><path d='M60 26 L94 53 V94 H26 V53 Z' fill='none' stroke='white' stroke-width='7' stroke-linejoin='round' stroke-linecap='round'/><circle cx='60' cy='71' r='13' fill='none' stroke='white' stroke-width='7'/><circle cx='80' cy='58' r='4.5' fill='%23fbbf24'/></svg>">
 <style>
   :root {
@@ -30,7 +34,7 @@
     }
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html { -webkit-text-size-adjust: 100%; }
+  html { -webkit-text-size-adjust: 100%; background: var(--hg); }
   body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -288,6 +292,70 @@
   }
   .mitteilung { display: flex; align-items: center; gap: 12px; }
   .mitteilung.neu { border-left: 4px solid var(--akzent); }
+
+  /* Tour — erklärt die App wie eine kleine Story */
+  #tour {
+    position: fixed; inset: 0; z-index: 98; display: none;
+    flex-direction: column; color: white;
+    transition: background 0.6s;
+  }
+  #tour.sichtbar { display: flex; }
+  #tour.weg { opacity: 0; transition: opacity 0.5s; pointer-events: none; }
+  .tour-balken { display: flex; gap: 6px; padding: calc(env(safe-area-inset-top) + 14px) 14px 0; }
+  .tour-balken div { flex: 1; height: 4px; border-radius: 999px; background: rgba(255,255,255,0.3); overflow: hidden; }
+  .tour-balken div i { display: block; height: 100%; width: 0; background: white; }
+  .tour-balken div.voll i { width: 100%; }
+  .tour-balken div.laeuft i { animation: balken-fuellen 3.5s linear forwards; }
+  @keyframes balken-fuellen { from { width: 0 } to { width: 100% } }
+  .tour-ueberspringen {
+    align-self: flex-end; margin: 10px 14px 0;
+    border: none; background: rgba(255,255,255,0.2); color: white;
+    font-size: 15px; font-weight: 600; padding: 8px 16px; border-radius: 999px;
+  }
+  .tour-mitte {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+    padding: 24px; gap: 10px;
+  }
+  .tour-emoji { font-size: 110px; animation: tour-hops 0.8s ease-out; }
+  @keyframes tour-hops {
+    0%   { transform: scale(0) rotate(-25deg); opacity: 0; }
+    60%  { transform: scale(1.15) rotate(6deg); }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
+  }
+  .tour-titel { font-size: 30px; font-weight: 800; letter-spacing: -0.5px; animation: tour-rauf 0.7s ease-out; }
+  .tour-text { font-size: 18px; line-height: 1.55; max-width: 320px; opacity: 0.95; animation: tour-rauf 0.9s ease-out both; }
+  @keyframes tour-rauf { from { transform: translateY(26px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+  .tour-unten { padding: 0 24px calc(env(safe-area-inset-bottom) + 28px); }
+  .tour-los {
+    width: 100%; border: none; border-radius: 16px;
+    background: white; color: #4c1d95;
+    font-size: 19px; font-weight: 800; padding: 16px; min-height: 54px;
+    animation: tour-rauf 0.6s ease-out;
+  }
+  .tour-tipp { text-align: center; color: rgba(255,255,255,0.7); font-size: 13px; margin-top: 12px; }
+
+  /* Übergänge beim Tab-Wechseln */
+  .rein { animation: seite-rein 0.35s ease-out; }
+  @keyframes seite-rein { from { opacity: 0; transform: translateY(16px) } to { opacity: 1; transform: none } }
+
+  /* Fliegendes Herz beim Liken */
+  .flieg-herz {
+    position: fixed; font-size: 28px; z-index: 50; pointer-events: none;
+    animation: herz-flug 0.9s ease-out forwards;
+  }
+  @keyframes herz-flug {
+    0%   { transform: scale(0.5); opacity: 1; }
+    100% { transform: translateY(-90px) scale(1.7) rotate(-12deg); opacity: 0; }
+  }
+
+  /* Konfetti beim Teilen */
+  .konfetti {
+    position: fixed; top: -14px; width: 10px; height: 14px;
+    border-radius: 3px; z-index: 60; pointer-events: none;
+    animation: konfetti-fall linear forwards;
+  }
+  @keyframes konfetti-fall { to { transform: translateY(105vh) rotate(560deg); } }
 </style>
 </head>
 <body>
@@ -308,8 +376,26 @@
   <div class="splash-name">Fami<span>gram</span></div>
 </div>
 
+<div id="tour"></div>
+
 <header>
-  <h1>Fami<span>gram</span></h1>
+  <h1>
+    <svg viewBox="0 0 120 120" width="34" height="34" style="vertical-align:-6px;margin-right:6px">
+      <defs>
+        <linearGradient id="kopf-g" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#a78bfa"/>
+          <stop offset="1" stop-color="#6d28d9"/>
+        </linearGradient>
+        <linearGradient id="kopf-linse" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#fbbf24"/>
+          <stop offset="1" stop-color="#f472b6"/>
+        </linearGradient>
+      </defs>
+      <rect width="120" height="120" rx="28" fill="url(#kopf-g)"/>
+      <path d="M60 26 L94 53 V94 H26 V53 Z" fill="none" stroke="white" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+      <circle cx="60" cy="71" r="13" fill="none" stroke="url(#kopf-linse)" stroke-width="8"/>
+      <circle cx="80" cy="58" r="5" fill="#fbbf24"/>
+    </svg>Fami<span>gram</span></h1>
   <div style="display:flex;gap:8px">
     <button class="hinweis-knopf" onclick="mitteilungenOeffnen()">🔔<span class="glocke-badge" id="glocke-badge" style="display:none"></span></button>
     <button class="hinweis-knopf" onclick="document.getElementById('info').showModal()">?</button>
@@ -319,13 +405,14 @@
 <main id="inhalt"></main>
 
 <nav id="leiste"></nav>
-<div class="version">v5 · 13:22</div>
+<div class="version">v6 · 13:37</div>
 
 <dialog id="info">
   <h3>💜 So funktioniert Famigram</h3>
   <p>Das ist dein Übungs-Netzwerk. Alles wird nur <b>auf deinem Gerät</b> gespeichert — niemand sonst kann es sehen.</p>
   <p>Die Familienmitglieder hier sind ausgedacht. Ein echtes Netzwerk, bei dem sich mehrere Geräte verbinden, braucht einen Server — das wäre der nächste Schritt!</p>
   <button class="gross-knopf" onclick="document.getElementById('info').close()">Alles klar</button>
+  <button class="neben-knopf" style="margin-top:8px" onclick="document.getElementById('info').close();tourStarten()">🎬 Tour nochmals anschauen</button>
 </dialog>
 
 <script>
@@ -335,6 +422,7 @@
 const SPEICHER = 'famigram-v1';
 let daten = null;
 let aktiverTab = 'feed';
+let uebergang = false; // stimmt kurz, wenn die Seite mit Animation reinkommen soll
 const h = 3600000, min = 60000; // eine Stunde / Minute in Millisekunden
 
 function startDaten() {
@@ -428,6 +516,7 @@ function leisteZeichnen() {
 function tabWechseln(id) {
   aktiverTab = id;
   ansicht = null;
+  uebergang = true;
   zeichnen();
   window.scrollTo(0, 0);
 }
@@ -463,7 +552,7 @@ function postKarte(p) {
       ${fotoHtml(p.foto)}
       <div class="post-text">${sicher(p.text)}</div>
       <div class="aktionen">
-        <button class="aktion ${geliked ? 'geliked' : ''}" onclick="likeDruecken('${p.id}')">
+        <button class="aktion ${geliked ? 'geliked' : ''}" onclick="likeDruecken('${p.id}', event)">
           ${geliked ? '❤️' : '🤍'} ${p.likes.length || ''}
         </button>
         ${p.autor === 'ich' ? `<button class="aktion" onclick="postLoeschen('${p.id}')">🗑️</button>` : ''}
@@ -479,10 +568,11 @@ function postKarte(p) {
       </div>
     </div>`;
 }
-function likeDruecken(postId) {
+function likeDruecken(postId, ev) {
   const p = daten.posts.find(x => x.id === postId);
   const i = p.likes.indexOf(daten.ich.name);
-  if (i >= 0) p.likes.splice(i, 1); else p.likes.push(daten.ich.name);
+  if (i >= 0) p.likes.splice(i, 1);
+  else { p.likes.push(daten.ich.name); herzFliegen(ev); }
   speichern(); zeichnen();
 }
 function kommentarSenden(postId) {
@@ -511,11 +601,13 @@ let ansicht = null; // null = normaler Tab, sonst {typ:'profil', id} oder {typ:'
 
 function profilOeffnen(id) {
   ansicht = { typ: 'profil', id: id };
+  uebergang = true;
   zeichnen();
   window.scrollTo(0, 0);
 }
 function zurueck() {
   ansicht = null;
+  uebergang = true;
   zeichnen();
 }
 function profilSeiteZeichnen(id) {
@@ -561,6 +653,7 @@ function mitteilungHinzu(text) {
 }
 function mitteilungenOeffnen() {
   ansicht = { typ: 'mitteilungen' };
+  uebergang = true;
   zeichnen();
   window.scrollTo(0, 0);
   daten.mitteilungen.forEach(m => m.gelesen = true);
@@ -709,6 +802,7 @@ function postSenden() {
   hochgeladenesBild = null;
   speichern();
   tabWechseln('feed');
+  konfetti();
 }
 
 // ─────────────────────────────────────────────
@@ -1002,16 +1096,119 @@ function zeichnen() {
   if (ansicht && ansicht.typ === 'profil') html = profilSeiteZeichnen(ansicht.id);
   else if (ansicht && ansicht.typ === 'mitteilungen') html = mitteilungenZeichnen();
   else html = seiten[aktiverTab]();
-  document.getElementById('inhalt').innerHTML = html;
+  const inhalt = document.getElementById('inhalt');
+  inhalt.innerHTML = html;
+  if (uebergang) {
+    uebergang = false;
+    inhalt.classList.remove('rein');
+    void inhalt.offsetWidth; // startet die Animation neu
+    inhalt.classList.add('rein');
+  }
   leisteZeichnen();
   glockeZeichnen();
+}
+
+// ─────────────────────────────────────────────
+// TOUR — erklärt die App wie ein kleines Video (Story-Stil)
+// ─────────────────────────────────────────────
+const tourSeiten = [
+  { hg: 'linear-gradient(160deg,#7c3aed,#4c1d95)', emoji: '👋', titel: 'Hallo bei Famigram!',
+    text: 'Dein privates Netzwerk — nur für deine Familie. In 20 Sekunden weisst du alles.' },
+  { hg: 'linear-gradient(160deg,#f59e0b,#db2777)', emoji: '🏠', titel: 'Der Feed',
+    text: 'Schau, was alle erlebt haben. Tippe aufs Herz oder schreib einen Kommentar.' },
+  { hg: 'linear-gradient(160deg,#0ea5e9,#1d4ed8)', emoji: '📍', titel: 'Orte',
+    text: 'Sieh, wo alle gerade sind. Dein eigener Ort schaltet nach der gewählten Zeit automatisch zurück.' },
+  { hg: 'linear-gradient(160deg,#10b981,#047857)', emoji: '🔒', titel: 'Privat bleibt privat',
+    text: 'Nur wer von dir angenommen wurde, sieht deine Beiträge. Und du kannst jede Person wieder entfernen.' },
+  { hg: 'linear-gradient(160deg,#ec4899,#7c3aed)', emoji: '🔔', titel: 'Folgen & Glocke',
+    text: 'Tippe auf ein Profilbild und folge — die Glocke meldet sich, sobald etwas passiert.' }
+];
+let tourNr = 0;
+let tourTimer = null;
+
+function tourStarten() {
+  tourNr = 0;
+  const t = document.getElementById('tour');
+  t.classList.remove('weg');
+  t.classList.add('sichtbar');
+  tourZeigen();
+}
+function tourZeigen() {
+  clearTimeout(tourTimer);
+  const t = document.getElementById('tour');
+  const s = tourSeiten[tourNr];
+  const letzte = tourNr === tourSeiten.length - 1;
+  t.style.background = s.hg;
+  t.innerHTML = `
+    <div class="tour-balken">
+      ${tourSeiten.map((x, i) => `<div class="${i < tourNr ? 'voll' : i === tourNr && !letzte ? 'laeuft' : i === tourNr ? 'voll' : ''}"><i></i></div>`).join('')}
+    </div>
+    <button class="tour-ueberspringen" onclick="tourFertig()">Überspringen</button>
+    <div class="tour-mitte" onclick="tourTipp(event)">
+      <div class="tour-emoji">${s.emoji}</div>
+      <div class="tour-titel">${s.titel}</div>
+      <div class="tour-text">${s.text}</div>
+    </div>
+    <div class="tour-unten">
+      ${letzte
+        ? '<button class="tour-los" onclick="tourFertig()">Los gehts! 🚀</button>'
+        : '<div class="tour-tipp">Tippe rechts für weiter, links für zurück</div>'}
+    </div>`;
+  if (!letzte) tourTimer = setTimeout(tourWeiter, 3500);
+}
+function tourTipp(ev) {
+  // Linkes Drittel = zurück, Rest = weiter (wie bei Storys)
+  if (ev.clientX < window.innerWidth / 3) {
+    if (tourNr > 0) { tourNr--; tourZeigen(); }
+  } else {
+    tourWeiter();
+  }
+}
+function tourWeiter() {
+  if (tourNr < tourSeiten.length - 1) { tourNr++; tourZeigen(); }
+  else tourFertig();
+}
+function tourFertig() {
+  clearTimeout(tourTimer);
+  const t = document.getElementById('tour');
+  t.classList.add('weg');
+  setTimeout(() => { t.classList.remove('sichtbar', 'weg'); t.innerHTML = ''; }, 500);
+  daten.introGesehen = true;
+  speichern();
+}
+
+// ─────────────────────────────────────────────
+// EFFEKTE — Herzen fliegen, Konfetti regnet
+// ─────────────────────────────────────────────
+function herzFliegen(ev) {
+  const s = document.createElement('div');
+  s.className = 'flieg-herz';
+  s.textContent = '❤️';
+  s.style.left = (ev.clientX - 14) + 'px';
+  s.style.top = (ev.clientY - 14) + 'px';
+  document.body.appendChild(s);
+  setTimeout(() => s.remove(), 900);
+}
+function konfetti() {
+  const farben = ['#fbbf24', '#f472b6', '#a78bfa', '#34d399', '#60a5fa'];
+  for (let i = 0; i < 28; i++) {
+    const k = document.createElement('div');
+    k.className = 'konfetti';
+    k.style.left = Math.random() * 100 + 'vw';
+    k.style.background = farben[i % farben.length];
+    k.style.animationDelay = (Math.random() * 0.4) + 's';
+    k.style.animationDuration = (0.9 + Math.random() * 0.9) + 's';
+    document.body.appendChild(k);
+    setTimeout(() => k.remove(), 2400);
+  }
 }
 
 laden();
 zeichnen();
 
-// Lade-Logo nach kurzem Moment ausblenden
+// Lade-Logo ausblenden — beim allerersten Mal startet danach die Tour
 setTimeout(() => {
+  if (!daten.introGesehen) tourStarten();
   document.getElementById('splash').classList.add('weg');
   setTimeout(() => document.getElementById('splash').remove(), 600);
 }, 1400);
