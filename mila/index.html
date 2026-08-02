@@ -245,19 +245,70 @@
   }
   dialog::backdrop { background: rgba(0,0,0,0.45); }
   dialog h3 { margin-top: 0; }
+
+  /* Lade-Logo beim Start */
+  #splash {
+    position: fixed; inset: 0; z-index: 99;
+    background: linear-gradient(160deg, #7c3aed, #4c1d95);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 10px; transition: opacity 0.5s;
+  }
+  #splash.weg { opacity: 0; pointer-events: none; }
+  .splash-logo { font-size: 90px; animation: splash-rein 0.9s ease-out; }
+  .splash-name {
+    font-size: 42px; font-weight: 800; letter-spacing: -1px; color: white;
+    animation: splash-rein 0.9s ease-out;
+  }
+  .splash-name span { color: #fbbf24; }
+  @keyframes splash-rein {
+    from { transform: scale(0.4); opacity: 0; }
+    60%  { transform: scale(1.08); }
+    to   { transform: scale(1); opacity: 1; }
+  }
+
+  /* Profilseite */
+  .post-kopf.klickbar { cursor: pointer; }
+  .zurueck-knopf {
+    border: none; background: none; color: var(--akzent);
+    font-size: 17px; font-weight: 700; font-family: inherit;
+    padding: 10px 6px; min-height: 44px;
+  }
+  .statistik { display: flex; justify-content: center; gap: 34px; margin: 14px 0 4px; }
+  .statistik .zahl { font-size: 26px; font-weight: 800; text-align: center; }
+  .statistik .was { font-size: 13px; color: var(--grau); text-align: center; }
+
+  /* Glocke mit Zähler */
+  .hinweis-knopf { position: relative; }
+  .glocke-badge {
+    position: absolute; top: -3px; right: -3px;
+    background: var(--rot); color: white;
+    font-size: 11px; font-weight: 700;
+    min-width: 18px; height: 18px; border-radius: 999px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .mitteilung { display: flex; align-items: center; gap: 12px; }
+  .mitteilung.neu { border-left: 4px solid var(--akzent); }
 </style>
 </head>
 <body>
 
+<div id="splash">
+  <div class="splash-logo">💜</div>
+  <div class="splash-name">Fami<span>gram</span></div>
+</div>
+
 <header>
   <h1>Fami<span>gram</span></h1>
-  <button class="hinweis-knopf" onclick="document.getElementById('info').showModal()">?</button>
+  <div style="display:flex;gap:8px">
+    <button class="hinweis-knopf" onclick="mitteilungenOeffnen()">🔔<span class="glocke-badge" id="glocke-badge" style="display:none"></span></button>
+    <button class="hinweis-knopf" onclick="document.getElementById('info').showModal()">?</button>
+  </div>
 </header>
 
 <main id="inhalt"></main>
 
 <nav id="leiste"></nav>
-<div class="version">v3 · 19:10</div>
+<div class="version">v4 · 12:57</div>
 
 <dialog id="info">
   <h3>💜 So funktioniert Famigram</h3>
@@ -307,6 +358,8 @@ function startDaten() {
       { id: 'a1', name: 'Tante Vera', emoji: '🎨', warum: 'Möchte deine Beiträge sehen und ihre teilen' }
     ],
     anfragenRaus: [],
+    folge: [],
+    mitteilungen: [],
     gesehen: true
   };
 }
@@ -314,6 +367,9 @@ function startDaten() {
 function laden() {
   try { daten = JSON.parse(localStorage.getItem(SPEICHER)); } catch (e) { daten = null; }
   if (!daten) { daten = startDaten(); speichern(); }
+  // Falls die App vorher eine ältere Version gespeichert hat: neue Felder ergänzen
+  if (!daten.folge) daten.folge = [];
+  if (!daten.mitteilungen) daten.mitteilungen = [];
 }
 function speichern() { localStorage.setItem(SPEICHER, JSON.stringify(daten)); }
 
@@ -360,6 +416,7 @@ function leisteZeichnen() {
 }
 function tabWechseln(id) {
   aktiverTab = id;
+  ansicht = null;
   zeichnen();
   window.scrollTo(0, 0);
 }
@@ -375,14 +432,16 @@ function fotoHtml(foto) {
 function feedZeichnen() {
   const posts = [...daten.posts].sort((a, b) => b.zeit - a.zeit);
   if (!posts.length) return '<div class="leer">Noch keine Beiträge.<br>Tippe unten auf ➕ und schreib den ersten!</div>';
-  return posts.map(p => {
+  return posts.map(postKarte).join('');
+}
+function postKarte(p) {
     const person = wer(p.autor);
     if (!person) return '';
     const geliked = p.likes.includes(daten.ich.name);
     const ortZeigen = person.ort && !(p.autor === 'ich' && daten.ich.ortPrivat);
     return `
     <div class="karte">
-      <div class="post-kopf">
+      <div class="post-kopf klickbar" onclick="profilOeffnen('${p.autor}')">
         <div class="avatar">${person.emoji}</div>
         <div>
           <div class="post-wer">${sicher(person.name)}</div>
@@ -408,7 +467,6 @@ function feedZeichnen() {
         <button onclick="kommentarSenden('${p.id}')">➤</button>
       </div>
     </div>`;
-  }).join('');
 }
 function likeDruecken(postId) {
   const p = daten.posts.find(x => x.id === postId);
@@ -433,6 +491,133 @@ function kommentarLoeschen(postId, nr) {
   const p = daten.posts.find(x => x.id === postId);
   p.kommentare.splice(nr, 1);
   speichern(); zeichnen();
+}
+
+// ─────────────────────────────────────────────
+// PROFILSEITE — tippe im Feed auf ein Profilbild
+// ─────────────────────────────────────────────
+let ansicht = null; // null = normaler Tab, sonst {typ:'profil', id} oder {typ:'mitteilungen'}
+
+function profilOeffnen(id) {
+  ansicht = { typ: 'profil', id: id };
+  zeichnen();
+  window.scrollTo(0, 0);
+}
+function zurueck() {
+  ansicht = null;
+  zeichnen();
+}
+function profilSeiteZeichnen(id) {
+  const person = id === 'ich' ? daten.ich : wer(id);
+  if (!person) { ansicht = null; return feedZeichnen(); }
+  const beitraege = daten.posts.filter(p => p.autor === id).sort((a, b) => b.zeit - a.zeit);
+  const herzen = beitraege.reduce((summe, p) => summe + p.likes.length, 0);
+  const folgt = daten.folge.includes(id);
+  const ortZeigen = person.ort && !(id === 'ich' && daten.ich.ortPrivat);
+  return `
+  <button class="zurueck-knopf" onclick="zurueck()">‹ Zurück</button>
+  <div class="karte" style="text-align:center">
+    <div class="avatar" style="width:90px;height:90px;font-size:50px;margin:8px auto">${person.emoji}</div>
+    <h2 style="margin:8px 0 2px">${sicher(person.name)}${id === 'ich' ? ' (du)' : ''}</h2>
+    ${ortZeigen ? `<span class="ort-chip">${person.ortEmoji || '📍'} ${sicher(person.ort)}</span>` : ''}
+    <div class="statistik">
+      <div><div class="zahl">${beitraege.length}</div><div class="was">Beiträge</div></div>
+      <div><div class="zahl">❤️ ${herzen}</div><div class="was">Herzen</div></div>
+    </div>
+    ${id !== 'ich' ? (folgt
+      ? `<button class="neben-knopf" onclick="folgenUmschalten('${id}')">✓ Du folgst ${sicher(person.name)} — nicht mehr folgen</button>`
+      : `<button class="gross-knopf" onclick="folgenUmschalten('${id}')">🔔 Folgen</button>`) : ''}
+    ${id !== 'ich' ? `<p style="color:var(--grau);font-size:14px;margin-bottom:0">
+      Wenn du folgst, bekommst du eine Mitteilung 🔔, sobald ${sicher(person.name)} etwas postet oder woandershin geht.
+    </p>` : ''}
+  </div>
+  <h2>Beiträge von ${sicher(person.name)}</h2>
+  ${beitraege.length ? beitraege.map(postKarte).join('') : '<div class="leer">Noch keine Beiträge.</div>'}`;
+}
+function folgenUmschalten(id) {
+  const i = daten.folge.indexOf(id);
+  if (i >= 0) daten.folge.splice(i, 1);
+  else daten.folge.push(id);
+  speichern(); zeichnen();
+}
+
+// ─────────────────────────────────────────────
+// MITTEILUNGEN — die Glocke oben rechts
+// ─────────────────────────────────────────────
+function mitteilungHinzu(text) {
+  daten.mitteilungen.push({ id: neueId(), text: text, zeit: Date.now(), gelesen: false });
+  speichern();
+}
+function mitteilungenOeffnen() {
+  ansicht = { typ: 'mitteilungen' };
+  zeichnen();
+  window.scrollTo(0, 0);
+  daten.mitteilungen.forEach(m => m.gelesen = true);
+  speichern();
+  glockeZeichnen();
+}
+function mitteilungenZeichnen() {
+  const liste = [...daten.mitteilungen].sort((a, b) => b.zeit - a.zeit);
+  return `
+  <button class="zurueck-knopf" onclick="zurueck()">‹ Zurück</button>
+  <h2 style="margin-top:4px">🔔 Mitteilungen</h2>
+  ${liste.length ? liste.map(m => `
+    <div class="karte mitteilung ${m.gelesen ? '' : 'neu'}">
+      <div class="anfrage-text">
+        <div>${sicher(m.text)}</div>
+        <div class="warum" style="color:var(--grau);font-size:13px;margin-top:2px">${zeitText(m.zeit)}</div>
+      </div>
+    </div>`).join('')
+    : '<div class="leer">Noch keine Mitteilungen.<br>Tippe im Feed auf ein Profilbild und dann auf «Folgen» — dann landet hier etwas, sobald die Person aktiv ist!</div>'}`;
+}
+function glockeZeichnen() {
+  const ungelesen = daten.mitteilungen.filter(m => !m.gelesen).length;
+  const badge = document.getElementById('glocke-badge');
+  badge.style.display = ungelesen ? 'flex' : 'none';
+  badge.textContent = ungelesen;
+}
+
+// Zur Übung: Personen, denen du folgst, machen ab und zu etwas —
+// sie posten oder wechseln den Ort. Dann klingelt die Glocke.
+let naechstesEreignis = Date.now() + 15000;
+const ereignisPosts = [
+  { text: 'So ein schöner Tag heute! ☀️', foto: { art: 'szene', farbe: 0, emoji: '☀️' } },
+  { text: 'Rate mal, wo ich gerade bin …', foto: { art: 'szene', farbe: 4, emoji: '🤫' } },
+  { text: 'Gerade etwas Feines gegessen 😋', foto: { art: 'szene', farbe: 3, emoji: '🍰' } },
+  { text: 'Schaut mal, wen ich getroffen habe!', foto: { art: 'szene', farbe: 2, emoji: '🐕' } }
+];
+const ereignisOrte = [
+  { ort: 'Rausgegangen', ortEmoji: '🚪' },
+  { ort: 'Im Garten', ortEmoji: '🌷' },
+  { ort: 'Beim Einkaufen', ortEmoji: '🛒' },
+  { ort: 'Im Café', ortEmoji: '☕' },
+  { ort: 'Am Spazieren', ortEmoji: '🚶' }
+];
+// Stimmt, wenn gerade in ein Feld getippt wird — dann nicht neu zeichnen,
+// sonst wäre der halb geschriebene Text weg
+function tipptGerade() {
+  const el = document.activeElement;
+  return el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA');
+}
+function ereignisPruefen() {
+  if (Date.now() < naechstesEreignis) return;
+  naechstesEreignis = Date.now() + 20000 + Math.random() * 25000;
+  const gefolgte = daten.freunde.filter(f => daten.folge.includes(f.id));
+  if (!gefolgte.length) return;
+  const person = gefolgte[Math.floor(Math.random() * gefolgte.length)];
+  if (Math.random() < 0.5) {
+    const vorlage = ereignisPosts[Math.floor(Math.random() * ereignisPosts.length)];
+    daten.posts.push({ id: neueId(), autor: person.id, zeit: Date.now(),
+      text: vorlage.text, foto: vorlage.foto, likes: [], kommentare: [] });
+    mitteilungHinzu(`${person.emoji} ${person.name} hat etwas Neues gepostet 📝`);
+  } else {
+    const neu = ereignisOrte[Math.floor(Math.random() * ereignisOrte.length)];
+    person.ort = neu.ort;
+    person.ortEmoji = neu.ortEmoji;
+    mitteilungHinzu(`${person.emoji} ${person.name} ist jetzt: ${neu.ort} ${neu.ortEmoji}`);
+  }
+  speichern();
+  if (tipptGerade()) glockeZeichnen(); else zeichnen();
 }
 
 // ─────────────────────────────────────────────
@@ -696,6 +881,7 @@ function freundEntfernen(id) {
   daten.freunde = daten.freunde.filter(x => x.id !== id);
   daten.posts = daten.posts.filter(p => p.autor !== id);
   daten.anfragenRaus = daten.anfragenRaus.filter(a => a.name !== f.name);
+  daten.folge = daten.folge.filter(x => x !== id);
   speichern(); zeichnen();
 }
 function anfrageAnnehmen(id) {
@@ -741,12 +927,13 @@ function anfragenPruefen() {
         text: 'Danke für die Einladung! Jetzt kann ich mitlesen. 😊',
         foto: null, likes: [], kommentare: []
       });
+      mitteilungHinzu(`✉️ ${a.name} hat deine Anfrage angenommen 🎉`);
       geaendert = true;
     }
   });
-  if (geaendert) { speichern(); zeichnen(); }
+  if (geaendert) { speichern(); if (tipptGerade()) glockeZeichnen(); else zeichnen(); }
 }
-setInterval(() => { anfragenPruefen(); ortPruefen(); }, 3000);
+setInterval(() => { anfragenPruefen(); ortPruefen(); ereignisPruefen(); }, 3000);
 
 // ─────────────────────────────────────────────
 // PROFIL
@@ -800,12 +987,23 @@ function zeichnen() {
     feed: feedZeichnen, orte: orteZeichnen, neu: neuZeichnen,
     anfragen: anfragenZeichnen, profil: profilZeichnen
   };
-  document.getElementById('inhalt').innerHTML = seiten[aktiverTab]();
+  let html;
+  if (ansicht && ansicht.typ === 'profil') html = profilSeiteZeichnen(ansicht.id);
+  else if (ansicht && ansicht.typ === 'mitteilungen') html = mitteilungenZeichnen();
+  else html = seiten[aktiverTab]();
+  document.getElementById('inhalt').innerHTML = html;
   leisteZeichnen();
+  glockeZeichnen();
 }
 
 laden();
 zeichnen();
+
+// Lade-Logo nach kurzem Moment ausblenden
+setTimeout(() => {
+  document.getElementById('splash').classList.add('weg');
+  setTimeout(() => document.getElementById('splash').remove(), 600);
+}, 1400);
 </script>
 </body>
 </html>
