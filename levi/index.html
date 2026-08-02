@@ -75,16 +75,14 @@
   .seite.aktiv { display: block; }
   h1 { font-size: 30px; font-weight: 800; letter-spacing: -.5px; text-align: center; margin: 6px 0 6px; }
   .untertitel { text-align: center; font-size: 17px; color: var(--grau); margin: 0 0 26px; line-height: 1.5; }
-  .abzeichen {
-    display: flex; justify-content: center; margin-bottom: 14px;
-  }
+  .abzeichen { display: flex; justify-content: center; margin-bottom: 14px; }
   .abzeichen .kreis {
-    width: 64px; height: 64px; border-radius: 50%;
+    width: 76px; height: 76px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 30px;
     background: linear-gradient(135deg, #e0f4f7, #dbeafe);
     border: 1px solid #bfdbfe;
   }
+  .abzeichen svg { height: 46px; width: auto; }
   .schritt {
     text-align: center; font-size: 13px; font-weight: 700;
     letter-spacing: 1.2px; color: var(--blau);
@@ -144,26 +142,6 @@
     box-shadow: none;
   }
   .knopf.gruen { background: var(--gruen); box-shadow: 0 6px 16px rgba(22,163,74,.25); }
-  /* ===== Rollenwahl ===== */
-  .rollen { display: flex; gap: 12px; margin-top: 12px; }
-  .rolle {
-    flex: 1;
-    font-family: inherit;
-    font-size: 16px;
-    font-weight: 600;
-    padding: 18px 8px;
-    border-radius: 14px;
-    border: 1.5px solid var(--linie);
-    background: var(--flaeche);
-    color: var(--tinte);
-    cursor: pointer;
-  }
-  .rolle .gross { font-size: 36px; display: block; margin-bottom: 6px; }
-  .rolle.gewaehlt {
-    border-color: var(--blau);
-    background: #eff6ff;
-    box-shadow: 0 0 0 4px rgba(37,99,235,.12);
-  }
   /* ===== Satz-Bausteine ===== */
   .bausteine { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
   .baustein {
@@ -199,7 +177,7 @@
   }
   @keyframes pulsieren { 50% { opacity: .55; } }
   .fehler { color: var(--rot); font-size: 15px; font-weight: 600; margin: 10px 0 0; display: none; }
-  /* ===== Gerichtssaal ===== */
+  /* ===== Gerichtssaal (gezeichnet, ohne Emojis) ===== */
   .saal {
     position: relative;
     height: 240px;
@@ -216,12 +194,13 @@
     border-radius: 0 0 40% 40%;
   }
   .vorhang-l { left: 0; } .vorhang-r { right: 0; }
-  .saal-wappen { position: absolute; top: 7%; left: 50%; transform: translateX(-50%); font-size: 28px; }
+  .saal-wappen { position: absolute; top: 7%; left: 50%; transform: translateX(-50%); }
+  .saal-wappen svg { height: 30px; }
   .richter {
-    position: absolute; bottom: 38%; left: 50%; transform: translateX(-50%);
-    font-size: 62px;
+    position: absolute; bottom: 37%; left: 50%; transform: translateX(-50%);
     animation: nicken 3s ease-in-out infinite;
   }
+  .richter svg { height: 84px; display: block; }
   @keyframes nicken { 50% { transform: translateX(-50%) translateY(4px); } }
   .pult {
     position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
@@ -240,10 +219,11 @@
   .parteien-im-saal {
     position: absolute; bottom: 4%; width: 100%;
     display: flex; justify-content: space-between; padding: 0 9%;
-    font-size: 32px;
   }
-  .hammer-halter { position: absolute; bottom: 44%; right: 15%; font-size: 38px; }
-  .hammer { display: inline-block; transform-origin: 80% 80%; }
+  .parteien-im-saal svg { height: 40px; }
+  .hammer-halter { position: absolute; bottom: 44%; right: 14%; }
+  .hammer { display: inline-block; transform-origin: 20% 80%; }
+  .hammer svg { height: 40px; display: block; }
   .hammer.klopft { animation: klopfen 1.8s ease; }
   @keyframes klopfen {
     0%, 28%, 56% { transform: rotate(0deg); }
@@ -273,7 +253,15 @@
     transition: left 1.2s ease;
   }
   .baro-text { font-size: 16.5px; font-weight: 700; text-align: center; color: var(--tinte); margin: 6px 0 0; }
-  .beobachtung { font-size: 16.5px; margin: 10px 0; line-height: 1.5; }
+  .beobachtung {
+    font-size: 16.5px; margin: 10px 0; line-height: 1.5;
+    padding-left: 18px; position: relative;
+  }
+  .beobachtung::before {
+    content: ""; position: absolute; left: 0; top: .48em;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--tuerkis), var(--blau));
+  }
   /* ===== Lösungen ===== */
   .vorschlag {
     background: var(--flaeche);
@@ -349,8 +337,16 @@
   }
   /* ===== PLUS ===== */
   .plus-karte { border: 1.5px solid #bfdbfe; background: linear-gradient(180deg, #eff6ff, #fff); }
-  .plus-karte .schloss { font-size: 14px; }
   .version { position: fixed; bottom: 10px; right: 14px; font-size: 12px; color: #cbd5e1; }
+  /* ===== Drucken: nur das Protokoll ===== */
+  @media print {
+    body * { visibility: hidden; }
+    #druckbereich, #druckbereich * { visibility: visible; }
+    #druckbereich { position: absolute; left: 0; top: 0; width: 100%; }
+    #druckbereich .knopf, #druckbereich .u-loeschen, #druckbereich .fehler, #druckbereich .hinweis { display: none; }
+    .protokoll, .karte { box-shadow: none; border-color: #999; }
+    .u-block canvas { border-color: #999; }
+  }
 </style>
 </head>
 <body>
@@ -384,45 +380,52 @@
 
 <!-- ===== Seite 0: Anmeldung ===== -->
 <section class="seite aktiv" id="seite-anmeldung">
-  <div class="abzeichen"><div class="kreis">🧑‍⚖️</div></div>
+  <div class="abzeichen"><div class="kreis">
+    <svg viewBox="0 0 100 108" fill="none" stroke="#17284d" stroke-width="5" stroke-linejoin="round">
+      <circle cx="50" cy="10" r="6"/>
+      <line x1="50" y1="16" x2="50" y2="62"/>
+      <path d="M50 22 L20 32 M50 22 L80 32"/>
+      <path d="M20 32 L10 54 M20 32 L30 54"/>
+      <path d="M80 32 L70 54 M80 32 L90 54"/>
+      <path d="M7 56 A 13 13 0 0 0 33 56 Z" fill="#2563eb" stroke="none"/>
+      <path d="M67 56 A 13 13 0 0 0 93 56 Z" fill="#1fb6c9" stroke="none"/>
+      <path d="M50 62 L50 90 M50 70 L36 80 L36 90 M50 70 L64 80 L64 90" stroke="#2563eb" stroke-width="4"/>
+      <circle cx="50" cy="96" r="5" stroke="#2563eb" stroke-width="4"/>
+      <circle cx="36" cy="96" r="5" stroke="#1fb6c9" stroke-width="4"/>
+      <circle cx="64" cy="96" r="5" stroke="#2563eb" stroke-width="4"/>
+    </svg>
+  </div></div>
   <h1>Willkommen bei JudgeAI</h1>
   <p class="untertitel">Der digitale Richter für faire Lösungen —<br>neutral, präzise und für beide Seiten.</p>
   <div class="karte">
     <h2>Wie heisst du?</h2>
     <p class="hinweis">Dein Name bleibt auf diesem Gerät gespeichert.</p>
     <input type="text" id="anmelde-name" placeholder="Dein Vorname" maxlength="20">
-    <h2 style="margin-top:20px">Wer bist du?</h2>
-    <div class="rollen">
-      <button class="rolle" id="rolle-kind" onclick="waehleRolle('kind')"><span class="gross">🧒</span>Kind / Jugendliche:r</button>
-      <button class="rolle" id="rolle-erwachsen" onclick="waehleRolle('erwachsen')"><span class="gross">🧑‍💼</span>Erwachsen / Firma</button>
-    </div>
-    <p class="hinweis" style="margin-top:10px">Erwachsene bekommen ein juristischeres Protokoll (Vergleich).</p>
-    <p class="fehler" id="fehler-anmeldung">Bitte Name eingeben und eine Rolle wählen.</p>
+    <p class="fehler" id="fehler-anmeldung">Bitte gib deinen Namen ein.</p>
   </div>
   <button class="knopf" onclick="anmelden()">Konto erstellen</button>
 </section>
 
 <!-- ===== Seite 1: Start ===== -->
 <section class="seite" id="seite-start">
-  <div class="abzeichen"><div class="kreis">🧑‍⚖️</div></div>
   <h1 id="start-gruss">Hallo!</h1>
   <p class="untertitel" id="start-faelle"></p>
   <div class="karte">
     <h2>So funktioniert es</h2>
-    <p class="beobachtung">1️⃣ &nbsp;Beide Seiten erzählen ihre Sicht — tippen oder sprechen.</p>
-    <p class="beobachtung">2️⃣ &nbsp;JudgeAI bewertet den Fall im Gerichtssaal.</p>
-    <p class="beobachtung">3️⃣ &nbsp;Ihr wählt gemeinsam eine der drei Lösungen.</p>
-    <p class="beobachtung">4️⃣ &nbsp;Beide bestätigen das Protokoll mit Unterschrift.</p>
+    <p class="beobachtung">Beide Seiten erzählen ihre Sicht — tippen oder sprechen.</p>
+    <p class="beobachtung">JudgeAI bewertet den Fall im Gerichtssaal.</p>
+    <p class="beobachtung">Ihr wählt gemeinsam eine der drei Lösungen.</p>
+    <p class="beobachtung">Beide bestätigen das Protokoll mit Unterschrift — und können es drucken.</p>
     <p class="hinweis" style="margin-top:12px">Alles bleibt auf diesem Gerät. Nichts wird verschickt.</p>
   </div>
   <div class="karte plus-karte">
-    <h2>⭐ JudgeAI PLUS</h2>
+    <h2>JudgeAI PLUS</h2>
     <p class="hinweis" style="margin-bottom:4px">Bald mit Plus-Konto:</p>
-    <p class="beobachtung"><span class="schloss">🔒</span> &nbsp;Risiko-Analyse vor der Verhandlung</p>
-    <p class="beobachtung"><span class="schloss">🔒</span> &nbsp;Unbegrenzte Fälle (gratis: 4 pro Person)</p>
+    <p class="beobachtung">Risiko-Analyse vor der Verhandlung</p>
+    <p class="beobachtung">Unbegrenzte Fälle (gratis: 4 pro Person)</p>
     <p class="hinweis" style="margin-top:8px">In der Testversion ist noch alles gratis.</p>
   </div>
-  <button class="knopf" onclick="neuerFall()">Verhandlung eröffnen 🔨</button>
+  <button class="knopf" onclick="neuerFall()">Verhandlung eröffnen</button>
   <button class="knopf klein leise" onclick="abmelden()">Anderes Konto</button>
 </section>
 
@@ -434,11 +437,11 @@
   <div class="karte">
     <h2>Wie heisst du?</h2>
     <input type="text" id="name-a" placeholder="z.B. Person 1" maxlength="20">
-    <h2 style="margin-top:20px" id="frage-a">Was ist passiert?</h2>
+    <h2 style="margin-top:20px">Was ist passiert?</h2>
     <p class="hinweis">Tipp auf einen Baustein, um den Satz zu beginnen:</p>
     <div class="bausteine" data-fuer="a"></div>
     <textarea id="text-a" placeholder="Also, es war so ..."></textarea>
-    <button class="mikro" id="mikro-a" onclick="sprechen('a')">🎤 Statt tippen: sprechen</button>
+    <button class="mikro" id="mikro-a" onclick="sprechen('a')">Statt tippen: sprechen</button>
     <p class="fehler" id="fehler-a">Bitte erzähl zuerst, was passiert ist.</p>
   </div>
   <button class="knopf" onclick="weiterZuB()">Fertig — Gerät weitergeben</button>
@@ -451,14 +454,14 @@
   <div class="karte">
     <h2>Wie heisst du?</h2>
     <input type="text" id="name-b" placeholder="z.B. Person 2" maxlength="20">
-    <h2 style="margin-top:20px" id="frage-b">Was ist passiert?</h2>
+    <h2 style="margin-top:20px">Was ist passiert?</h2>
     <p class="hinweis">Tipp auf einen Baustein, um den Satz zu beginnen:</p>
     <div class="bausteine" data-fuer="b"></div>
     <textarea id="text-b" placeholder="Also, aus meiner Sicht ..."></textarea>
-    <button class="mikro" id="mikro-b" onclick="sprechen('b')">🎤 Statt tippen: sprechen</button>
+    <button class="mikro" id="mikro-b" onclick="sprechen('b')">Statt tippen: sprechen</button>
     <p class="fehler" id="fehler-b">Bitte erzähl zuerst, was passiert ist.</p>
   </div>
-  <button class="knopf" onclick="urteilen()">Zum Urteil 🔨</button>
+  <button class="knopf" onclick="urteilen()">Zum Urteil</button>
 </section>
 
 <!-- ===== Seite 4: Urteil ===== -->
@@ -469,15 +472,40 @@
 
   <div class="saal">
     <div class="vorhang-l"></div><div class="vorhang-r"></div>
-    <div class="saal-wappen">⚖️</div>
-    <div class="richter">🧑‍⚖️</div>
-    <div class="hammer-halter"><span class="hammer" id="hammer">🔨</span></div>
+    <div class="saal-wappen">
+      <svg viewBox="0 0 100 70" fill="none" stroke="#c9a227" stroke-width="6" stroke-linejoin="round">
+        <circle cx="50" cy="8" r="5"/>
+        <line x1="50" y1="13" x2="50" y2="62"/>
+        <path d="M50 18 L20 28 M50 18 L80 28"/>
+        <path d="M20 28 L10 48 M20 28 L30 48 M10 50 A 11 11 0 0 0 30 50"/>
+        <path d="M80 28 L70 48 M80 28 L90 48 M70 50 A 11 11 0 0 0 90 50"/>
+        <line x1="38" y1="64" x2="62" y2="64"/>
+      </svg>
+    </div>
+    <div class="richter">
+      <svg viewBox="0 0 100 110">
+        <circle cx="50" cy="24" r="16" fill="#e8b88a"/>
+        <path d="M34 20 Q34 6 50 6 Q66 6 66 20 L66 24 Q58 16 50 16 Q42 16 34 24 Z" fill="#8d8d94"/>
+        <path d="M22 110 Q22 52 50 48 Q78 52 78 110 Z" fill="#1e293b"/>
+        <path d="M42 52 L50 62 L58 52 L54 48 L46 48 Z" fill="#fff"/>
+      </svg>
+    </div>
+    <div class="hammer-halter"><span class="hammer" id="hammer">
+      <svg viewBox="0 0 110 110">
+        <rect x="14" y="44" width="66" height="14" rx="7" fill="#c9a227" transform="rotate(-40 47 51)"/>
+        <rect x="58" y="4" width="26" height="44" rx="8" fill="#8a5a32" transform="rotate(-40 71 26)"/>
+        <rect x="8" y="92" width="52" height="12" rx="6" fill="#6b4423"/>
+      </svg>
+    </span></div>
     <div class="pult"><div class="pult-schild">JUDGE AI</div></div>
-    <div class="parteien-im-saal"><span>🧍</span><span>🧍</span></div>
+    <div class="parteien-im-saal">
+      <svg viewBox="0 0 60 90"><circle cx="30" cy="16" r="13" fill="#93a8c9"/><path d="M8 90 Q8 42 30 40 Q52 42 52 90 Z" fill="#93a8c9"/></svg>
+      <svg viewBox="0 0 60 90"><circle cx="30" cy="16" r="13" fill="#c9b493"/><path d="M8 90 Q8 42 30 40 Q52 42 52 90 Z" fill="#c9b493"/></svg>
+    </div>
   </div>
 
   <div class="karte">
-    <h2>⚖️ Die Waage der Verantwortung</h2>
+    <h2>Die Waage der Verantwortung</h2>
     <p class="hinweis">Wer trägt wie viel zum Streit bei? (Fast nie ist es 100 : 0!)</p>
     <div class="waage-balken">
       <div class="waage-a" id="waage-a"></div>
@@ -490,19 +518,19 @@
   </div>
 
   <div class="karte">
-    <h2>🌡️ Einigungs-Barometer</h2>
+    <h2>Einigungs-Barometer</h2>
     <p class="hinweis">Wie nah seid ihr an einer Einigung?</p>
     <div class="baro-rahmen"><div class="baro-nadel" id="baro-nadel" style="left:5%"></div></div>
     <p class="baro-text" id="baro-text"></p>
   </div>
 
   <div class="karte">
-    <h2>🔍 Was dem Richter aufgefallen ist</h2>
+    <h2>Was dem Richter aufgefallen ist</h2>
     <div id="beobachtungen"></div>
   </div>
 
   <div class="karte">
-    <h2>🤝 Drei Lösungen für euren Fall</h2>
+    <h2>Drei Lösungen für euren Fall</h2>
     <p class="hinweis">Lest alle drei und wählt gemeinsam eine aus.</p>
     <div id="vorschlaege"></div>
   </div>
@@ -511,64 +539,55 @@
 <!-- ===== Seite 5: Protokoll ===== -->
 <section class="seite" id="seite-protokoll">
   <p class="schritt">Schritt 4 von 4</p>
-  <h1 id="protokoll-titel">Das Protokoll</h1>
+  <h1>Das Protokoll</h1>
   <p class="untertitel">Neutral, kurz und für beide gültig</p>
 
-  <div class="protokoll" id="protokoll-inhalt"></div>
+  <div id="druckbereich">
+    <div class="protokoll" id="protokoll-inhalt"></div>
 
-  <div class="karte">
-    <h2>✍️ Bestätigung beider Parteien</h2>
-    <p class="hinweis">Unterschreibt mit dem Finger und tippt dann auf Bestätigen.</p>
-    <div class="unterschriften">
-      <div class="u-block">
-        <canvas id="unterschrift-a"></canvas>
-        <p class="u-name" id="u-name-a"></p>
-        <button class="u-loeschen" onclick="leereUnterschrift('a')">löschen</button>
+    <div class="karte">
+      <h2>Bestätigung beider Parteien</h2>
+      <p class="hinweis">Unterschreibt mit dem Finger und tippt dann auf Bestätigen.</p>
+      <div class="unterschriften">
+        <div class="u-block">
+          <canvas id="unterschrift-a"></canvas>
+          <p class="u-name" id="u-name-a"></p>
+          <button class="u-loeschen" onclick="leereUnterschrift('a')">löschen</button>
+        </div>
+        <div class="u-block">
+          <canvas id="unterschrift-b"></canvas>
+          <p class="u-name" id="u-name-b"></p>
+          <button class="u-loeschen" onclick="leereUnterschrift('b')">löschen</button>
+        </div>
       </div>
-      <div class="u-block">
-        <canvas id="unterschrift-b"></canvas>
-        <p class="u-name" id="u-name-b"></p>
-        <button class="u-loeschen" onclick="leereUnterschrift('b')">löschen</button>
-      </div>
+      <button class="knopf gruen" onclick="bestaetigen()">Beide bestätigen</button>
+      <p class="fehler" id="fehler-unterschrift">Bitte müssen beide zuerst unterschreiben.</p>
+      <div class="stempel" id="stempel">FALL GELÖST</div>
     </div>
-    <button class="knopf gruen" onclick="bestaetigen()">Beide bestätigen ✅</button>
-    <p class="fehler" id="fehler-unterschrift">Bitte müssen beide zuerst unterschreiben.</p>
-    <div class="stempel" id="stempel">✔ FALL GELÖST</div>
   </div>
 
-  <button class="knopf" onclick="zurueckZumStart()">Neuer Fall 📂</button>
+  <button class="knopf leise" onclick="window.print()">Protokoll drucken</button>
+  <button class="knopf" onclick="zurueckZumStart()">Neuer Fall</button>
 </section>
 
-<div class="version">v6 · 18:09</div>
+<div class="version">v7 · 12:53</div>
 
 <script>
 // ================= Konto (nur auf diesem Gerät) =================
-let rolleWahl = null;
-
-function waehleRolle(r) {
-  rolleWahl = r;
-  document.getElementById('rolle-kind').classList.toggle('gewaehlt', r === 'kind');
-  document.getElementById('rolle-erwachsen').classList.toggle('gewaehlt', r === 'erwachsen');
-}
-
 function anmelden() {
   const name = saubere(document.getElementById('anmelde-name').value);
-  if (!name || !rolleWahl) {
+  if (!name) {
     document.getElementById('fehler-anmeldung').style.display = 'block';
     return;
   }
   localStorage.setItem('judgeaiName', name);
-  localStorage.setItem('judgeaiModus', rolleWahl);
   zeigeStart();
 }
 
 function abmelden() {
   localStorage.removeItem('judgeaiName');
-  localStorage.removeItem('judgeaiModus');
   zeige('seite-anmeldung');
 }
-
-function istErwachsen() { return localStorage.getItem('judgeaiModus') === 'erwachsen'; }
 
 function zeigeStart() {
   const name = localStorage.getItem('judgeaiName');
@@ -582,9 +601,6 @@ function zeigeStart() {
 function neuerFall() {
   ['name-a', 'text-a', 'name-b', 'text-b'].forEach(id => document.getElementById(id).value = '');
   gewaehlteLoesung = null;
-  const frage = istErwachsen() ? 'Bitte schildern Sie den Sachverhalt:' : 'Was ist passiert?';
-  document.getElementById('frage-a').textContent = frage;
-  document.getElementById('frage-b').textContent = frage;
   zeige('seite-a');
 }
 
@@ -648,7 +664,7 @@ function sprechen(wer) {
   erkennung.interimResults = false;
   erkennung.continuous = true;
   const feld = document.getElementById('text-' + wer);
-  knopf.textContent = '🔴 Ich höre zu ... (zum Stoppen tippen)';
+  knopf.textContent = 'Aufnahme läuft — zum Stoppen tippen';
   knopf.classList.add('anhoerung');
   erkennung.onresult = e => {
     let neu = '';
@@ -656,7 +672,7 @@ function sprechen(wer) {
     feld.value = (feld.value + ' ' + neu).trim();
   };
   erkennung.onend = () => {
-    knopf.textContent = '🎤 Statt tippen: sprechen';
+    knopf.textContent = 'Statt tippen: sprechen';
     knopf.classList.remove('anhoerung');
     erkennung = null;
   };
@@ -697,16 +713,20 @@ function analysiere(text) {
 
 // ---------- Thema und Streit-Objekt erkennen ----------
 const THEMEN = [
+  { name: 'spielzeug',  titel: 'Spielzeug teilen', woerter: ['spielzeug', 'teilen', 'lego', 'puppe', 'plüschtier', 'plueschtier', 'figur', 'bausteine'] },
+  { name: 'reihenfolge', titel: 'Reihenfolge', woerter: ['zuerst', 'reihenfolge', '\\bdran\\b', 'vorgedrängelt', 'vorgedraengelt', 'drängel', 'draengel', 'warten', 'an der reihe'] },
+  { name: 'schummeln',  titel: 'Schummeln', woerter: ['schummel', 'geschummelt', 'betrogen', 'gemogelt', 'mogel', 'nicht an die regeln'] },
+  { name: 'auslachen',  titel: 'Auslachen', woerter: ['ausgelacht', 'auslach', 'lacht mich', 'verspottet', 'lustig gemacht'] },
+  { name: 'nichtmit',   titel: 'Nicht mitspielen', woerter: ['nicht mitspielen', 'ausgeschlossen', 'darf nicht mit', 'ohne mich', 'nicht dabei sein', 'ausgegrenzt'] },
   { name: 'sache',      titel: 'Streit um einen Gegenstand', woerter: ['ausgeliehen', 'geliehen', 'genommen', 'kaputt', 'weggenommen', 'geklaut', 'zurückgeben', 'zurueckgeben', '\\bmeins\\b', 'gehört mir', 'gehoert mir'] },
   { name: 'bildschirm', titel: 'Streit um Bildschirmzeit', woerter: ['handy', 'ipad', 'tablet', 'konsole', 'playstation', 'switch', 'nintendo', 'fernseher', 'zocken', 'gamen', '\\bgame\\b', 'controller', 'bildschirm', 'computer'] },
   { name: 'koerper',    titel: 'Körperlicher Streit', woerter: ['geschlagen', 'gehauen', 'geschubst', 'getreten', 'gekniffen', 'wehgetan', 'weh getan', 'gebissen'] },
-  { name: 'worte',      titel: 'Streit um Worte und Vertrauen', woerter: ['ausgelacht', 'beleidigt', 'gelästert', 'gelaestert', 'petze', 'verpetzt', 'angelogen', 'gelogen', 'geheimnis', 'weitererzählt', 'weitererzaehlt', 'ausgeschlossen', 'ignoriert'] },
+  { name: 'worte',      titel: 'Streit um Worte und Vertrauen', woerter: ['beleidigt', 'gelästert', 'gelaestert', 'petze', 'verpetzt', 'angelogen', 'gelogen', 'geheimnis', 'weitererzählt', 'weitererzaehlt', 'ignoriert'] },
   { name: 'raum',       titel: 'Streit um Raum und Ruhe', woerter: ['zimmer', 'aufräumen', 'aufraeumen', 'unordnung', '\\blaut\\b', 'lärm', 'laerm', 'musik', 'gestört', 'gestoert', 'privatsphäre', 'privatsphaere', 'reingekommen'] },
-  { name: 'geld',       titel: 'Streit um Geld', woerter: ['miete', 'nebenkosten', '\\bgeld\\b', 'bezahlt', 'bezahlen', 'schulden', 'schuldet', 'rechnung', 'franken', '\\bchf\\b', 'euro', 'kosten', 'ausgegeben', 'zurückzahlen', 'zurueckzahlen', 'taschengeld', 'gekauft'] },
-  { name: 'arbeit',     titel: 'Streit am Arbeitsplatz', woerter: ['arbeit', '\\bchef\\b', 'chefin', 'kollege', 'kollegin', 'büro', 'buero', 'schicht', 'überstunden', 'ueberstunden', 'projekt', 'aufgabe', 'termin', 'meeting', 'kunde'] }
+  { name: 'geld',       titel: 'Streit um Geld', woerter: ['miete', 'nebenkosten', '\\bgeld\\b', 'bezahlt', 'bezahlen', 'schulden', 'schuldet', 'rechnung', 'franken', '\\bchf\\b', 'euro', 'kosten', 'ausgegeben', 'zurückzahlen', 'zurueckzahlen', 'taschengeld', 'gekauft'] }
 ];
 
-const OBJEKTE = ['handy', 'ipad', 'tablet', 'playstation', 'switch', 'nintendo', 'konsole', 'controller', 'fernseher', 'computer', 'velo', 'fahrrad', 'ball', 'stift', 'buch', 'jacke', 'pullover', 'kopfhörer', 'kopfhoerer', 'zimmer', 'spiel', 'karten', 'lego', 'roller'];
+const OBJEKTE = ['handy', 'ipad', 'tablet', 'playstation', 'switch', 'nintendo', 'konsole', 'controller', 'fernseher', 'computer', 'velo', 'fahrrad', 'ball', 'stift', 'buch', 'jacke', 'pullover', 'kopfhörer', 'kopfhoerer', 'zimmer', 'spiel', 'karten', 'lego', 'roller', 'puppe'];
 
 function findeThema(beide) {
   let beste = 0, gefunden = null;
@@ -736,8 +756,53 @@ function alsGeld(zahl) {
   return (zahl % 1 === 0 ? zahl : zahl.toFixed(2)) + ' Franken';
 }
 
+// ---------- Der Lösungs-Baukasten (aus der Liste mit 5000 Lösungen) ----------
+// Die 5000 Lösungen sind Kombinationen aus diesen Bausteinen:
+const BK_AKTIONEN = [
+  'abwechseln', 'auslosen', 'Stein-Schere-Papier spielen', 'die Zeit aufteilen',
+  'einander helfen', 'einander zuhören', 'eine Belohnung vereinbaren', 'eine Pause machen',
+  'eine Regel aufschreiben', 'eine Wiedergutmachung anbieten', 'eine Wunschliste erstellen',
+  'einen Erwachsenen fragen', 'einen Plan malen', 'sich entschuldigen', 'die Sache ersetzen',
+  'gemeinsam aufräumen', 'die Sache gemeinsam nutzen', 'die Sache gemeinsam reparieren',
+  'neu verhandeln', 'zusammen spielen'
+];
+const BK_ZWECKE = [
+  'alle mitmachen können', 'beide Spass haben', 'beide zufrieden sind', 'der Streit endet',
+  'es beim nächsten Mal besser klappt', 'es fair bleibt', 'jede Person einmal dran kommt',
+  'niemand traurig ist', 'sich beide verstanden fühlen', 'Vertrauen entsteht'
+];
+const BK_ABSCHLUESSE = [
+  'Beide geben sich zum Schluss die Hand.',
+  'Beide sagen etwas Nettes zueinander.',
+  'Die Vereinbarung wird gemerkt.',
+  'Beim nächsten Mal gilt dieselbe Regel.',
+  'Nach zehn Minuten prüfen beide, ob die Lösung funktioniert.'
+];
+const BK_THEMEN = ['spielzeug', 'reihenfolge', 'schummeln', 'auslachen', 'nichtmit'];
+
+// Eine Zahl aus dem Text errechnen, damit jeder Fall andere Bausteine bekommt.
+function textZahl(text) {
+  let z = 0;
+  for (let i = 0; i < text.length; i++) z = (z + text.charCodeAt(i) * (i + 1)) % 100000;
+  return z;
+}
+
+function baukastenLoesungen(f, anzahl) {
+  const z = textZahl(f.textA + f.textB);
+  const l = [];
+  for (let i = 0; i < anzahl; i++) {
+    const aktion = BK_AKTIONEN[(z + i * 7) % BK_AKTIONEN.length];
+    const zweck = BK_ZWECKE[(z + i * 3) % BK_ZWECKE.length];
+    const schluss = BK_ABSCHLUESSE[(z + i) % BK_ABSCHLUESSE.length];
+    const titel = aktion.charAt(0).toUpperCase() + aktion.slice(1);
+    l.push([titel,
+      'Bei «' + f.themaTitel + '» sollen ' + f.nameA + ' und ' + f.nameB + ' ' + aktion +
+      '. Das hilft, damit ' + zweck + '. ' + schluss]);
+  }
+  return l;
+}
+
 // ---------- Individuelle Lösungen bauen ----------
-// Jede Lösung baut Namen, Objekt und Analyse ein.
 function baueLoesungen(f) {
   const objekt = f.objekt || 'die Sache';
   const l = [];  // Kandidaten, die besten 3 werden genommen
@@ -751,7 +816,13 @@ function baueLoesungen(f) {
       schimpfer.join(' und ') + ' entschuldigt sich zuerst für die harten Worte — mit einem ganzen Satz: «Es tut mir leid, dass ich ... gesagt habe.» Erst danach wird über ' + objekt + ' geredet.']);
   }
 
-  // 2. Themen-Lösungen mit Objekt und Namen
+  // 2. Für die fünf Konflikt-Arten aus der Lösungs-Liste: der Baukasten.
+  if (BK_THEMEN.includes(f.thema)) {
+    l.push(...baukastenLoesungen(f, 3));
+    return l.slice(0, 3);
+  }
+
+  // 3. Themen-Lösungen mit Objekt und Namen
   if (f.thema === 'bildschirm') {
     l.push(['Der Timer entscheidet',
       'Stellt einen Timer auf 30 Minuten. ' + f.nameB + ' beginnt heute mit ' + objekt + ', morgen beginnt ' + f.nameA + '. Wenn der Timer klingelt, wird ohne Diskussion gewechselt.']);
@@ -797,29 +868,18 @@ function baueLoesungen(f) {
     l.push(['Alles aufschreiben',
       'Ab jetzt wird jede gemeinsame Ausgabe sofort notiert (Zettel oder Handy-Notiz). Am Monatsende wird abgerechnet — dann gibt es keine Diskussionen mehr über «wer hat was bezahlt».']);
   }
-  if (f.thema === 'arbeit') {
-    l.push(['Aufgaben klar verteilen',
-      f.nameA + ' und ' + f.nameB + ' schreiben gemeinsam auf, wer wofür zuständig ist — schwarz auf weiss. Was auf der Liste steht, gilt. Neues wird nur gemeinsam ergänzt.']);
-    l.push(['Das Klärungsgespräch',
-      '15 Minuten, nur ihr zwei: Jede Person sagt ungestört 5 Minuten ihre Sicht, die andere hört nur zu. Danach sucht ihr gemeinsam einen Punkt, in dem ihr euch sofort einig seid — und startet dort.']);
-    l.push(['Abwechseln bei Unbeliebtem',
-      'Die unbeliebte Aufgabe (Schicht, Termin, Zusatzarbeit) wird abgewechselt: diese Woche ' + f.nameA + ', nächste Woche ' + f.nameB + '. Ein Plan an der Wand macht es sichtbar.']);
-  }
 
-  // 3. Wenn jemand einen Wunsch geäussert hat, wird er Teil der Lösung.
+  // 4. Wenn jemand einen Wunsch geäussert hat, wird er Teil der Lösung.
   const wuenscher = f.a.wunsch > 0 ? f.nameA : (f.b.wunsch > 0 ? f.nameB : null);
   if (wuenscher) {
     l.push(['Der Wunsch zählt',
       wuenscher + ' hat einen Wunsch geäussert. Die andere Seite erfüllt ihn ganz oder zur Hälfte — und darf dafür einen eigenen Wunsch dazulegen. Beide Wünsche werden aufgeschrieben.']);
   }
 
-  // 4. Allgemeine Lösungen zum Auffüllen
+  // 5. Allgemeine Lösungen zum Auffüllen (aus dem Baukasten)
+  l.push(...baukastenLoesungen(f, 2));
   l.push(['Der Seitenwechsel',
     f.nameA + ' erzählt die Geschichte einmal aus der Sicht von ' + f.nameB + ' — und umgekehrt. So ehrlich wie möglich. Das öffnet die Augen.']);
-  l.push(['Der 50:50-Deal',
-    'Beide geben etwas nach: ' + f.nameA + ' und ' + f.nameB + ' nennen je eine Sache, die sie ab jetzt anders machen. Aufschreiben und in einer Woche gemeinsam prüfen.']);
-  l.push(['Die Schiedsrichter-Lösung',
-    'Wenn ihr euch nicht einigen könnt: Holt eine neutrale Person dazu und akzeptiert deren Entscheidung — beide, ohne zu murren.']);
 
   return l.slice(0, 3);
 }
@@ -869,21 +929,21 @@ function urteilen() {
   fall.baro = baro;
   document.getElementById('baro-nadel').style.left = 'calc(' + baro + '% - 3px)';
   document.getElementById('baro-text').textContent =
-    baro >= 70 ? baro + '% — Eine Einigung ist ganz nah! 🌤️' :
-    baro >= 40 ? baro + '% — Mit etwas gutem Willen klappt das. 🌥️' :
-                 baro + '% — Da braucht es noch Arbeit von beiden. ⛈️';
+    baro >= 70 ? baro + '% — Eine Einigung ist ganz nah!' :
+    baro >= 40 ? baro + '% — Mit etwas gutem Willen klappt das.' :
+                 baro + '% — Da braucht es noch Arbeit von beiden.';
 
   // Beobachtungen
   const beob = [];
   for (const [name, p] of [[nameA, a], [nameB, b]]) {
-    if (p.schimpf > 0) beob.push('⚠️ ' + name + ' benutzt Schimpfwörter. Das macht jeden Streit schlimmer.');
-    if (p.einsicht > 0) beob.push('🌟 ' + name + ' zeigt Einsicht und übernimmt Verantwortung. Stark!');
-    if (p.gefuehl > 0) beob.push('💙 ' + name + ' spricht über Gefühle. Das hilft dem Richter sehr.');
-    if (p.absolut > 1) beob.push('🔎 ' + name + ' sagt Wörter wie «immer» oder «nie». Stimmt das wirklich jedes Mal?');
-    if (p.vorwurf > 2 && p.ichSicht === 0) beob.push('👉 ' + name + ' zeigt viel auf die andere Person. Versuch mal Sätze mit «Ich ...»');
+    if (p.schimpf > 0) beob.push(name + ' benutzt Schimpfwörter. Das macht jeden Streit schlimmer.');
+    if (p.einsicht > 0) beob.push(name + ' zeigt Einsicht und übernimmt Verantwortung. Stark!');
+    if (p.gefuehl > 0) beob.push(name + ' spricht über Gefühle. Das hilft dem Richter sehr.');
+    if (p.absolut > 1) beob.push(name + ' sagt Wörter wie «immer» oder «nie». Stimmt das wirklich jedes Mal?');
+    if (p.vorwurf > 2 && p.ichSicht === 0) beob.push(name + ' zeigt viel auf die andere Person. Versuch mal Sätze mit «Ich ...»');
   }
-  if (beob.length === 0) beob.push('👏 Beide haben sachlich erzählt. Das ist die beste Grundlage für eine Lösung.');
-  if (Math.abs(anteilA - 50) <= 5) beob.push('⚖️ Die Waage steht fast in der Mitte: An diesem Streit sind beide etwa gleich beteiligt.');
+  if (beob.length === 0) beob.push('Beide haben sachlich erzählt. Das ist die beste Grundlage für eine Lösung.');
+  if (Math.abs(anteilA - 50) <= 5) beob.push('Die Waage steht fast in der Mitte: An diesem Streit sind beide etwa gleich beteiligt.');
   document.getElementById('beobachtungen').innerHTML =
     beob.map(s => '<p class="beobachtung">' + s + '</p>').join('');
 
@@ -903,7 +963,7 @@ function waehleLoesung(i) {
   fall.loesungen.forEach((_, n) => {
     const el = document.getElementById('vorschlag-' + n);
     el.classList.toggle('gewaehlt', n === i);
-    el.querySelector('.waehlen').textContent = n === i ? '✓ Gewählt — zum Protokoll' : 'Diese Lösung wählen';
+    el.querySelector('.waehlen').textContent = n === i ? 'Gewählt — zum Protokoll' : 'Diese Lösung wählen';
   });
   setTimeout(zeigeProtokoll, 400);
 }
@@ -932,29 +992,25 @@ function hammerKlopfen() {
 
 // ================= Protokoll =================
 function zeigeProtokoll() {
-  const erw = istErwachsen();
   const f = fall;
   const l = f.loesungen[gewaehlteLoesung];
   const datum = new Date().toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' });
   const nr = 'JA-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random() * 900) + 100);
 
-  document.getElementById('protokoll-titel').textContent = erw ? 'Vergleichsprotokoll' : 'Das Protokoll';
-
   document.getElementById('protokoll-inhalt').innerHTML =
-    '<h3>' + (erw ? 'VERGLEICHSPROTOKOLL' : 'STREIT-PROTOKOLL') + '</h3>' +
+    '<h3>STREIT-PROTOKOLL</h3>' +
     '<p class="aktenzeichen">Fall ' + nr + ' · ' + datum + '</p>' +
-    '<h4>' + (erw ? 'Parteien' : 'Wer war beteiligt?') + '</h4>' +
+    '<h4>Wer war beteiligt?</h4>' +
     '<p>' + f.nameA + ' und ' + f.nameB + '</p>' +
-    '<h4>' + (erw ? 'Sachverhalt' : 'Worum ging es?') + '</h4>' +
+    '<h4>Worum ging es?</h4>' +
     '<p>' + f.themaTitel + (f.objekt ? ' (' + f.objekt + ')' : '') + '. Beide Seiten haben ihre Sicht geschildert. ' +
     'JudgeAI schätzt die Chance auf eine Einigung auf ' + f.baro + '%.</p>' +
     '<h4>Sicht von ' + f.nameA + '</h4>' +
     '<p class="zitat">«' + saubere(f.textA) + '»</p>' +
     '<h4>Sicht von ' + f.nameB + '</h4>' +
     '<p class="zitat">«' + saubere(f.textB) + '»</p>' +
-    '<h4>' + (erw ? 'Vereinbarung' : 'Gewählte Lösung') + '</h4>' +
-    '<p>' + (erw ? 'Die Parteien vereinbaren einvernehmlich: ' : '') + '<b>' + l[0] + '.</b> ' + l[1] + '</p>' +
-    (erw ? '<p>Mit ihrer Unterschrift anerkennen beide Parteien diese Vereinbarung. Der Fall gilt damit als beigelegt.</p>' : '');
+    '<h4>Gewählte Lösung</h4>' +
+    '<p><b>' + l[0] + '.</b> ' + l[1] + '</p>';
 
   document.getElementById('u-name-a').textContent = f.nameA;
   document.getElementById('u-name-b').textContent = f.nameB;
