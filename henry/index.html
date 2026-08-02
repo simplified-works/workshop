@@ -46,6 +46,23 @@
     user-select: none;
   }
 
+  /* ── Schriftzug-Logo: der Blitz steckt mitten im Namen ── */
+  .wortmarke { display: block; height: 56px; }
+  .wortmarke .wm-text {
+    font-family: inherit;
+    font-style: italic;
+    font-weight: 900;
+    font-size: 42px;
+    letter-spacing: 1px;
+  }
+  .wortmarke .wm-blitz { filter: drop-shadow(0 0 7px rgba(253, 224, 71, 0.75)); }
+  .wortmarke .wm-slogan {
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 4px;
+  }
+
   /* ── Blitz-Einschlag beim Start ───────────── */
   .splash {
     position: fixed;
@@ -59,7 +76,7 @@
     pointer-events: none;
   }
 
-  .splash svg {
+  .splash > svg:not(.wortmarke) {
     width: 130px;
     height: 130px;
     filter: drop-shadow(0 0 28px rgba(250, 204, 21, 0.9));
@@ -74,13 +91,10 @@
     animation: aufblitzen 0.5s ease 0.5s;
   }
 
-  .splash b {
+  .splash .wortmarke {
     position: absolute;
-    bottom: 22%;
-    color: #fde047;
-    font-size: 24px;
-    font-weight: 800;
-    letter-spacing: -0.4px;
+    bottom: 20%;
+    height: 48px;
     opacity: 0;
     animation: name-zeigen 0.4s ease 0.65s forwards;
   }
@@ -112,44 +126,22 @@
     position: fixed;
     border-radius: 50%;
     filter: blur(70px);
-    opacity: 0.16;
+    opacity: 0.10;
     pointer-events: none;
     z-index: 0;
   }
-  .wolke.eins { width: 320px; height: 320px; background: var(--akzent1); top: -80px; right: -100px; opacity: 0.10; }
-  .wolke.zwei { width: 280px; height: 280px; background: var(--akzent2); bottom: 60px; left: -120px; opacity: 0.10; }
+  .wolke.eins { width: 320px; height: 320px; background: var(--akzent1); top: -80px; right: -100px; }
+  .wolke.zwei { width: 280px; height: 280px; background: var(--akzent2); bottom: 60px; left: -120px; }
 
   /* ── Kopfzeile ────────────────────────────── */
   header {
     display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: calc(env(safe-area-inset-top) + 14px) 22px 12px;
+    justify-content: center;
+    padding: calc(env(safe-area-inset-top) + 14px) 22px 10px;
     width: 100%;
     max-width: 620px;
     margin: 0 auto;
     z-index: 2;
-  }
-
-  .logo {
-    width: 42px;
-    height: 42px;
-    border-radius: 10.5px;
-    flex-shrink: 0;
-    box-shadow: 0 3px 12px rgba(253, 224, 71, 0.35);
-  }
-
-  .app-name b {
-    display: block;
-    font-size: 20px;
-    font-weight: 800;
-    letter-spacing: -0.4px;
-  }
-
-  .app-name span {
-    font-size: 12.5px;
-    color: var(--text-leise);
-    font-weight: 500;
   }
 
   /* ── Ansichten ────────────────────────────── */
@@ -198,10 +190,14 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 14px;
+    gap: 13px;
     position: relative;
     overflow: hidden;
+    touch-action: none;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
+
+  .karte.ziehen { transition: none; }
 
   .karte::before {
     content: "";
@@ -217,6 +213,53 @@
     from { transform: translateY(26px) scale(0.94); opacity: 0; }
     to   { transform: translateY(0) scale(1); opacity: 1; }
   }
+
+  /* Stempel beim Wischen, wie bei grossen Apps */
+  .stempel {
+    position: absolute;
+    top: 20px;
+    font-size: 19px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    padding: 6px 14px;
+    border-radius: 12px;
+    border: 3px solid;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  .stempel.gut {
+    left: 16px;
+    color: #30d158;
+    border-color: #30d158;
+    transform: rotate(-12deg);
+  }
+
+  .stempel.schlecht {
+    right: 16px;
+    color: #ff453a;
+    border-color: #ff453a;
+    transform: rotate(12deg);
+  }
+
+  /* Vorlese-Knopf oben rechts auf der Karte */
+  .hoer-knopf {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: var(--feld);
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 6;
+    transition: transform 0.1s ease;
+  }
+
+  .hoer-knopf:active { transform: scale(1.15); }
 
   .abzeichen {
     font-size: 11.5px;
@@ -257,22 +300,15 @@
     text-align: center;
   }
 
-  .bewertung { display: flex; gap: 16px; }
-
-  .bewertung button {
-    font-size: 24px;
-    background: var(--feld);
-    border: none;
-    border-radius: 50%;
-    width: 54px;
-    height: 54px;
-    cursor: pointer;
-    transition: transform 0.12s ease, background 0.2s ease, box-shadow 0.2s ease;
+  .wisch-hinweis {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-leise);
+    visibility: hidden;
   }
 
-  .bewertung button:active { transform: scale(1.2); }
-  .bewertung button.gut      { background: #30d158; box-shadow: 0 4px 12px rgba(48,209,88,0.4); }
-  .bewertung button.schlecht { background: #ff453a; box-shadow: 0 4px 12px rgba(255,69,58,0.4); }
+  .wisch-hinweis b.links  { color: #ff453a; }
+  .wisch-hinweis b.rechts { color: #30d158; }
 
   /* Kommentar nach dem Bewerten */
   .kommentar-zeile {
@@ -302,7 +338,7 @@
 
   .kommentar-zeile input:focus { border-color: var(--akzent1); }
 
-  .kommentar-zeile button {
+  .kommentar-zeile button[type="submit"] {
     border: none;
     border-radius: 13px;
     width: 44px;
@@ -311,6 +347,30 @@
     color: var(--auf-gelb);
     background: linear-gradient(135deg, var(--akzent1), var(--akzent2));
     cursor: pointer;
+  }
+
+  /* Mikrofon-Knöpfe für die Sprachaufnahme */
+  .mik {
+    border: 1px solid var(--linie);
+    border-radius: 13px;
+    width: 44px;
+    flex-shrink: 0;
+    font-size: 17px;
+    background: var(--feld);
+    cursor: pointer;
+    transition: transform 0.1s ease;
+  }
+
+  .mik:active { transform: scale(0.92); }
+
+  .mik.aufnahme {
+    background: #ff453a;
+    border-color: #ff453a;
+    animation: pulsieren 1s ease infinite;
+  }
+
+  @keyframes pulsieren {
+    50% { transform: scale(1.12); }
   }
 
   .danke {
@@ -516,7 +576,7 @@
 
   .eingabe-zeile input:focus { border-color: var(--akzent1); }
 
-  .eingabe-zeile button {
+  .eingabe-zeile button[type="submit"] {
     border: none;
     border-radius: 13px;
     width: 46px;
@@ -529,7 +589,7 @@
     transition: transform 0.1s ease;
   }
 
-  .eingabe-zeile button:active { transform: scale(0.92); }
+  .eingabe-zeile button[type="submit"]:active { transform: scale(0.92); }
 
   /* ── Tab-Leiste unten ─────────────────────── */
   nav {
@@ -584,28 +644,30 @@
     <svg viewBox="0 0 100 100" aria-hidden="true">
       <path d="M60 4 L18 58 L43 58 L37 96 L82 40 L56 40 Z" fill="#facc15"/>
     </svg>
-    <b>IdeenBlitz</b>
+    <svg class="wortmarke" viewBox="0 0 292 78" aria-hidden="true">
+      <text x="0" y="44" class="wm-text" fill="#fde047" textLength="120" lengthAdjust="spacingAndGlyphs">IDEEN</text>
+      <path class="wm-blitz" d="M148 1 L126 28 L139 28 L136 47 L158 20 L145 20 Z" fill="#fde047"/>
+      <text x="164" y="44" class="wm-text" fill="#fde047" textLength="120" lengthAdjust="spacingAndGlyphs">BLITZ</text>
+    </svg>
   </div>
 
   <div class="wolke eins"></div>
   <div class="wolke zwei"></div>
 
   <header>
-    <!-- Das Logo: ein Blitz, weil die Ideen blitzschnell kommen -->
-    <svg class="logo" viewBox="0 0 100 100" aria-hidden="true">
+    <!-- Das Schriftzug-Logo: der Blitz ersetzt den Zwischenraum -->
+    <svg class="wortmarke" viewBox="0 0 292 78" role="img" aria-label="IdeenBlitz – Nie mehr Langeweile">
       <defs>
-        <linearGradient id="logoVerlauf" x1="0" y1="0" x2="1" y2="1">
+        <linearGradient id="wmVerlauf" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stop-color="#fde047"/>
           <stop offset="1" stop-color="#f59e0b"/>
         </linearGradient>
       </defs>
-      <rect width="100" height="100" rx="24" fill="url(#logoVerlauf)"/>
-      <path d="M60 12 L24 56 L45 56 L40 88 L76 44 L55 44 Z" fill="#111111"/>
+      <text x="0" y="44" class="wm-text" fill="url(#wmVerlauf)" textLength="120" lengthAdjust="spacingAndGlyphs">IDEEN</text>
+      <path class="wm-blitz" d="M148 1 L126 28 L139 28 L136 47 L158 20 L145 20 Z" fill="url(#wmVerlauf)"/>
+      <text x="164" y="44" class="wm-text" fill="url(#wmVerlauf)" textLength="120" lengthAdjust="spacingAndGlyphs">BLITZ</text>
+      <text x="1" y="70" class="wm-slogan" fill="#9a9a92" textLength="283" lengthAdjust="spacing">NIE MEHR LANGEWEILE</text>
     </svg>
-    <div class="app-name">
-      <b>IdeenBlitz</b>
-      <span>Nie mehr Langeweile</span>
-    </div>
   </header>
 
   <main>
@@ -613,14 +675,15 @@
     <section class="ansicht aktiv" id="ansichtIdeen">
       <div class="buehne">
         <div class="karte" id="karte">
+          <div class="stempel gut" id="stempelGut">GUT! 👍</div>
+          <div class="stempel schlecht" id="stempelSchlecht">NEIN 👎</div>
+          <button class="hoer-knopf" id="hoerKnopf" onclick="vorlesen()" aria-label="Vorlesen">🔊</button>
           <div class="abzeichen" id="abzeichen">Bereit?</div>
           <div class="emoji-kreis" id="emoji">⚡️</div>
           <div class="ideen-text" id="ideenText">Hol dir deinen ersten Ideen&#8203;blitz!</div>
-          <div class="bewertung" id="bewertung" style="visibility:hidden">
-            <button id="daumenHoch" onclick="bewerten(1)" aria-label="Gute Idee">👍</button>
-            <button id="daumenRunter" onclick="bewerten(-1)" aria-label="Schlechte Idee">👎</button>
-          </div>
+          <div class="wisch-hinweis" id="wischHinweis"><b class="links">← Nicht gut</b> &nbsp;·&nbsp; wische die Karte &nbsp;·&nbsp; <b class="rechts">Gut →</b></div>
           <form class="kommentar-zeile" id="kommentarZeile" onsubmit="kommentarSenden(event)">
+            <button type="button" class="mik" onclick="diktieren('kommentarFeld', this)" aria-label="Sprechen statt tippen">🎤</button>
             <input id="kommentarFeld" type="text" placeholder="Magst du noch etwas dazu sagen?" maxlength="100" autocomplete="off">
             <button type="submit" aria-label="Kommentar senden">➤</button>
           </form>
@@ -640,7 +703,7 @@
     <section class="ansicht" id="ansichtWelt">
       <div class="welt-scroll">
         <div class="welt-titel">Meine Welt</div>
-        <div class="welt-hinweis">Trag hier ein, was du hast und magst. Die App baut daraus persönliche Ideen nur für dich!</div>
+        <div class="welt-hinweis">Trag hier ein, was du hast und magst. Die App baut daraus persönliche Ideen nur für dich! Tipp: Mit 🎤 kannst du sprechen statt tippen.</div>
 
         <div class="sektion">
           <div class="sektion-kopf">
@@ -649,6 +712,7 @@
           </div>
           <div class="chips" id="chips-spielsachen"></div>
           <form class="eingabe-zeile" onsubmit="hinzufuegen(event, 'spielsachen')">
+            <button type="button" class="mik" onclick="diktieren('eingabe-spielsachen', this)" aria-label="Sprechen">🎤</button>
             <input id="eingabe-spielsachen" type="text" placeholder="Spielsache eintragen…" maxlength="30" autocomplete="off">
             <button type="submit" aria-label="Hinzufügen">+</button>
           </form>
@@ -661,6 +725,7 @@
           </div>
           <div class="chips" id="chips-freunde"></div>
           <form class="eingabe-zeile" onsubmit="hinzufuegen(event, 'freunde')">
+            <button type="button" class="mik" onclick="diktieren('eingabe-freunde', this)" aria-label="Sprechen">🎤</button>
             <input id="eingabe-freunde" type="text" placeholder="Name eintragen…" maxlength="30" autocomplete="off">
             <button type="submit" aria-label="Hinzufügen">+</button>
           </form>
@@ -673,7 +738,21 @@
           </div>
           <div class="chips" id="chips-hobbys"></div>
           <form class="eingabe-zeile" onsubmit="hinzufuegen(event, 'hobbys')">
+            <button type="button" class="mik" onclick="diktieren('eingabe-hobbys', this)" aria-label="Sprechen">🎤</button>
             <input id="eingabe-hobbys" type="text" placeholder="Hobby eintragen…" maxlength="30" autocomplete="off">
+            <button type="submit" aria-label="Hinzufügen">+</button>
+          </form>
+        </div>
+
+        <div class="sektion">
+          <div class="sektion-kopf">
+            <div class="icon">💡</div>
+            <div><b>Meine Interessen</b><span>z.B. Dinos, Weltall, Ritter – was findest du spannend?</span></div>
+          </div>
+          <div class="chips" id="chips-interessen"></div>
+          <form class="eingabe-zeile" onsubmit="hinzufuegen(event, 'interessen')">
+            <button type="button" class="mik" onclick="diktieren('eingabe-interessen', this)" aria-label="Sprechen">🎤</button>
+            <input id="eingabe-interessen" type="text" placeholder="Interesse eintragen…" maxlength="30" autocomplete="off">
             <button type="submit" aria-label="Hinzufügen">+</button>
           </form>
         </div>
@@ -685,6 +764,7 @@
           </div>
           <div class="chips" id="chips-orte"></div>
           <form class="eingabe-zeile" onsubmit="hinzufuegen(event, 'orte')">
+            <button type="button" class="mik" onclick="diktieren('eingabe-orte', this)" aria-label="Sprechen">🎤</button>
             <input id="eingabe-orte" type="text" placeholder="Ort eintragen…" maxlength="30" autocomplete="off">
             <button type="submit" aria-label="Hinzufügen">+</button>
           </form>
@@ -697,7 +777,21 @@
           </div>
           <div class="chips" id="chips-anderes"></div>
           <form class="eingabe-zeile" onsubmit="hinzufuegen(event, 'anderes')">
+            <button type="button" class="mik" onclick="diktieren('eingabe-anderes', this)" aria-label="Sprechen">🎤</button>
             <input id="eingabe-anderes" type="text" placeholder="Etwas eintragen…" maxlength="30" autocomplete="off">
+            <button type="submit" aria-label="Hinzufügen">+</button>
+          </form>
+        </div>
+
+        <div class="sektion">
+          <div class="sektion-kopf">
+            <div class="icon">🚫</div>
+            <div><b>Mag ich nicht</b><span>Das schlägt dir die App nicht mehr vor. Lernt sie aus deinen Kommentaren!</span></div>
+          </div>
+          <div class="chips" id="chips-magNicht"></div>
+          <form class="eingabe-zeile" onsubmit="hinzufuegen(event, 'magNicht')">
+            <button type="button" class="mik" onclick="diktieren('eingabe-magNicht', this)" aria-label="Sprechen">🎤</button>
+            <input id="eingabe-magNicht" type="text" placeholder="z.B. lesen…" maxlength="30" autocomplete="off">
             <button type="submit" aria-label="Hinzufügen">+</button>
           </form>
         </div>
@@ -716,7 +810,7 @@
     </button>
   </nav>
 
-  <div class="version">v5</div>
+  <div class="version">v6</div>
 
 <script>
   // ─────────────────────────────────────────────
@@ -788,6 +882,12 @@
       { emoji: "🚀", text: "Erfinde eine neue Übung oder einen Trick für {x}!" },
       { emoji: "📋", text: "Mach ein Plakat über {x} mit allem, was du weisst!" }
     ],
+    interessen: [
+      { emoji: "💡", text: "Erfinde ein Spiel rund um {x}!" },
+      { emoji: "🎨", text: "Zeichne oder bastle etwas zu {x}!" },
+      { emoji: "📖", text: "Denk dir eine spannende Geschichte über {x} aus!" },
+      { emoji: "🏗️", text: "Bau etwas, das mit {x} zu tun hat!" }
+    ],
     orte: [
       { emoji: "🧭", text: "Mach eine Expedition zu deinem Ort «{x}» – was entdeckst du dort Neues?" },
       { emoji: "📸", text: "Foto-Safari bei «{x}»: Fotografiere 5 spannende Dinge!" },
@@ -830,12 +930,23 @@
     { emoji: "🚗", text: "Was sagt ein Auto mit Schnupfen? – «Hatschi-way!»" }
   ];
 
+  // Diese Wörter ignoriert die App, wenn sie aus Kommentaren lernt
+  const STOPPWOERTER = new Set([
+    "ich","du","er","sie","es","wir","ihr","mich","mir","dich","dir","das","der","die","den","dem",
+    "ein","eine","einen","einem","einer","kein","keine","keinen","mein","meine","meinem","meiner","meinen",
+    "kann","will","mag","möchte","moechte","habe","hab","bin","ist","sind","war","nicht","nichts","nie",
+    "und","oder","aber","auch","noch","mal","so","zu","mit","für","fuer","von","auf","im","in","am","an",
+    "was","wie","wo","wenn","dann","doch","sehr","gern","gerne","gut","super","cool","toll","doof","blöd",
+    "bloed","langweilig","gleich","heute","jetzt","mehr","lieber","machen","mache","etwas","irgendetwas","gar"
+  ]);
+
   // ─────────────────────────────────────────────
   // Gespeicherte Daten (bleiben auch nach dem Schliessen da)
   // ─────────────────────────────────────────────
+  const ARTEN = ["spielsachen", "freunde", "hobbys", "interessen", "orte", "anderes", "magNicht"];
   let punkte = JSON.parse(localStorage.getItem("ideenPunkte") || "{}");
   let meineWelt = JSON.parse(localStorage.getItem("meineWelt") || "{}");
-  for (const art of ["spielsachen", "freunde", "hobbys", "orte", "anderes"]) {
+  for (const art of ARTEN) {
     if (!meineWelt[art]) meineWelt[art] = [];
   }
   let kommentare = JSON.parse(localStorage.getItem("kommentare") || "[]");
@@ -843,7 +954,10 @@
   let klickZahl = parseInt(localStorage.getItem("klickZahl") || "0");
 
   let aktuelleIdee = null;
+  let aktuellerText = "";
   let letzteBewertung = 0;
+  let bereitsBewertet = false;
+  let weiterTimer = null;
   let letzteIdeen = [];  // die letzten 12 Ideen, damit nichts doppelt kommt
   let verlauf = [];      // alles, was gezeigt wurde – für den Zurück-Knopf
 
@@ -875,19 +989,25 @@
   }
 
   // ─────────────────────────────────────────────
-  // Ideen auswählen: 👍 = kommt öfter,
-  // 👎 = verschwindet ganz aus dem Stapel!
+  // Ideen auswählen: Wisch nach rechts = kommt öfter,
+  // Wisch nach links = verschwindet ganz!
   // ─────────────────────────────────────────────
   function gewichtVon(schluessel) {
     const p = punkte[schluessel] || 0;
-    if (p < 0) return 0;         // Daumen runter: weg damit!
-    return 1 + p * 0.5;          // je mehr 👍, desto öfter
+    if (p < 0) return 0;         // nach links gewischt: weg damit!
+    return 1 + p * 0.5;          // je öfter nach rechts, desto öfter kommt sie
+  }
+
+  // Steht ein «Mag ich nicht»-Wort in der Idee? Dann kommt sie nicht.
+  function istBlockiert(text) {
+    const t = text.toLowerCase();
+    return meineWelt.magNicht.some(w => w && t.includes(w.toLowerCase()));
   }
 
   // Baut eine persönliche Idee aus «Meine Welt»
   function persoenlicheIdee(wunschArt, wunschDing) {
     let art = wunschArt;
-    if (art && meineWelt[art].length === 0) art = null;
+    if (art && (!VORLAGEN[art] || meineWelt[art].length === 0)) art = null;
     if (!art) {
       const arten = Object.keys(VORLAGEN).filter(a => meineWelt[a].length > 0);
       if (arten.length === 0) return null;
@@ -896,12 +1016,14 @@
     const brauchbar = VORLAGEN[art].filter(v => gewichtVon(v.text) > 0);
     if (brauchbar.length === 0) return null;
     const vorlage = zufallAus(brauchbar);
-    return {
+    const idee = {
       emoji: vorlage.emoji,
       text: vorlage.text.replace("{x}", wunschDing || zufallAus(meineWelt[art])),
       schluessel: vorlage.text,   // bewertet wird die Vorlage
       persoenlich: true
     };
+    if (istBlockiert(idee.text)) return null;
+    return idee;
   }
 
   function zufaelligeIdee(wunsch) {
@@ -915,9 +1037,9 @@
       const p = persoenlicheIdee();
       if (p && !letzteIdeen.includes(p.text)) return p;
     }
-    let auswahl = IDEEN.filter(i => !letzteIdeen.includes(i.text) && gewichtVon(i.text) > 0);
-    if (auswahl.length === 0) auswahl = IDEEN.filter(i => gewichtVon(i.text) > 0);
-    if (auswahl.length === 0) auswahl = IDEEN;   // falls du wirklich alles weggeklickt hast
+    let auswahl = IDEEN.filter(i => !letzteIdeen.includes(i.text) && gewichtVon(i.text) > 0 && !istBlockiert(i.text));
+    if (auswahl.length === 0) auswahl = IDEEN.filter(i => gewichtVon(i.text) > 0 && !istBlockiert(i.text));
+    if (auswahl.length === 0) auswahl = IDEEN;   // falls du wirklich alles weggewischt hast
     let summe = 0;
     for (const i of auswahl) summe += Math.max(gewichtVon(i.text), 0.01);
     let los = Math.random() * summe;
@@ -932,7 +1054,7 @@
   // Erkennt Wünsche im Kommentar, z.B. «etwas mit meinem Freund machen»
   function wunschErkennen(text) {
     const t = text.toLowerCase();
-    for (const art of Object.keys(meineWelt)) {
+    for (const art of Object.keys(VORLAGEN)) {
       for (const ding of meineWelt[art]) {
         if (t.includes(ding.toLowerCase())) return { art: art, ding: ding };
       }
@@ -944,28 +1066,40 @@
     return null;
   }
 
+  // Holt die wichtigen Wörter aus einem Kommentar,
+  // z.B. «Ich kann nicht lesen» → «lesen»
+  function wichtigeWoerter(text) {
+    return text.toLowerCase().replace(/[^a-zäöüéèà\s-]/g, "")
+      .split(/\s+/)
+      .filter(w => w.length >= 4 && !STOPPWOERTER.has(w));
+  }
+
   // ─────────────────────────────────────────────
   // Anzeigen auf der Karte + Verlauf für Zurück
   // ─────────────────────────────────────────────
   function zeigeEintrag(eintrag) {
     const karte = document.getElementById("karte");
-    karte.classList.remove("neu");
+    karte.style.transform = "";
+    karte.classList.remove("neu", "ziehen");
     void karte.offsetWidth; // Trick, damit die Animation neu startet
     karte.classList.add("neu");
 
+    clearTimeout(weiterTimer);
     document.getElementById("danke").textContent = "";
-    document.getElementById("daumenHoch").className = "";
-    document.getElementById("daumenRunter").className = "";
     document.getElementById("kommentarZeile").classList.remove("sichtbar");
     document.getElementById("kommentarFeld").value = "";
+    document.getElementById("stempelGut").style.opacity = 0;
+    document.getElementById("stempelSchlecht").style.opacity = 0;
 
     const abzeichen = document.getElementById("abzeichen");
     abzeichen.textContent = eintrag.abzeichen;
     abzeichen.className = eintrag.persoenlich ? "abzeichen persoenlich" : "abzeichen";
     document.getElementById("emoji").textContent = eintrag.emoji;
     document.getElementById("ideenText").textContent = eintrag.text;
-    document.getElementById("bewertung").style.visibility = eintrag.idee ? "visible" : "hidden";
+    document.getElementById("wischHinweis").style.visibility = eintrag.idee ? "visible" : "hidden";
     aktuelleIdee = eintrag.idee;
+    aktuellerText = eintrag.text;
+    bereitsBewertet = false;
 
     document.getElementById("zurueckKnopf").disabled = verlauf.length < 2;
   }
@@ -1008,10 +1142,59 @@
   }
 
   // ─────────────────────────────────────────────
+  // Wischen: nach rechts = gut, nach links = nicht gut
+  // ─────────────────────────────────────────────
+  const karteElement = document.getElementById("karte");
+  let zieheKarte = false;
+  let startX = 0;
+
+  karteElement.addEventListener("pointerdown", (e) => {
+    if (!aktuelleIdee || bereitsBewertet) return;
+    if (e.target.closest("input, button, form")) return;
+    zieheKarte = true;
+    startX = e.clientX;
+    karteElement.classList.add("ziehen");
+    karteElement.setPointerCapture(e.pointerId);
+  });
+
+  karteElement.addEventListener("pointermove", (e) => {
+    if (!zieheKarte) return;
+    const dx = e.clientX - startX;
+    karteElement.style.transform = "translateX(" + dx + "px) rotate(" + (dx / 18) + "deg)";
+    document.getElementById("stempelGut").style.opacity = Math.min(1, Math.max(0, dx / 90));
+    document.getElementById("stempelSchlecht").style.opacity = Math.min(1, Math.max(0, -dx / 90));
+  });
+
+  karteElement.addEventListener("pointerup", (e) => {
+    if (!zieheKarte) return;
+    zieheKarte = false;
+    karteElement.classList.remove("ziehen");
+    const dx = e.clientX - startX;
+    if (Math.abs(dx) > 90) {
+      bewerten(dx > 0 ? 1 : -1);
+    }
+    // Karte federt zurück in die Mitte
+    karteElement.style.transform = "";
+    if (Math.abs(dx) <= 90) {
+      document.getElementById("stempelGut").style.opacity = 0;
+      document.getElementById("stempelSchlecht").style.opacity = 0;
+    }
+  });
+
+  karteElement.addEventListener("pointercancel", () => {
+    zieheKarte = false;
+    karteElement.classList.remove("ziehen");
+    karteElement.style.transform = "";
+    document.getElementById("stempelGut").style.opacity = 0;
+    document.getElementById("stempelSchlecht").style.opacity = 0;
+  });
+
+  // ─────────────────────────────────────────────
   // Bewerten + Kommentar schreiben
   // ─────────────────────────────────────────────
   function bewerten(wert) {
-    if (!aktuelleIdee) return;
+    if (!aktuelleIdee || bereitsBewertet) return;
+    bereitsBewertet = true;
     letzteBewertung = wert;
     punkte[aktuelleIdee.schluessel] = (punkte[aktuelleIdee.schluessel] || 0) + wert;
     speichern();
@@ -1019,21 +1202,23 @@
     document.getElementById("kommentarZeile").classList.add("sichtbar");
 
     if (wert === 1) {
-      document.getElementById("daumenHoch").className = "gut";
-      document.getElementById("daumenRunter").className = "";
+      document.getElementById("stempelGut").style.opacity = 1;
+      document.getElementById("stempelSchlecht").style.opacity = 0;
       document.getElementById("danke").textContent = "Super! Die Idee kommt jetzt öfter. 🎉";
-      konfettiRegen(document.getElementById("daumenHoch"));
+      konfettiRegen(karteElement);
     } else {
-      document.getElementById("daumenRunter").className = "schlecht";
-      document.getElementById("daumenHoch").className = "";
-      document.getElementById("danke").textContent = "Okay, die ist jetzt weg. Gleich kommt eine neue!";
-      // Nach dem Daumen runter kommt automatisch eine neue Idee –
-      // ausser du willst noch einen Kommentar schreiben.
-      setTimeout(() => {
-        if (letzteBewertung === -1 && document.getElementById("kommentarFeld").value === "") {
+      document.getElementById("stempelSchlecht").style.opacity = 1;
+      document.getElementById("stempelGut").style.opacity = 0;
+      document.getElementById("danke").textContent = "Okay, die ist weg! Magst du sagen, warum? Sonst drück einfach ⚡️";
+      // Die App wartet eine ganze Minute, damit du in Ruhe
+      // schreiben kannst. Dann kommt von selbst eine neue Idee.
+      clearTimeout(weiterTimer);
+      weiterTimer = setTimeout(() => {
+        const feld = document.getElementById("kommentarFeld");
+        if (letzteBewertung === -1 && feld.value.trim() === "" && document.activeElement !== feld) {
           neueIdee();
         }
-      }, 2500);
+      }, 60000);
     }
   }
 
@@ -1044,20 +1229,80 @@
     if (!text) return;
 
     kommentare.push({ idee: aktuelleIdee ? aktuelleIdee.text : "", bewertung: letzteBewertung, kommentar: text });
-    speichern();
     feld.value = "";
     feld.blur();
     document.getElementById("kommentarZeile").classList.remove("sichtbar");
 
-    if (letzteBewertung === -1) {
-      const wunsch = wunschErkennen(text);
-      document.getElementById("danke").textContent = wunsch
-        ? "Gute Idee! Ich such dir genau so etwas… 💛"
-        : "Danke! Hier kommt eine neue Idee…";
-      setTimeout(() => neueIdee(wunsch), 900);
-    } else {
-      document.getElementById("danke").textContent = "Danke für deinen Kommentar! 💛";
+    // Die App lernt aus deinem Kommentar!
+    const wunsch = letzteBewertung === -1 ? wunschErkennen(text) : null;
+    const istWunsch = /will|möcht|moecht|lieber|mehr/.test(text.toLowerCase());
+    let gelernt = "";
+
+    if (letzteBewertung === -1 && !istWunsch) {
+      // z.B. «Ich kann nicht lesen» → «lesen» kommt zu «Mag ich nicht»
+      for (const wort of wichtigeWoerter(text)) {
+        if (!meineWelt.magNicht.includes(wort)) meineWelt.magNicht.push(wort);
+        gelernt = wort;
+      }
+      if (gelernt) zeigeChips("magNicht");
+    } else if (letzteBewertung === 1) {
+      // Bei Daumen hoch merkt sich die App deine Interessen
+      for (const wort of wichtigeWoerter(text)) {
+        if (!meineWelt.interessen.includes(wort)) meineWelt.interessen.push(wort);
+        gelernt = wort;
+      }
+      if (gelernt) zeigeChips("interessen");
     }
+    speichern();
+
+    if (letzteBewertung === -1) {
+      let nachricht = "Danke! Hier kommt eine neue Idee…";
+      if (gelernt) nachricht = "Gemerkt! 🚫 «" + gelernt + "» steht jetzt bei «Mag ich nicht».";
+      else if (wunsch) nachricht = "Gute Idee! Ich such dir genau so etwas… 💛";
+      document.getElementById("danke").textContent = nachricht;
+      clearTimeout(weiterTimer);
+      weiterTimer = setTimeout(() => neueIdee(wunsch), 1600);
+    } else {
+      document.getElementById("danke").textContent = gelernt
+        ? "Gemerkt! 💡 «" + gelernt + "» steht jetzt bei deinen Interessen."
+        : "Danke für deinen Kommentar! 💛";
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // Vorlesen (für alle, die noch nicht lesen können)
+  // ─────────────────────────────────────────────
+  function vorlesen() {
+    if (!("speechSynthesis" in window) || !aktuellerText) return;
+    speechSynthesis.cancel();
+    const stimme = new SpeechSynthesisUtterance(aktuellerText);
+    stimme.lang = "de-DE";
+    stimme.rate = 0.95;
+    speechSynthesis.speak(stimme);
+  }
+
+  // ─────────────────────────────────────────────
+  // Sprachaufnahme: sprechen statt tippen
+  // ─────────────────────────────────────────────
+  const Spracherkennung = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  function diktieren(feldId, knopf) {
+    if (!Spracherkennung) return;
+    const erkennung = new Spracherkennung();
+    erkennung.lang = "de-DE";
+    erkennung.interimResults = false;
+    knopf.classList.add("aufnahme");
+    erkennung.onresult = (e) => {
+      document.getElementById(feldId).value = e.results[0][0].transcript;
+    };
+    erkennung.onend = () => knopf.classList.remove("aufnahme");
+    erkennung.onerror = () => knopf.classList.remove("aufnahme");
+    erkennung.start();
+  }
+
+  // Wenn das Gerät keine Spracherkennung kann, verstecken wir die Mikrofone
+  if (!Spracherkennung) {
+    document.querySelectorAll(".mik").forEach(k => k.style.display = "none");
   }
 
   function konfettiRegen(vonElement) {
@@ -1068,7 +1313,7 @@
       k.className = "konfetti";
       k.textContent = zufallAus(teile);
       k.style.left = (start.left + start.width / 2) + "px";
-      k.style.top = (start.top + start.height / 2) + "px";
+      k.style.top = (start.top + start.height / 3) + "px";
       k.style.setProperty("--dx", (Math.random() * 240 - 120) + "px");
       k.style.setProperty("--dy", (-40 - Math.random() * 160) + "px");
       k.style.setProperty("--dreh", (Math.random() * 360 - 180) + "deg");
@@ -1128,7 +1373,7 @@
   // ─────────────────────────────────────────────
   // Beim Start
   // ─────────────────────────────────────────────
-  ["spielsachen", "freunde", "hobbys", "orte", "anderes"].forEach(zeigeChips);
+  ARTEN.forEach(zeigeChips);
   if (klickZahl > 0) {
     document.getElementById("zaehler").textContent = "Schon " + klickZahl + " Ideenblitze geholt";
   }
