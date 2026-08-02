@@ -6,37 +6,24 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="IdeenBlitz">
-<meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#0a0a0a">
 <link rel="apple-touch-icon" href="icon.png">
 <title>IdeenBlitz – Nie mehr Langeweile</title>
 <style>
+  /* Schwarz-gelb wie ein Blitz in der Nacht! */
   :root {
-    --hintergrund: #f2f2f7;
-    --karte: #ffffff;
-    --text: #16162a;
-    --text-leise: #8e8e93;
-    --akzent1: #7c3aed;
-    --akzent2: #f43f5e;
-    --chip: #eeeaf9;
-    --feld: #f2f2f7;
-    --linie: rgba(60, 60, 67, 0.12);
-    --tabbar: rgba(255, 255, 255, 0.82);
-    --schatten: 0 10px 30px rgba(22, 22, 42, 0.10), 0 2px 8px rgba(22, 22, 42, 0.05);
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --hintergrund: #000000;
-      --karte: #1c1c1e;
-      --text: #f2f2f7;
-      --text-leise: #98989e;
-      --chip: #2c2440;
-      --feld: #2c2c2e;
-      --linie: rgba(255, 255, 255, 0.12);
-      --tabbar: rgba(22, 22, 24, 0.82);
-      --schatten: 0 10px 30px rgba(0, 0, 0, 0.55);
-    }
+    --hintergrund: #0a0a0a;
+    --karte: #1a1a1c;
+    --text: #f5f5f0;
+    --text-leise: #9a9a92;
+    --akzent1: #fde047;
+    --akzent2: #f59e0b;
+    --auf-gelb: #1a1400;
+    --chip: #2b2510;
+    --feld: #26262a;
+    --linie: rgba(255, 255, 255, 0.12);
+    --tabbar: rgba(16, 16, 18, 0.85);
+    --schatten: 0 10px 30px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.4);
   }
 
   * {
@@ -64,7 +51,7 @@
     position: fixed;
     inset: 0;
     z-index: 100;
-    background: #180f2e;
+    background: #0a0a0a;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -90,7 +77,7 @@
   .splash b {
     position: absolute;
     bottom: 22%;
-    color: #fff;
+    color: #fde047;
     font-size: 24px;
     font-weight: 800;
     letter-spacing: -0.4px;
@@ -129,8 +116,8 @@
     pointer-events: none;
     z-index: 0;
   }
-  .wolke.eins { width: 320px; height: 320px; background: var(--akzent1); top: -80px; right: -100px; }
-  .wolke.zwei { width: 280px; height: 280px; background: var(--akzent2); bottom: 60px; left: -120px; }
+  .wolke.eins { width: 320px; height: 320px; background: var(--akzent1); top: -80px; right: -100px; opacity: 0.10; }
+  .wolke.zwei { width: 280px; height: 280px; background: var(--akzent2); bottom: 60px; left: -120px; opacity: 0.10; }
 
   /* ── Kopfzeile ────────────────────────────── */
   header {
@@ -149,7 +136,7 @@
     height: 42px;
     border-radius: 10.5px;
     flex-shrink: 0;
-    box-shadow: 0 3px 10px rgba(124, 58, 237, 0.35);
+    box-shadow: 0 3px 12px rgba(253, 224, 71, 0.35);
   }
 
   .app-name b {
@@ -243,7 +230,7 @@
   }
 
   .abzeichen.persoenlich {
-    color: #fff;
+    color: var(--auf-gelb);
     background: linear-gradient(90deg, var(--akzent1), var(--akzent2));
   }
 
@@ -251,7 +238,7 @@
     width: clamp(74px, 15vh, 112px);
     height: clamp(74px, 15vh, 112px);
     border-radius: 50%;
-    background: radial-gradient(circle at 30% 25%, rgba(124,58,237,0.16), rgba(244,63,94,0.12));
+    background: radial-gradient(circle at 30% 25%, rgba(253,224,71,0.18), rgba(245,158,11,0.10));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -321,7 +308,7 @@
     width: 44px;
     flex-shrink: 0;
     font-size: 18px;
-    color: #fff;
+    color: var(--auf-gelb);
     background: linear-gradient(135deg, var(--akzent1), var(--akzent2));
     cursor: pointer;
   }
@@ -349,7 +336,7 @@
   }
 
   .zurueck-knopf {
-    border: none;
+    border: 1px solid rgba(253, 224, 71, 0.35);
     border-radius: 20px;
     width: 62px;
     flex-shrink: 0;
@@ -373,17 +360,17 @@
     font-size: 19px;
     font-weight: 800;
     letter-spacing: -0.2px;
-    color: #fff;
+    color: var(--auf-gelb);
     background: linear-gradient(135deg, var(--akzent1), var(--akzent2));
-    box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35), inset 0 1px 0 rgba(255,255,255,0.25);
+    box-shadow: 0 8px 24px rgba(253, 224, 71, 0.30), inset 0 1px 0 rgba(255,255,255,0.35);
     cursor: pointer;
     transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.1s ease;
   }
 
   .idee-knopf:active {
     transform: scale(0.97);
-    filter: brightness(1.1);
-    box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3);
+    filter: brightness(1.08);
+    box-shadow: 0 4px 12px rgba(253, 224, 71, 0.25);
   }
 
   .zaehler {
@@ -494,7 +481,7 @@
 
   .chip button {
     border: none;
-    background: rgba(124, 58, 237, 0.18);
+    background: rgba(253, 224, 71, 0.18);
     color: var(--akzent1);
     width: 21px;
     height: 21px;
@@ -536,7 +523,7 @@
     flex-shrink: 0;
     font-size: 22px;
     font-weight: 700;
-    color: #fff;
+    color: var(--auf-gelb);
     background: linear-gradient(135deg, var(--akzent1), var(--akzent2));
     cursor: pointer;
     transition: transform 0.1s ease;
@@ -608,12 +595,12 @@
     <svg class="logo" viewBox="0 0 100 100" aria-hidden="true">
       <defs>
         <linearGradient id="logoVerlauf" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stop-color="#7c3aed"/>
-          <stop offset="1" stop-color="#f43f5e"/>
+          <stop offset="0" stop-color="#fde047"/>
+          <stop offset="1" stop-color="#f59e0b"/>
         </linearGradient>
       </defs>
       <rect width="100" height="100" rx="24" fill="url(#logoVerlauf)"/>
-      <path d="M60 12 L24 56 L45 56 L40 88 L76 44 L55 44 Z" fill="#fff"/>
+      <path d="M60 12 L24 56 L45 56 L40 88 L76 44 L55 44 Z" fill="#111111"/>
     </svg>
     <div class="app-name">
       <b>IdeenBlitz</b>
@@ -729,7 +716,7 @@
     </button>
   </nav>
 
-  <div class="version">v4</div>
+  <div class="version">v5</div>
 
 <script>
   // ─────────────────────────────────────────────
@@ -997,7 +984,7 @@
       letzteIdeen.push(idee.text);
       if (letzteIdeen.length > 12) letzteIdeen.shift();
       eintrag = {
-        abzeichen: idee.persoenlich ? "💜 Extra für dich" : "⚡️ Deine Idee",
+        abzeichen: idee.persoenlich ? "💛 Extra für dich" : "⚡️ Deine Idee",
         emoji: idee.emoji,
         text: idee.text,
         idee: idee,
@@ -1065,17 +1052,17 @@
     if (letzteBewertung === -1) {
       const wunsch = wunschErkennen(text);
       document.getElementById("danke").textContent = wunsch
-        ? "Gute Idee! Ich such dir genau so etwas… 💜"
+        ? "Gute Idee! Ich such dir genau so etwas… 💛"
         : "Danke! Hier kommt eine neue Idee…";
       setTimeout(() => neueIdee(wunsch), 900);
     } else {
-      document.getElementById("danke").textContent = "Danke für deinen Kommentar! 💜";
+      document.getElementById("danke").textContent = "Danke für deinen Kommentar! 💛";
     }
   }
 
   function konfettiRegen(vonElement) {
     const start = vonElement.getBoundingClientRect();
-    const teile = ["🎉", "⭐", "✨", "💜", "⚡️"];
+    const teile = ["🎉", "⭐", "✨", "💛", "⚡️"];
     for (let i = 0; i < 14; i++) {
       const k = document.createElement("span");
       k.className = "konfetti";
