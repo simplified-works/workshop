@@ -405,7 +405,7 @@
 <main id="inhalt"></main>
 
 <nav id="leiste"></nav>
-<div class="version">v6 · 13:37</div>
+<div class="version">v7 · 13:41</div>
 
 <dialog id="info">
   <h3>💜 So funktioniert Famigram</h3>
@@ -1206,9 +1206,11 @@ function konfetti() {
 laden();
 zeichnen();
 
-// Lade-Logo ausblenden — beim allerersten Mal startet danach die Tour
+// Lade-Logo ausblenden, danach die Tour zeigen.
+// Testphase: Die Tour kommt bei JEDEM Start.
+// Später: Zeile unten ersetzen durch  if (!daten.introGesehen) tourStarten();
 setTimeout(() => {
-  if (!daten.introGesehen) tourStarten();
+  tourStarten();
   document.getElementById('splash').classList.add('weg');
   setTimeout(() => document.getElementById('splash').remove(), 600);
 }, 1400);
