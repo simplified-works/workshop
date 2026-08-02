@@ -298,6 +298,7 @@
     position: fixed; inset: 0; z-index: 98; display: none;
     flex-direction: column; color: white;
     transition: background 0.6s;
+    user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
   }
   #tour.sichtbar { display: flex; }
   #tour.weg { opacity: 0; transition: opacity 0.5s; pointer-events: none; }
@@ -305,7 +306,7 @@
   .tour-balken div { flex: 1; height: 4px; border-radius: 999px; background: rgba(255,255,255,0.3); overflow: hidden; }
   .tour-balken div i { display: block; height: 100%; width: 0; background: white; }
   .tour-balken div.voll i { width: 100%; }
-  .tour-balken div.laeuft i { animation: balken-fuellen 3.5s linear forwards; }
+  .tour-balken div.laeuft i { animation: balken-fuellen 8s linear forwards; }
   @keyframes balken-fuellen { from { width: 0 } to { width: 100% } }
   .tour-ueberspringen {
     align-self: flex-end; margin: 10px 14px 0;
@@ -405,12 +406,20 @@
 <main id="inhalt"></main>
 
 <nav id="leiste"></nav>
-<div class="version">v7 · 13:41</div>
+<div class="version">v8 · 13:50</div>
 
 <dialog id="info">
   <h3>💜 So funktioniert Famigram</h3>
   <p>Das ist dein Übungs-Netzwerk. Alles wird nur <b>auf deinem Gerät</b> gespeichert — niemand sonst kann es sehen.</p>
   <p>Die Familienmitglieder hier sind ausgedacht. Ein echtes Netzwerk, bei dem sich mehrere Geräte verbinden, braucht einen Server — das wäre der nächste Schritt!</p>
+  <div style="text-align:center;margin:16px 0">
+    <img src="icon.png" alt="Famigram App-Icon" style="width:84px;height:84px;border-radius:19px;box-shadow:0 4px 14px rgba(0,0,0,0.25)">
+    <div style="font-size:13px;margin-top:6px">Famigram</div>
+    <div style="color:var(--grau);font-size:14px;margin-top:8px;line-height:1.5">
+      So sieht die App auf deinem Homescreen aus!<br>
+      Sichern: Teilen-Knopf <span style="white-space:nowrap">⬆️</span> → «Zum Home-Bildschirm»
+    </div>
+  </div>
   <button class="gross-knopf" onclick="document.getElementById('info').close()">Alles klar</button>
   <button class="neben-knopf" style="margin-top:8px" onclick="document.getElementById('info').close();tourStarten()">🎬 Tour nochmals anschauen</button>
 </dialog>
@@ -1123,8 +1132,12 @@ const tourSeiten = [
   { hg: 'linear-gradient(160deg,#ec4899,#7c3aed)', emoji: '🔔', titel: 'Folgen & Glocke',
     text: 'Tippe auf ein Profilbild und folge — die Glocke meldet sich, sobald etwas passiert.' }
 ];
+const TOUR_DAUER = 8000; // 8 Sekunden pro Szene — genug Zeit zum Lesen
 let tourNr = 0;
 let tourTimer = null;
+let tourStartZeit = 0;   // wann die aktuelle Szene gestartet ist
+let tourRest = 0;        // wie viel Zeit der Szene noch übrig ist
+let tourGehaltenSeit = 0;
 
 function tourStarten() {
   tourNr = 0;
@@ -1144,7 +1157,8 @@ function tourZeigen() {
       ${tourSeiten.map((x, i) => `<div class="${i < tourNr ? 'voll' : i === tourNr && !letzte ? 'laeuft' : i === tourNr ? 'voll' : ''}"><i></i></div>`).join('')}
     </div>
     <button class="tour-ueberspringen" onclick="tourFertig()">Überspringen</button>
-    <div class="tour-mitte" onclick="tourTipp(event)">
+    <div class="tour-mitte"
+         onpointerdown="tourHalten()" onpointerup="tourLoslassen(event)" onpointercancel="tourLoslassen(event)">
       <div class="tour-emoji">${s.emoji}</div>
       <div class="tour-titel">${s.titel}</div>
       <div class="tour-text">${s.text}</div>
@@ -1152,17 +1166,37 @@ function tourZeigen() {
     <div class="tour-unten">
       ${letzte
         ? '<button class="tour-los" onclick="tourFertig()">Los gehts! 🚀</button>'
-        : '<div class="tour-tipp">Tippe rechts für weiter, links für zurück</div>'}
+        : '<div class="tour-tipp">Tippe rechts für weiter, links für zurück.<br>Finger draufhalten = Pause ✋</div>'}
     </div>`;
-  if (!letzte) tourTimer = setTimeout(tourWeiter, 3500);
+  tourStartZeit = Date.now();
+  tourRest = TOUR_DAUER;
+  if (!letzte) tourTimer = setTimeout(tourWeiter, TOUR_DAUER);
 }
-function tourTipp(ev) {
-  // Linkes Drittel = zurück, Rest = weiter (wie bei Storys)
-  if (ev.clientX < window.innerWidth / 3) {
-    if (tourNr > 0) { tourNr--; tourZeigen(); }
-  } else {
-    tourWeiter();
+// Finger drauf: Tour hält an (der Balken oben stoppt auch)
+function tourHalten() {
+  tourGehaltenSeit = Date.now();
+  clearTimeout(tourTimer);
+  tourRest -= Date.now() - tourStartZeit;
+  const balken = document.querySelector('.tour-balken .laeuft i');
+  if (balken) balken.style.animationPlayState = 'paused';
+}
+// Finger weg: kurzes Tippen = blättern, langes Halten = weiterlaufen lassen
+function tourLoslassen(ev) {
+  const warKurz = Date.now() - tourGehaltenSeit < 300;
+  if (warKurz) {
+    if (ev.clientX < window.innerWidth / 3) {
+      if (tourNr > 0) { tourNr--; tourZeigen(); }
+      else tourZeigen();
+    } else {
+      tourWeiter();
+    }
+    return;
   }
+  tourStartZeit = Date.now();
+  const balken = document.querySelector('.tour-balken .laeuft i');
+  if (balken) balken.style.animationPlayState = 'running';
+  const letzte = tourNr === tourSeiten.length - 1;
+  if (!letzte) tourTimer = setTimeout(tourWeiter, Math.max(tourRest, 500));
 }
 function tourWeiter() {
   if (tourNr < tourSeiten.length - 1) { tourNr++; tourZeigen(); }
