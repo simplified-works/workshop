@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<title>JudgeAI</title>
+<title>FairResolve</title>
 <style>
   * { box-sizing: border-box; }
   :root {
@@ -283,6 +283,28 @@
   }
   .vorschlag.gewaehlt { border-left-color: var(--gruen); background: #f0fdf4; border-color: #bbf7d0; }
   .vorschlag.gewaehlt .waehlen { background: var(--gruen); color: #fff; }
+  .hoeren {
+    display: block; width: 100%; margin-top: 10px;
+    font-family: inherit; font-size: 15px; font-weight: 700;
+    padding: 10px; border-radius: 10px;
+    border: 1.5px solid #bfdbfe;
+    background: #eff6ff; color: var(--blau); cursor: pointer;
+  }
+  .hoeren.liest { background: var(--blau); color: #fff; animation: pulsieren 1.4s infinite; }
+  /* ===== Fall-Archiv ===== */
+  .fall-eintrag {
+    border: 1px solid var(--linie); border-radius: 12px;
+    padding: 14px 16px; margin: 12px 0; background: var(--flaeche);
+  }
+  .fall-titel { font-weight: 700; font-size: 16.5px; }
+  .fall-meta { font-size: 13.5px; color: var(--grau); margin: 3px 0 10px; }
+  .fall-knoepfe { display: flex; gap: 8px; }
+  .fall-knoepfe button {
+    flex: 1; font-family: inherit; font-size: 14.5px; font-weight: 700;
+    padding: 9px; border-radius: 9px; cursor: pointer;
+  }
+  .fall-anschauen { border: 1.5px solid var(--blau); background: #fff; color: var(--blau); }
+  .fall-loeschen { border: 1.5px solid var(--linie); background: #fff; color: var(--grau); }
   /* ===== Protokoll ===== */
   .protokoll {
     background: #fff;
@@ -341,9 +363,9 @@
   /* ===== Drucken: nur das Protokoll ===== */
   @media print {
     body * { visibility: hidden; }
-    #druckbereich, #druckbereich * { visibility: visible; }
-    #druckbereich { position: absolute; left: 0; top: 0; width: 100%; }
-    #druckbereich .knopf, #druckbereich .u-loeschen, #druckbereich .fehler, #druckbereich .hinweis { display: none; }
+    .druckbereich, .druckbereich * { visibility: visible; }
+    .druckbereich { position: absolute; left: 0; top: 0; width: 100%; }
+    .druckbereich .knopf, .druckbereich .u-loeschen, .druckbereich .fehler, .druckbereich .hinweis, .druckbereich .hoeren { display: none; }
     .protokoll, .karte { box-shadow: none; border-color: #999; }
     .u-block canvas { border-color: #999; }
   }
@@ -373,7 +395,7 @@
       <circle cx="36" cy="96" r="5" stroke="#1fb6c9" stroke-width="4"/>
       <circle cx="64" cy="96" r="5" stroke="#2563eb" stroke-width="4"/>
     </svg>
-    <div class="logo-wort">Judge<span>AI</span></div>
+    <div class="logo-wort">Fair<span>Resolve</span></div>
   </div>
   <div class="plus-abzeichen">TESTVERSION · GRATIS</div>
 </div></header>
@@ -395,7 +417,7 @@
       <circle cx="64" cy="96" r="5" stroke="#2563eb" stroke-width="4"/>
     </svg>
   </div></div>
-  <h1>Willkommen bei JudgeAI</h1>
+  <h1>Willkommen bei FairResolve</h1>
   <p class="untertitel">Der digitale Richter für faire Lösungen —<br>neutral, präzise und für beide Seiten.</p>
   <div class="karte">
     <h2>Wie heisst du?</h2>
@@ -413,20 +435,34 @@
   <div class="karte">
     <h2>So funktioniert es</h2>
     <p class="beobachtung">Beide Seiten erzählen ihre Sicht — tippen oder sprechen.</p>
-    <p class="beobachtung">JudgeAI bewertet den Fall im Gerichtssaal.</p>
+    <p class="beobachtung">FairResolve bewertet den Fall im Gerichtssaal.</p>
     <p class="beobachtung">Ihr wählt gemeinsam eine der drei Lösungen.</p>
     <p class="beobachtung">Beide bestätigen das Protokoll mit Unterschrift — und können es drucken.</p>
     <p class="hinweis" style="margin-top:12px">Alles bleibt auf diesem Gerät. Nichts wird verschickt.</p>
   </div>
   <div class="karte plus-karte">
-    <h2>JudgeAI PLUS</h2>
+    <h2>FairResolve PLUS</h2>
     <p class="hinweis" style="margin-bottom:4px">Bald mit Plus-Konto:</p>
     <p class="beobachtung">Risiko-Analyse vor der Verhandlung</p>
     <p class="beobachtung">Unbegrenzte Fälle (gratis: 4 pro Person)</p>
     <p class="hinweis" style="margin-top:8px">In der Testversion ist noch alles gratis.</p>
   </div>
   <button class="knopf" onclick="neuerFall()">Verhandlung eröffnen</button>
+  <button class="knopf klein leise" id="knopf-archiv" onclick="zeigeArchiv()">Meine Fälle</button>
   <button class="knopf klein leise" onclick="abmelden()">Anderes Konto</button>
+</section>
+
+<!-- ===== Seite: Meine Fälle ===== -->
+<section class="seite" id="seite-archiv">
+  <h1>Meine Fälle</h1>
+  <p class="untertitel">Gespeichert auf diesem Gerät</p>
+  <div class="karte" id="archiv-liste"></div>
+  <div id="archiv-detail" class="druckbereich" style="display:none">
+    <div class="protokoll" id="archiv-protokoll"></div>
+    <button class="knopf leise" onclick="window.print()">Protokoll drucken</button>
+    <button class="knopf klein leise" onclick="zeigeArchiv()">Zurück zur Liste</button>
+  </div>
+  <button class="knopf" onclick="zeigeStart()">Zur Startseite</button>
 </section>
 
 <!-- ===== Seite 2 + 3: Aussagen ===== -->
@@ -441,7 +477,7 @@
     <p class="hinweis">Tipp auf einen Baustein, um den Satz zu beginnen:</p>
     <div class="bausteine" data-fuer="a"></div>
     <textarea id="text-a" placeholder="Also, es war so ..."></textarea>
-    <button class="mikro" id="mikro-a" onclick="sprechen('a')">Statt tippen: sprechen</button>
+    <button class="mikro" id="mikro-a" onclick="sprechen('a')">Fall einsprechen (Mikrofon)</button>
     <p class="fehler" id="fehler-a">Bitte erzähl zuerst, was passiert ist.</p>
   </div>
   <button class="knopf" onclick="weiterZuB()">Fertig — Gerät weitergeben</button>
@@ -458,7 +494,7 @@
     <p class="hinweis">Tipp auf einen Baustein, um den Satz zu beginnen:</p>
     <div class="bausteine" data-fuer="b"></div>
     <textarea id="text-b" placeholder="Also, aus meiner Sicht ..."></textarea>
-    <button class="mikro" id="mikro-b" onclick="sprechen('b')">Statt tippen: sprechen</button>
+    <button class="mikro" id="mikro-b" onclick="sprechen('b')">Fall einsprechen (Mikrofon)</button>
     <p class="fehler" id="fehler-b">Bitte erzähl zuerst, was passiert ist.</p>
   </div>
   <button class="knopf" onclick="urteilen()">Zum Urteil</button>
@@ -497,7 +533,7 @@
         <rect x="8" y="92" width="52" height="12" rx="6" fill="#6b4423"/>
       </svg>
     </span></div>
-    <div class="pult"><div class="pult-schild">JUDGE AI</div></div>
+    <div class="pult"><div class="pult-schild">FAIR RESOLVE</div></div>
     <div class="parteien-im-saal">
       <svg viewBox="0 0 60 90"><circle cx="30" cy="16" r="13" fill="#93a8c9"/><path d="M8 90 Q8 42 30 40 Q52 42 52 90 Z" fill="#93a8c9"/></svg>
       <svg viewBox="0 0 60 90"><circle cx="30" cy="16" r="13" fill="#c9b493"/><path d="M8 90 Q8 42 30 40 Q52 42 52 90 Z" fill="#c9b493"/></svg>
@@ -542,7 +578,7 @@
   <h1>Das Protokoll</h1>
   <p class="untertitel">Neutral, kurz und für beide gültig</p>
 
-  <div id="druckbereich">
+  <div id="druckbereich" class="druckbereich">
     <div class="protokoll" id="protokoll-inhalt"></div>
 
     <div class="karte">
@@ -570,31 +606,41 @@
   <button class="knopf" onclick="zurueckZumStart()">Neuer Fall</button>
 </section>
 
-<div class="version">v7 · 12:53</div>
+<div class="version">v8 · 13:34</div>
 
 <script>
 // ================= Konto (nur auf diesem Gerät) =================
+// Wer schon ein JudgeAI-Konto hatte, wird automatisch übernommen.
+[['judgeaiName', 'frName'], ['judgeaiFaelle', 'frFaelle']].forEach(([alt, neu]) => {
+  const wert = localStorage.getItem(alt);
+  if (wert !== null && localStorage.getItem(neu) === null) localStorage.setItem(neu, wert);
+  localStorage.removeItem(alt);
+});
+
 function anmelden() {
   const name = saubere(document.getElementById('anmelde-name').value);
   if (!name) {
     document.getElementById('fehler-anmeldung').style.display = 'block';
     return;
   }
-  localStorage.setItem('judgeaiName', name);
+  localStorage.setItem('frName', name);
   zeigeStart();
 }
 
 function abmelden() {
-  localStorage.removeItem('judgeaiName');
+  localStorage.removeItem('frName');
   zeige('seite-anmeldung');
 }
 
 function zeigeStart() {
-  const name = localStorage.getItem('judgeaiName');
-  const faelle = Number(localStorage.getItem('judgeaiFaelle') || 0);
+  const name = localStorage.getItem('frName');
+  const faelle = Number(localStorage.getItem('frFaelle') || 0);
   document.getElementById('start-gruss').textContent = 'Hallo ' + name + '!';
   document.getElementById('start-faelle').textContent =
     'Fall ' + Math.min(faelle + 1, 4) + ' von 4 Gratis-Fällen · Testversion: alles gratis';
+  const anzahl = ladeArchiv().length;
+  document.getElementById('knopf-archiv').textContent =
+    anzahl ? 'Meine Fälle (' + anzahl + ')' : 'Meine Fälle';
   zeige('seite-start');
 }
 
@@ -605,15 +651,49 @@ function neuerFall() {
 }
 
 function zurueckZumStart() {
-  localStorage.setItem('judgeaiFaelle', Number(localStorage.getItem('judgeaiFaelle') || 0) + 1);
+  localStorage.setItem('frFaelle', Number(localStorage.getItem('frFaelle') || 0) + 1);
   zeigeStart();
 }
 
 // ================= Seiten & Eingabe =================
 function zeige(id) {
+  if (window.speechSynthesis) speechSynthesis.cancel();
   document.querySelectorAll('.seite').forEach(s => s.classList.remove('aktiv'));
   document.getElementById(id).classList.add('aktiv');
   window.scrollTo(0, 0);
+}
+
+// ---------- Vorlesen (Sprachausgabe) ----------
+function vorlesen(text, knopf) {
+  if (!window.speechSynthesis) {
+    knopf.textContent = 'Vorlesen geht in diesem Browser leider nicht';
+    knopf.disabled = true;
+    return;
+  }
+  if (knopf.classList.contains('liest')) {   // läuft schon → stoppen
+    speechSynthesis.cancel();
+    return;
+  }
+  speechSynthesis.cancel();
+  document.querySelectorAll('.hoeren.liest').forEach(k => {
+    k.classList.remove('liest');
+    k.textContent = 'Vorlesen';
+  });
+  const stimme = new SpeechSynthesisUtterance(text);
+  stimme.lang = 'de-DE';
+  stimme.rate = 0.95;
+  knopf.classList.add('liest');
+  knopf.textContent = 'Stopp';
+  stimme.onend = stimme.onerror = () => {
+    knopf.classList.remove('liest');
+    knopf.textContent = 'Vorlesen';
+  };
+  speechSynthesis.speak(stimme);
+}
+
+function liesLoesung(i, knopf) {
+  const l = fall.loesungen[i];
+  vorlesen('Lösung ' + (i + 1) + ': ' + l[0] + '. ' + l[1], knopf);
 }
 
 function saubere(text) { return text.replace(/[<>&]/g, '').trim(); }
@@ -672,7 +752,7 @@ function sprechen(wer) {
     feld.value = (feld.value + ' ' + neu).trim();
   };
   erkennung.onend = () => {
-    knopf.textContent = 'Statt tippen: sprechen';
+    knopf.textContent = 'Fall einsprechen (Mikrofon)';
     knopf.classList.remove('anhoerung');
     erkennung = null;
   };
@@ -951,6 +1031,7 @@ function urteilen() {
   fall.loesungen = baueLoesungen(fall);
   document.getElementById('vorschlaege').innerHTML = fall.loesungen.map((l, i) =>
     '<div class="vorschlag" id="vorschlag-' + i + '"><b>' + (i + 1) + '. ' + l[0] + ':</b> ' + l[1] +
+    '<button class="hoeren" onclick="liesLoesung(' + i + ', this)">Vorlesen</button>' +
     '<button class="waehlen" onclick="waehleLoesung(' + i + ')">Diese Lösung wählen</button></div>'
   ).join('');
 
@@ -991,26 +1072,35 @@ function hammerKlopfen() {
 }
 
 // ================= Protokoll =================
+// Baut den Protokoll-Text — für den frischen Fall und fürs Archiv.
+function protokollHTML(p) {
+  return '<h3>STREIT-PROTOKOLL</h3>' +
+    '<p class="aktenzeichen">Fall ' + p.nr + ' · ' + p.datum + '</p>' +
+    '<h4>Wer war beteiligt?</h4>' +
+    '<p>' + p.nameA + ' und ' + p.nameB + '</p>' +
+    '<h4>Worum ging es?</h4>' +
+    '<p>' + p.thema + (p.objekt ? ' (' + p.objekt + ')' : '') + '. Beide Seiten haben ihre Sicht geschildert. ' +
+    'FairResolve schätzt die Chance auf eine Einigung auf ' + p.baro + '%.</p>' +
+    '<h4>Sicht von ' + p.nameA + '</h4>' +
+    '<p class="zitat">«' + saubere(p.textA) + '»</p>' +
+    '<h4>Sicht von ' + p.nameB + '</h4>' +
+    '<p class="zitat">«' + saubere(p.textB) + '»</p>' +
+    '<h4>Gewählte Lösung</h4>' +
+    '<p><b>' + p.loesung[0] + '.</b> ' + p.loesung[1] + '</p>';
+}
+
 function zeigeProtokoll() {
   const f = fall;
-  const l = f.loesungen[gewaehlteLoesung];
-  const datum = new Date().toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' });
-  const nr = 'JA-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random() * 900) + 100);
+  f.datum = new Date().toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' });
+  f.nr = 'FR-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random() * 900) + 100);
+  f.gespeichert = false;
 
-  document.getElementById('protokoll-inhalt').innerHTML =
-    '<h3>STREIT-PROTOKOLL</h3>' +
-    '<p class="aktenzeichen">Fall ' + nr + ' · ' + datum + '</p>' +
-    '<h4>Wer war beteiligt?</h4>' +
-    '<p>' + f.nameA + ' und ' + f.nameB + '</p>' +
-    '<h4>Worum ging es?</h4>' +
-    '<p>' + f.themaTitel + (f.objekt ? ' (' + f.objekt + ')' : '') + '. Beide Seiten haben ihre Sicht geschildert. ' +
-    'JudgeAI schätzt die Chance auf eine Einigung auf ' + f.baro + '%.</p>' +
-    '<h4>Sicht von ' + f.nameA + '</h4>' +
-    '<p class="zitat">«' + saubere(f.textA) + '»</p>' +
-    '<h4>Sicht von ' + f.nameB + '</h4>' +
-    '<p class="zitat">«' + saubere(f.textB) + '»</p>' +
-    '<h4>Gewählte Lösung</h4>' +
-    '<p><b>' + l[0] + '.</b> ' + l[1] + '</p>';
+  document.getElementById('protokoll-inhalt').innerHTML = protokollHTML({
+    nr: f.nr, datum: f.datum, nameA: f.nameA, nameB: f.nameB,
+    thema: f.themaTitel, objekt: f.objekt, baro: f.baro,
+    textA: f.textA, textB: f.textB,
+    loesung: f.loesungen[gewaehlteLoesung]
+  });
 
   document.getElementById('u-name-a').textContent = f.nameA;
   document.getElementById('u-name-b').textContent = f.nameB;
@@ -1077,11 +1167,66 @@ function bestaetigen() {
   }
   document.getElementById('fehler-unterschrift').style.display = 'none';
   document.getElementById('stempel').style.display = 'block';
+  fallSpeichern();
   hammerKlopfen();
 }
 
+// ================= Meine Fälle (Archiv auf diesem Gerät) =================
+function ladeArchiv() {
+  try { return JSON.parse(localStorage.getItem('frArchiv') || '[]'); }
+  catch (e) { return []; }
+}
+
+function fallSpeichern() {
+  if (fall.gespeichert) return;   // nicht doppelt speichern
+  const archiv = ladeArchiv();
+  archiv.unshift({
+    nr: fall.nr, datum: fall.datum, nameA: fall.nameA, nameB: fall.nameB,
+    thema: fall.themaTitel, objekt: fall.objekt, baro: fall.baro,
+    textA: fall.textA, textB: fall.textB,
+    loesung: fall.loesungen[gewaehlteLoesung]
+  });
+  localStorage.setItem('frArchiv', JSON.stringify(archiv.slice(0, 50)));
+  fall.gespeichert = true;
+}
+
+function zeigeArchiv() {
+  const liste = ladeArchiv();
+  document.getElementById('archiv-detail').style.display = 'none';
+  const box = document.getElementById('archiv-liste');
+  box.style.display = 'block';
+  box.innerHTML = '<h2>Gelöste Fälle</h2>' + (liste.length
+    ? liste.map((f, i) =>
+        '<div class="fall-eintrag">' +
+        '<div class="fall-titel">' + f.nameA + ' und ' + f.nameB + ' — ' + f.thema + '</div>' +
+        '<div class="fall-meta">Fall ' + f.nr + ' · ' + f.datum + ' · Lösung: ' + f.loesung[0] + '</div>' +
+        '<div class="fall-knoepfe">' +
+        '<button class="fall-anschauen" onclick="archivDetail(' + i + ')">Protokoll anschauen</button>' +
+        '<button class="fall-loeschen" onclick="archivLoeschen(' + i + ')">Löschen</button>' +
+        '</div></div>').join('')
+    : '<p class="hinweis">Noch keine gespeicherten Fälle. Sobald beide ein Protokoll bestätigt haben, landet der Fall automatisch hier.</p>');
+  zeige('seite-archiv');
+}
+
+function archivDetail(i) {
+  const f = ladeArchiv()[i];
+  if (!f) return;
+  document.getElementById('archiv-liste').style.display = 'none';
+  document.getElementById('archiv-detail').style.display = 'block';
+  document.getElementById('archiv-protokoll').innerHTML = protokollHTML(f) +
+    '<p style="text-align:center; font-weight:700; color:var(--gruen); margin-top:14px">Von beiden Parteien bestätigt</p>';
+  window.scrollTo(0, 0);
+}
+
+function archivLoeschen(i) {
+  const archiv = ladeArchiv();
+  archiv.splice(i, 1);
+  localStorage.setItem('frArchiv', JSON.stringify(archiv));
+  zeigeArchiv();
+}
+
 // ================= Start =================
-if (localStorage.getItem('judgeaiName')) zeigeStart();
+if (localStorage.getItem('frName')) zeigeStart();
 </script>
 </body>
 </html>
