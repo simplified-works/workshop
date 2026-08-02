@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Famigram</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>💜</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23a78bfa'/><stop offset='1' stop-color='%236d28d9'/></linearGradient></defs><rect width='120' height='120' rx='28' fill='url(%23g)'/><path d='M60 26 L94 53 V94 H26 V53 Z' fill='none' stroke='white' stroke-width='7' stroke-linejoin='round' stroke-linecap='round'/><circle cx='60' cy='71' r='13' fill='none' stroke='white' stroke-width='7'/><circle cx='80' cy='58' r='4.5' fill='%23fbbf24'/></svg>">
 <style>
   :root {
     --hg: #f2f2f7;        /* Hintergrund */
@@ -254,7 +254,7 @@
     gap: 10px; transition: opacity 0.5s;
   }
   #splash.weg { opacity: 0; pointer-events: none; }
-  .splash-logo { font-size: 90px; animation: splash-rein 0.9s ease-out; }
+  .splash-logo { animation: splash-rein 0.9s ease-out; }
   .splash-name {
     font-size: 42px; font-weight: 800; letter-spacing: -1px; color: white;
     animation: splash-rein 0.9s ease-out;
@@ -293,7 +293,18 @@
 <body>
 
 <div id="splash">
-  <div class="splash-logo">💜</div>
+  <svg class="splash-logo" viewBox="0 0 120 120" width="118" height="118" aria-label="Famigram Logo">
+    <defs>
+      <linearGradient id="linse" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#fbbf24"/>
+        <stop offset="1" stop-color="#f472b6"/>
+      </linearGradient>
+    </defs>
+    <rect width="120" height="120" rx="30" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.35)" stroke-width="2"/>
+    <path d="M60 26 L94 53 V94 H26 V53 Z" fill="none" stroke="white" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="60" cy="71" r="13" fill="none" stroke="url(#linse)" stroke-width="7"/>
+    <circle cx="80" cy="58" r="4.5" fill="#fbbf24"/>
+  </svg>
   <div class="splash-name">Fami<span>gram</span></div>
 </div>
 
@@ -308,7 +319,7 @@
 <main id="inhalt"></main>
 
 <nav id="leiste"></nav>
-<div class="version">v4 · 12:57</div>
+<div class="version">v5 · 13:22</div>
 
 <dialog id="info">
   <h3>💜 So funktioniert Famigram</h3>
