@@ -1,7 +1,7 @@
 // Offline-Speicher für IdeenBlitz.
 // Merkt sich die App auf dem Gerät, damit sie auch ohne Internet startet.
 // Bei jeder neuen Version hier die Nummer erhöhen!
-const CACHE = "ideenblitz-v6";
+const CACHE = "ideenblitz-v7";
 
 self.addEventListener("install", (e) => {
   e.waitUntil(
@@ -21,7 +21,9 @@ self.addEventListener("activate", (e) => {
 
 // Erst aus dem Speicher antworten (schnell, geht offline),
 // gleichzeitig im Internet nach einer neueren Version schauen.
+// Das Wetter (fremde Adresse) wird nie gespeichert – es muss frisch sein!
 self.addEventListener("fetch", (e) => {
+  if (!e.request.url.startsWith(self.location.origin)) return;
   e.respondWith(
     caches.match(e.request).then((gespeichert) => {
       const ausDemNetz = fetch(e.request)
