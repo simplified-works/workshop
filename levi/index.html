@@ -421,7 +421,7 @@
     </svg>
   </div></div>
   <h1>Willkommen bei FairResolve</h1>
-  <p class="untertitel">Der digitale Richter für faire Lösungen —<br>neutral, präzise und für beide Seiten.</p>
+  <p class="untertitel">Der digitale Richter für faire Lösungen —<br>neutral und präzise für beide Seiten.</p>
   <div class="karte">
     <h2>Wie heisst du?</h2>
     <p class="hinweis">Dein Name bleibt auf diesem Gerät gespeichert.</p>
@@ -438,7 +438,7 @@
   <div class="karte">
     <h2>So funktioniert es</h2>
     <p class="beobachtung">Beide Seiten erzählen ihre Sicht — tippen oder sprechen.</p>
-    <p class="beobachtung">FairResolve bewertet den Fall im Gerichtssaal.</p>
+    <p class="beobachtung">FairResolve bewertet den Fall.</p>
     <p class="beobachtung">Ihr wählt gemeinsam eine der drei Lösungen.</p>
     <p class="beobachtung">Beide bestätigen das Protokoll mit Unterschrift — und können es drucken.</p>
     <p class="hinweis" style="margin-top:12px">Alles bleibt auf diesem Gerät. Nichts wird verschickt.</p>
@@ -446,11 +446,11 @@
   <div class="karte plus-karte">
     <h2>FairResolve PLUS</h2>
     <p class="hinweis" style="margin-bottom:4px">Bald mit Plus-Konto:</p>
-    <p class="beobachtung">Risiko-Analyse vor der Verhandlung</p>
+    <p class="beobachtung">Risiko-Analyse beim Start eines Falls</p>
     <p class="beobachtung">Unbegrenzte Fälle (gratis: 4 pro Person)</p>
     <p class="hinweis" style="margin-top:8px">In der Testversion ist noch alles gratis.</p>
   </div>
-  <button class="knopf" onclick="neuerFall()">Verhandlung eröffnen</button>
+  <button class="knopf" onclick="neuerFall()">Fall eröffnen</button>
   <button class="knopf klein leise" id="knopf-archiv" onclick="zeigeArchiv()">Meine Fälle</button>
   <button class="knopf klein leise" onclick="abmelden()">Anderes Konto</button>
 </section>
@@ -500,14 +500,14 @@
     <button class="mikro" id="mikro-b" onclick="sprechen('b')">Fall einsprechen (Mikrofon)</button>
     <p class="fehler" id="fehler-b">Bitte erzähl zuerst, was passiert ist.</p>
   </div>
-  <button class="knopf" onclick="urteilen()">Zum Urteil</button>
+  <button class="knopf" onclick="urteilen()">Zur Bewertung</button>
 </section>
 
 <!-- ===== Seite 4: Urteil ===== -->
 <section class="seite" id="seite-urteil">
   <p class="schritt">Schritt 3 von 4</p>
-  <h1>Das Urteil</h1>
-  <p class="untertitel">Im Namen der Fairness</p>
+  <h1>Die Bewertung</h1>
+  <p class="untertitel">Fair für beide Seiten</p>
 
   <div class="saal">
     <div class="vorhang-l"></div><div class="vorhang-r"></div>
@@ -585,7 +585,7 @@
     <div class="protokoll" id="protokoll-inhalt"></div>
 
     <div class="karte">
-      <h2>Bestätigung beider Parteien</h2>
+      <h2>Bestätigung von beiden</h2>
       <p class="hinweis">Unterschreibt mit dem Finger und tippt dann auf Bestätigen.</p>
       <div class="unterschriften">
         <div class="u-block">
@@ -609,7 +609,7 @@
   <button class="knopf" onclick="zurueckZumStart()">Neuer Fall</button>
 </section>
 
-<div class="version">v9 · 13:52</div>
+<div class="version">v10 · 13:37</div>
 
 <script>
 // ================= Konto (nur auf diesem Gerät) =================
@@ -1217,7 +1217,7 @@ function archivDetail(i) {
   document.getElementById('archiv-liste').style.display = 'none';
   document.getElementById('archiv-detail').style.display = 'block';
   document.getElementById('archiv-protokoll').innerHTML = protokollHTML(f) +
-    '<p style="text-align:center; font-weight:700; color:var(--gruen); margin-top:14px">Von beiden Parteien bestätigt</p>';
+    '<p style="text-align:center; font-weight:700; color:var(--gruen); margin-top:14px">Von beiden bestätigt</p>';
   window.scrollTo(0, 0);
 }
 
