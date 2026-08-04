@@ -591,6 +591,57 @@
 
   .eingabe-zeile button[type="submit"]:active { transform: scale(0.92); }
 
+  /* Vorschläge zum Antippen */
+  .vorschlaege {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .vorschlaege:empty { margin: 0; }
+
+  .vorschlag {
+    border: 1.5px dashed var(--linie);
+    background: none;
+    color: var(--text-leise);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 7px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+  }
+
+  .vorschlag:active { transform: scale(0.92); }
+
+  /* Wetter-Sektion */
+  .wetter-status {
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--text);
+    margin-top: 12px;
+    line-height: 1.4;
+  }
+
+  .wetter-knopf {
+    margin-top: 12px;
+    width: 100%;
+    border: none;
+    border-radius: 13px;
+    padding: 12px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--auf-gelb);
+    background: linear-gradient(135deg, var(--akzent1), var(--akzent2));
+    cursor: pointer;
+    transition: transform 0.1s ease;
+  }
+
+  .wetter-knopf:active { transform: scale(0.97); }
+
   /* ── Tab-Leiste unten ─────────────────────── */
   nav {
     display: flex;
@@ -707,6 +758,15 @@
 
         <div class="sektion">
           <div class="sektion-kopf">
+            <div class="icon">🌦️</div>
+            <div><b>Das Wetter bei dir</b><span>Bei Regen schlägt dir die App nichts für draussen vor</span></div>
+          </div>
+          <div class="wetter-status" id="wetterStatus">Noch kein Ort gespeichert.</div>
+          <button class="wetter-knopf" onclick="standortHolen()">📍 Meinen Ort benutzen</button>
+        </div>
+
+        <div class="sektion">
+          <div class="sektion-kopf">
             <div class="icon">🧸</div>
             <div><b>Meine Spielsachen</b><span>z.B. Lego, Fussball, Kapla</span></div>
           </div>
@@ -810,7 +870,7 @@
     </button>
   </nav>
 
-  <div class="version">v6</div>
+  <div class="version">v7</div>
 
 <script>
   // ─────────────────────────────────────────────
@@ -824,12 +884,12 @@
     { emoji: "🕵️", text: "Spiel Detektiv: Versteck etwas und zeichne eine Schatzkarte dazu!" },
     { emoji: "🍪", text: "Frag, ob ihr zusammen Guetzli backen könnt!" },
     { emoji: "🎭", text: "Erfinde ein Theaterstück und führ es der Familie vor!" },
-    { emoji: "🚲", text: "Mach eine Velotour um den Block!" },
+    { emoji: "🚲", text: "Mach eine Velotour um den Block!", draussen: true },
     { emoji: "🎵", text: "Erfinde einen eigenen Song und nimm ihn auf!" },
     { emoji: "🏗️", text: "Bau den höchsten Turm, den du schaffst!" },
     { emoji: "🔬", text: "Mach ein Experiment: Was schwimmt, was sinkt? Teste es mit Sachen aus der Küche!" },
     { emoji: "🎪", text: "Übe einen Zaubertrick und zeig ihn jemandem!" },
-    { emoji: "🐜", text: "Geh raus und beobachte Insekten – wie viele verschiedene findest du?" },
+    { emoji: "🐜", text: "Geh raus und beobachte Insekten – wie viele verschiedene findest du?", draussen: true },
     { emoji: "✉️", text: "Schreib einen Brief an deine Grosseltern!" },
     { emoji: "🏃", text: "Bau einen Hindernis-Parcours und stopp deine Zeit!" },
     { emoji: "📸", text: "Mach eine Foto-Safari: Fotografiere 10 rote Dinge!" },
@@ -841,7 +901,7 @@
     { emoji: "🎯", text: "Bau eine Wurfbude mit Bechern und einem Ball!" },
     { emoji: "🗺️", text: "Zeichne eine Karte von deinem Zimmer oder deiner Wohnung!" },
     { emoji: "💃", text: "Mach eine Tanzparty – dreh die Musik auf!" },
-    { emoji: "🔭", text: "Schau am Abend die Sterne an – findest du den grossen Wagen?" },
+    { emoji: "🔭", text: "Schau am Abend die Sterne an – findest du den grossen Wagen?", draussen: true },
     { emoji: "🏴‍☠️", text: "Spiel Pirat: Dein Bett ist das Schiff, der Boden ist das Meer!" },
     { emoji: "🧊", text: "Frier kleine Spielsachen in Eiswürfel ein und befreie sie!" },
     { emoji: "📞", text: "Ruf jemanden an, den du gern hast!" },
@@ -854,7 +914,7 @@
     { emoji: "🐾", text: "Denk dir ein Fantasie-Tier aus und zeichne es!" },
     { emoji: "🏠", text: "Bau ein Haus für deine Kuscheltiere!" },
     { emoji: "⏰", text: "Räum dein Zimmer auf – aber auf Zeit, wie ein Wettkampf!" },
-    { emoji: "🌈", text: "Sammle draussen Sachen in allen Regenbogenfarben!" },
+    { emoji: "🌈", text: "Sammle draussen Sachen in allen Regenbogenfarben!", draussen: true },
     { emoji: "🥷", text: "Schleich-Training: Beweg dich durchs Haus, ohne dass dich jemand hört!" },
     { emoji: "🧠", text: "Lern 5 neue Wörter in einer anderen Sprache!" }
   ];
@@ -889,10 +949,10 @@
       { emoji: "🏗️", text: "Bau etwas, das mit {x} zu tun hat!" }
     ],
     orte: [
-      { emoji: "🧭", text: "Mach eine Expedition zu deinem Ort «{x}» – was entdeckst du dort Neues?" },
-      { emoji: "📸", text: "Foto-Safari bei «{x}»: Fotografiere 5 spannende Dinge!" },
-      { emoji: "🏴‍☠️", text: "Versteck einen kleinen Schatz bei «{x}» und zeichne eine Schatzkarte!" },
-      { emoji: "🧺", text: "Pack ein Znüni ein und mach ein Picknick bei «{x}»!" }
+      { emoji: "🧭", text: "Mach eine Expedition zu deinem Ort «{x}» – was entdeckst du dort Neues?", draussen: true },
+      { emoji: "📸", text: "Foto-Safari bei «{x}»: Fotografiere 5 spannende Dinge!", draussen: true },
+      { emoji: "🏴‍☠️", text: "Versteck einen kleinen Schatz bei «{x}» und zeichne eine Schatzkarte!", draussen: true },
+      { emoji: "🧺", text: "Pack ein Znüni ein und mach ein Picknick bei «{x}»!", draussen: true }
     ],
     anderes: [
       { emoji: "📦", text: "Mach heute etwas mit {x} – dir fällt sicher etwas Cooles ein!" },
@@ -930,6 +990,17 @@
     { emoji: "🚗", text: "Was sagt ein Auto mit Schnupfen? – «Hatschi-way!»" }
   ];
 
+  // Vorschläge zum Antippen bei «Meine Welt» – als Starthilfe
+  const VORSCHLAEGE = {
+    spielsachen: ["Lego", "Playmobil", "Puzzle", "Fussball", "Kapla", "Karten", "Kuscheltiere"],
+    freunde: ["Mami", "Papi", "Bruder", "Schwester", "Grosi", "Opa"],
+    hobbys: ["Fussball", "Zeichnen", "Schwimmen", "Tanzen", "Velofahren", "Basteln"],
+    interessen: ["Dinos", "Weltall", "Tiere", "Ritter", "Autos", "Zauberei"],
+    orte: ["Garten", "Spielplatz", "Wald", "Park", "Mein Zimmer", "See"],
+    anderes: ["Trampolin", "Hund", "Katze", "Verkleidungskiste"],
+    magNicht: ["lesen", "aufräumen", "malen"]
+  };
+
   // Diese Wörter ignoriert die App, wenn sie aus Kommentaren lernt
   const STOPPWOERTER = new Set([
     "ich","du","er","sie","es","wir","ihr","mich","mir","dich","dir","das","der","die","den","dem",
@@ -952,6 +1023,8 @@
   let kommentare = JSON.parse(localStorage.getItem("kommentare") || "[]");
   let witzStapel = JSON.parse(localStorage.getItem("witzStapel") || "[]");
   let klickZahl = parseInt(localStorage.getItem("klickZahl") || "0");
+  let standort = JSON.parse(localStorage.getItem("standort") || "null");
+  let wetter = JSON.parse(localStorage.getItem("wetter") || "null");
 
   let aktuelleIdee = null;
   let aktuellerText = "";
@@ -1004,6 +1077,70 @@
     return meineWelt.magNicht.some(w => w && t.includes(w.toLowerCase()));
   }
 
+  // ─────────────────────────────────────────────
+  // Wetter: bei Regen oder Schnee keine Draussen-Ideen
+  // ─────────────────────────────────────────────
+  function istSchlechtwetter() {
+    if (!wetter) return false;
+    const c = wetter.code;
+    return (c >= 51 && c <= 67) || (c >= 71 && c <= 86) || c >= 95;
+  }
+
+  function wetterEmoji(code) {
+    if (code <= 1) return "☀️";
+    if (code <= 3) return "⛅";
+    if (code <= 48) return "🌫️";
+    if (code >= 95) return "⛈️";
+    if ((code >= 71 && code <= 77) || code === 85 || code === 86) return "❄️";
+    return "🌧️";
+  }
+
+  function zeigeWetter() {
+    const status = document.getElementById("wetterStatus");
+    if (!standort) {
+      status.textContent = "Noch kein Ort gespeichert.";
+    } else if (!wetter) {
+      status.textContent = "Ich hole gerade das Wetter…";
+    } else {
+      let text = wetterEmoji(wetter.code) + " " + wetter.temp + " Grad bei dir. ";
+      text += istSchlechtwetter()
+        ? "Schlechtes Wetter – Draussen-Ideen lasse ich gerade weg!"
+        : "Gutes Wetter – auch Draussen-Ideen sind dabei!";
+      status.textContent = text;
+    }
+  }
+
+  function standortHolen() {
+    if (!navigator.geolocation) {
+      document.getElementById("wetterStatus").textContent = "Dein Gerät kennt seinen Ort leider nicht.";
+      return;
+    }
+    document.getElementById("wetterStatus").textContent = "Ich suche deinen Ort…";
+    navigator.geolocation.getCurrentPosition(
+      (p) => {
+        standort = { lat: p.coords.latitude, lon: p.coords.longitude };
+        localStorage.setItem("standort", JSON.stringify(standort));
+        wetterHolen();
+      },
+      () => {
+        document.getElementById("wetterStatus").textContent = "Das hat nicht geklappt. Erlaube der App deinen Ort in den Einstellungen.";
+      }
+    );
+  }
+
+  async function wetterHolen() {
+    if (!standort) return;
+    zeigeWetter();
+    try {
+      const antwort = await fetch("https://api.open-meteo.com/v1/forecast?latitude=" + standort.lat +
+        "&longitude=" + standort.lon + "&current=temperature_2m,weather_code");
+      const daten = await antwort.json();
+      wetter = { code: daten.current.weather_code, temp: Math.round(daten.current.temperature_2m), zeit: Date.now() };
+      localStorage.setItem("wetter", JSON.stringify(wetter));
+    } catch (e) { /* kein Internet? Dann einfach ohne Wetter weiter */ }
+    zeigeWetter();
+  }
+
   // Baut eine persönliche Idee aus «Meine Welt»
   function persoenlicheIdee(wunschArt, wunschDing) {
     let art = wunschArt;
@@ -1013,7 +1150,7 @@
       if (arten.length === 0) return null;
       art = zufallAus(arten);
     }
-    const brauchbar = VORLAGEN[art].filter(v => gewichtVon(v.text) > 0);
+    const brauchbar = VORLAGEN[art].filter(v => gewichtVon(v.text) > 0 && !(istSchlechtwetter() && v.draussen));
     if (brauchbar.length === 0) return null;
     const vorlage = zufallAus(brauchbar);
     const idee = {
@@ -1037,8 +1174,8 @@
       const p = persoenlicheIdee();
       if (p && !letzteIdeen.includes(p.text)) return p;
     }
-    let auswahl = IDEEN.filter(i => !letzteIdeen.includes(i.text) && gewichtVon(i.text) > 0 && !istBlockiert(i.text));
-    if (auswahl.length === 0) auswahl = IDEEN.filter(i => gewichtVon(i.text) > 0 && !istBlockiert(i.text));
+    let auswahl = IDEEN.filter(i => !letzteIdeen.includes(i.text) && gewichtVon(i.text) > 0 && !istBlockiert(i.text) && !(istSchlechtwetter() && i.draussen));
+    if (auswahl.length === 0) auswahl = IDEEN.filter(i => gewichtVon(i.text) > 0 && !istBlockiert(i.text) && !(istSchlechtwetter() && i.draussen));
     if (auswahl.length === 0) auswahl = IDEEN;   // falls du wirklich alles weggewischt hast
     let summe = 0;
     for (const i of auswahl) summe += Math.max(gewichtVon(i.text), 0.01);
@@ -1104,15 +1241,43 @@
     document.getElementById("zurueckKnopf").disabled = verlauf.length < 2;
   }
 
+  // Alle Ideen, die du schon geliked hast (nach rechts gewischt)
+  function gelikteIdeen() {
+    const liste = IDEEN.filter(i => (punkte[i.text] || 0) > 0);
+    for (const art of Object.keys(VORLAGEN)) {
+      if (meineWelt[art].length === 0) continue;
+      for (const v of VORLAGEN[art]) {
+        if ((punkte[v.text] || 0) > 0) {
+          liste.push({ emoji: v.emoji, text: v.text.replace("{x}", zufallAus(meineWelt[art])) });
+        }
+      }
+    }
+    return liste;
+  }
+
   function neueIdee(wunsch) {
     klickZahl++;
 
     let eintrag;
-    // Jedes 4. Mal gibt es einen Witz statt einer Idee
-    // (ausser du hast gerade einen Wunsch geäussert)
+    // Jedes 4. Mal gibt es eine Pause statt einer Idee
+    // (ausser du hast gerade einen Wunsch geäussert):
+    // Hast du schon 2 Ideen geliked, erinnert dich die App daran –
+    // sonst gibt es einen Witz.
     if (klickZahl % 4 === 0 && !wunsch) {
-      const witz = naechsterWitz();
-      eintrag = { abzeichen: "😂 Witz-Pause", emoji: witz.emoji, text: witz.text, idee: null, persoenlich: false };
+      const geliked = gelikteIdeen();
+      if (geliked.length >= 2) {
+        const lieblings = zufallAus(geliked);
+        eintrag = {
+          abzeichen: "💛 Deine Lieblings-Ideen",
+          emoji: lieblings.emoji,
+          text: "Du hast schon " + geliked.length + " Ideen geliked! Spiel doch etwas davon – zum Beispiel: " + lieblings.text,
+          idee: null,
+          persoenlich: true
+        };
+      } else {
+        const witz = naechsterWitz();
+        eintrag = { abzeichen: "😂 Witz-Pause", emoji: witz.emoji, text: witz.text, idee: null, persoenlich: false };
+      }
     } else {
       const idee = zufaelligeIdee(wunsch);
       letzteIdeen.push(idee.text);
@@ -1358,6 +1523,32 @@
       chip.appendChild(weg);
       behaelter.appendChild(chip);
     });
+    zeigeVorschlaege(art);
+  }
+
+  // Vorschläge zum Antippen unter jedem Eingabefeld
+  function zeigeVorschlaege(art) {
+    const form = document.getElementById("eingabe-" + art).parentElement;
+    let box = document.getElementById("vorschlaege-" + art);
+    if (!box) {
+      box = document.createElement("div");
+      box.id = "vorschlaege-" + art;
+      box.className = "vorschlaege";
+      form.parentElement.insertBefore(box, form);
+    }
+    box.innerHTML = "";
+    (VORSCHLAEGE[art] || []).filter(v => !meineWelt[art].includes(v)).forEach(v => {
+      const knopf = document.createElement("button");
+      knopf.type = "button";
+      knopf.className = "vorschlag";
+      knopf.textContent = "+ " + v;
+      knopf.onclick = () => {
+        meineWelt[art].push(v);
+        speichern();
+        zeigeChips(art);
+      };
+      box.appendChild(knopf);
+    });
   }
 
   // ─────────────────────────────────────────────
@@ -1376,6 +1567,13 @@
   ARTEN.forEach(zeigeChips);
   if (klickZahl > 0) {
     document.getElementById("zaehler").textContent = "Schon " + klickZahl + " Ideenblitze geholt";
+  }
+
+  // Wetter anzeigen und alle 30 Minuten frisch holen
+  if (standort && (!wetter || Date.now() - wetter.zeit > 30 * 60 * 1000)) {
+    wetterHolen();
+  } else {
+    zeigeWetter();
   }
 
   // Blitz-Einschlag wegräumen, wenn er fertig ist
