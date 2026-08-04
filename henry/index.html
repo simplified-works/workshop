@@ -870,7 +870,7 @@
     </button>
   </nav>
 
-  <div class="version">v7</div>
+  <div class="version">v8</div>
 
 <script>
   // ─────────────────────────────────────────────
@@ -962,34 +962,6 @@
     ]
   };
 
-  // ─────────────────────────────────────────────
-  // Die Witze für die Witz-Pause
-  // ─────────────────────────────────────────────
-  const WITZE = [
-    { emoji: "🐄", text: "Was macht eine Kuh, wenn ihr langweilig ist? – Muuuhsik hören!" },
-    { emoji: "🚜", text: "Was ist gelb und kann nicht schwimmen? – Ein Bagger. Und warum? – Weil er nur einen Arm hat!" },
-    { emoji: "🐧", text: "Was sagt ein Pinguin in der Wüste? – «Ich glaub, ich bin falsch abgebogen!»" },
-    { emoji: "🍞", text: "Treffen sich zwei Brote. Sagt das eine: «Du siehst heute aber alt aus!» – «Ja, ich bin von gestern.»" },
-    { emoji: "👻", text: "Warum können Geister so schlecht lügen? – Weil man durch sie hindurchsieht!" },
-    { emoji: "🐘", text: "Warum haben Elefanten rote Augen? – Damit sie sich besser im Kirschbaum verstecken können!" },
-    { emoji: "🧛", text: "Was trinkt ein Vampir am liebsten? – Tomatensaft mit ganz viel O!" },
-    { emoji: "🐌", text: "Sagt eine Schnecke zur anderen: «Wow, du bist aber schnell heute!» – «Ja, ich hab Turnschuhe an!»" },
-    { emoji: "🦒", text: "Warum hat die Giraffe so einen langen Hals? – Weil ihr Kopf so weit oben ist!" },
-    { emoji: "🍕", text: "Was sagt eine Pizza, die zu spät kommt? – «Sorry, ich war noch im Ofen!»" },
-    { emoji: "🐟", text: "Was macht ein Fisch am Computer? – Er surft im Netz!" },
-    { emoji: "🤖", text: "Warum ging der Roboter zum Arzt? – Er hatte einen Virus!" },
-    { emoji: "🐝", text: "Was sagt eine Biene zur Blume? – «Hallo Süsse!»" },
-    { emoji: "⚽", text: "Warum können Skelette so schlecht Fussball spielen? – Weil ihnen der Mumm fehlt!" },
-    { emoji: "🦈", text: "Warum ging der Hai nicht zur Schule? – Er war schon Klassen-Bester im Schwimmen!" },
-    { emoji: "🌙", text: "Was sagt der grosse Stift zum kleinen Stift? – «Wachs-mal-Stift!»" },
-    { emoji: "🐔", text: "Warum ging das Huhn über die Strasse? – Um auf die andere Seite zu kommen!" },
-    { emoji: "🦁", text: "Was ist gestreift und hüpft durch die Savanne? – Ein Zebra auf dem Trampolin!" },
-    { emoji: "🧀", text: "Was sagt der Käse vor dem Foto? – Nichts, er lächelt einfach!" },
-    { emoji: "🐸", text: "Was trinkt ein Frosch am liebsten? – Kroko-Cola!" },
-    { emoji: "🎈", text: "Warum platzen Ballone nie vor Lachen? – Weil sie sonst aus der Luft gehen!" },
-    { emoji: "🚗", text: "Was sagt ein Auto mit Schnupfen? – «Hatschi-way!»" }
-  ];
-
   // Vorschläge zum Antippen bei «Meine Welt» – als Starthilfe
   const VORSCHLAEGE = {
     spielsachen: ["Lego", "Playmobil", "Puzzle", "Fussball", "Kapla", "Karten", "Kuscheltiere"],
@@ -1021,7 +993,6 @@
     if (!meineWelt[art]) meineWelt[art] = [];
   }
   let kommentare = JSON.parse(localStorage.getItem("kommentare") || "[]");
-  let witzStapel = JSON.parse(localStorage.getItem("witzStapel") || "[]");
   let klickZahl = parseInt(localStorage.getItem("klickZahl") || "0");
   let standort = JSON.parse(localStorage.getItem("standort") || "null");
   let wetter = JSON.parse(localStorage.getItem("wetter") || "null");
@@ -1038,27 +1009,11 @@
     localStorage.setItem("ideenPunkte", JSON.stringify(punkte));
     localStorage.setItem("meineWelt", JSON.stringify(meineWelt));
     localStorage.setItem("kommentare", JSON.stringify(kommentare));
-    localStorage.setItem("witzStapel", JSON.stringify(witzStapel));
     localStorage.setItem("klickZahl", klickZahl);
   }
 
   function zufallAus(liste) {
     return liste[Math.floor(Math.random() * liste.length)];
-  }
-
-  // ─────────────────────────────────────────────
-  // Witze: wie ein Kartenstapel – erst wenn alle
-  // erzählt sind, wird neu gemischt. Nichts doppelt!
-  // ─────────────────────────────────────────────
-  function naechsterWitz() {
-    if (witzStapel.length === 0) {
-      witzStapel = WITZE.map((w, i) => i);
-      for (let i = witzStapel.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [witzStapel[i], witzStapel[j]] = [witzStapel[j], witzStapel[i]];
-      }
-    }
-    return WITZE[witzStapel.pop()];
   }
 
   // ─────────────────────────────────────────────
@@ -1259,25 +1214,19 @@
     klickZahl++;
 
     let eintrag;
-    // Jedes 4. Mal gibt es eine Pause statt einer Idee
-    // (ausser du hast gerade einen Wunsch geäussert):
-    // Hast du schon 2 Ideen geliked, erinnert dich die App daran –
-    // sonst gibt es einen Witz.
-    if (klickZahl % 4 === 0 && !wunsch) {
-      const geliked = gelikteIdeen();
-      if (geliked.length >= 2) {
-        const lieblings = zufallAus(geliked);
-        eintrag = {
-          abzeichen: "💛 Deine Lieblings-Ideen",
-          emoji: lieblings.emoji,
-          text: "Du hast schon " + geliked.length + " Ideen geliked! Spiel doch etwas davon – zum Beispiel: " + lieblings.text,
-          idee: null,
-          persoenlich: true
-        };
-      } else {
-        const witz = naechsterWitz();
-        eintrag = { abzeichen: "😂 Witz-Pause", emoji: witz.emoji, text: witz.text, idee: null, persoenlich: false };
-      }
+    // Jedes 4. Mal erinnert dich die App an deine Lieblings-Ideen –
+    // sobald du mindestens 2 geliked hast
+    // (ausser du hast gerade einen Wunsch geäussert).
+    const geliked = gelikteIdeen();
+    if (klickZahl % 4 === 0 && !wunsch && geliked.length >= 2) {
+      const lieblings = zufallAus(geliked);
+      eintrag = {
+        abzeichen: "💛 Deine Lieblings-Ideen",
+        emoji: lieblings.emoji,
+        text: "Du hast schon " + geliked.length + " Ideen geliked! Spiel doch etwas davon – zum Beispiel: " + lieblings.text,
+        idee: null,
+        persoenlich: true
+      };
     } else {
       const idee = zufaelligeIdee(wunsch);
       letzteIdeen.push(idee.text);
@@ -1581,8 +1530,16 @@
 
   // Offline-Speicher: dank dem Service Worker startet die App
   // auch ohne Internet – wie eine echte App!
+  // Und: Sobald eine neue Version fertig geladen ist,
+  // startet die App einmal automatisch neu.
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js");
+    navigator.serviceWorker.register("sw.js").then(reg => reg.update());
+    let schonNeuGeladen = false;
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (schonNeuGeladen) return;
+      schonNeuGeladen = true;
+      location.reload();
+    });
   }
 </script>
 </body>
